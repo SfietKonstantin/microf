@@ -53,7 +53,8 @@ class TstSocialNetwork: public QObject
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
-    void testSocialContentItem();
+    void tstSimple();
+    void tstError();
 private:
     QSharedPointer<QTemporaryDir> m_tempDir;
     QSharedPointer<QProcess> m_process;
@@ -62,8 +63,8 @@ private:
 class SimpleRequest: public SocialRequest
 {
 public:
-    explicit SimpleRequest(QObject *parent = 0)
-        : SocialRequest(parent)
+    explicit SimpleRequest(const QUrl &url, QObject *parent = 0)
+        : SocialRequest(parent), m_url(url)
     {
     }
     Type type() const
@@ -75,7 +76,7 @@ protected:
     {
         Q_UNUSED(socialNetwork);
         QNetworkRequest request;
-        request.setUrl(QUrl("http://localhost:8080/api/postsimple"));
+        request.setUrl(m_url);
         return request;
     }
     QByteArray createPostData(const SocialNetwork &socialNetwork) const override
@@ -83,6 +84,8 @@ protected:
         Q_UNUSED(socialNetwork);
         return QByteArray();
     }
+private:
+    QUrl m_url;
 };
 
 class SimpleBuilder: public SocialContentBuilder
@@ -142,7 +145,7 @@ void TstSocialNetwork::initTestCase()
     QTest::qWait(1000); // Wait for Node to start
 }
 
-void TstSocialNetwork::testSocialContentItem()
+void TstSocialNetwork::tstSimple()
 {
     SocialContentItem socialContentItem;
     socialContentItem.classBegin();
@@ -161,7 +164,7 @@ void TstSocialNetwork::testSocialContentItem()
     QVERIFY(!socialContentItem.load()); // No request
 
     QSignalSpy requestSpy (&socialContentItem, SIGNAL(requestChanged()));
-    SimpleRequest request;
+    SimpleRequest request (QUrl("http://localhost:8080/api/postsimple"));
     request.classBegin();
     request.componentComplete();
     socialContentItem.setRequest(&request);
@@ -197,6 +200,41 @@ void TstSocialNetwork::testSocialContentItem()
     const QMetaProperty &metaProperty = meta->property(meta->indexOfProperty("text"));
     QVariant value = metaProperty.read(object);
     QCOMPARE(value, QVariant("Hello world"));
+}
+
+void TstSocialNetwork::tstError()
+{
+    SocialContentItem socialContentItem;
+    socialContentItem.classBegin();
+    socialContentItem.componentComplete();
+
+    SocialNetwork socialNetwork;
+    socialNetwork.classBegin();
+    socialNetwork.componentComplete();
+    socialContentItem.setSocialNetwork(&socialNetwork);
+
+    SimpleRequest request (QUrl("http://localhost:8080/api/postsimpleerror"));
+    request.classBegin();
+    request.componentComplete();
+    socialContentItem.setRequest(&request);
+
+    SimpleBuilder builder;
+    builder.classBegin();
+    builder.componentComplete();
+    socialContentItem.setBuilder(&builder);
+
+    QSignalSpy statusSpy (&socialContentItem, SIGNAL(statusChanged()));
+    QVERIFY(socialContentItem.load());
+    QCOMPARE(statusSpy.count(), 1);
+    statusSpy.clear();
+
+    while (statusSpy.count() < 1) {
+        QTest::qWait(200);
+    }
+
+    QCOMPARE(socialContentItem.status(), SocialContentItem::Error);
+    QCOMPARE(socialContentItem.error(), SocialContentItem::NetworkError);
+    QVERIFY(!socialContentItem.errorString().isEmpty());
 }
 
 QTEST_MAIN(TstSocialNetwork)
