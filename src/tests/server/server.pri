@@ -1,0 +1,2 @@
+RESOURCES += \
+    $$PWD/server.qrc

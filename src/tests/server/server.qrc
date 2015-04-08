@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>app.js</file>
+        <file>package.json</file>
+    </qresource>
+</RCC>

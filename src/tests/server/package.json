@@ -1,0 +1,13 @@
+{
+    "name": "microftest",
+    "version": "0.0.0",
+    "description": "Test webservice for microf",
+    "author": "Lucien Xu",
+    "private": true,
+    "main": "app.js", 
+    "dependencies": {
+        "express": "~4.9.0",
+        "morgan": "~1.3.0",
+        "body-parser": "~1.9.0"
+    }
+} 
