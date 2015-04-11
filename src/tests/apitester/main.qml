@@ -7,7 +7,10 @@ ApplicationWindow {
 
     Facebook {
         id: facebook
-        locale: authHelper.locale
+        userId: authHelper.userId
+        sessionKey: authHelper.sessionKey
+        secret: authHelper.secret
+        accessToken: authHelper.accessToken
     }
 
     AuthHelper {
@@ -42,8 +45,14 @@ ApplicationWindow {
         Tab {
             id: queryPage
             title: "Query"
-            enabled: authHelper.token !== ""
+            enabled: authHelper.accessToken !== ""
+        }
+        Tab {
+            id: tools
+            title: "Tools"
+            Tools {}
         }
     }
+
 }
 

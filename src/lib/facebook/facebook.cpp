@@ -50,12 +50,23 @@ class FacebookPrivate: public SocialNetworkPrivate
 {
 public:
     explicit FacebookPrivate(Facebook *q);
+    void updateCountryCode();
     QString locale;
+    QString countryCode;
+    QString userId;
+    QString sessionKey;
+    QString secret;
+    QString accessToken;
+private:
+    Q_DECLARE_PUBLIC(Facebook)
 };
 
 FacebookPrivate::FacebookPrivate(Facebook *q)
     : SocialNetworkPrivate(q)
 {
+    const QLocale &systemLocale = QLocale::system();
+    countryCode = QLocale::countryToString(systemLocale.country());
+    locale = QString("%1_%2").arg(QLocale::languageToString(systemLocale.language()), countryCode);
 }
 
 Facebook::Facebook(QObject *parent)
@@ -87,12 +98,69 @@ QString Facebook::locale() const
     return d->locale;
 }
 
-void Facebook::setLocale(const QString &locale)
+QString Facebook::countryCode() const
+{
+    Q_D(const Facebook);
+    return d->countryCode;
+}
+
+QString Facebook::userId() const
+{
+    Q_D(const Facebook);
+    return d->userId;
+}
+
+void Facebook::setUserId(const QString &userId)
 {
     Q_D(Facebook);
-    if (d->locale != locale) {
-        d->locale = locale;
-        emit localeChanged();
+    if (d->userId != userId) {
+        d->userId = userId;
+        emit userIdChanged();
+    }
+}
+
+QString Facebook::sessionKey() const
+{
+    Q_D(const Facebook);
+    return d->sessionKey;
+}
+
+void Facebook::setSessionKey(const QString &sessionKey)
+{
+    Q_D(Facebook);
+    if (d->sessionKey != sessionKey) {
+        d->sessionKey = sessionKey;
+        emit sessionKeyChanged();
+    }
+}
+
+QString Facebook::secret() const
+{
+    Q_D(const Facebook);
+    return d->secret;
+}
+
+void Facebook::setSecret(const QString &secret)
+{
+    Q_D(Facebook);
+    if (d->secret != secret) {
+        d->secret = secret;
+        emit secretChanged();
+    }
+}
+
+QString Facebook::accessToken() const
+{
+    Q_D(const Facebook);
+    return d->accessToken;
+}
+
+void Facebook::setAccessToken(const QString &accessToken)
+{
+    Q_D(Facebook);
+    if (d->accessToken != accessToken) {
+        d->accessToken = accessToken;
+        emit accessTokenChanged();
     }
 }
 
@@ -101,5 +169,3 @@ QByteArray Facebook::userAgent() const
     Q_D(const Facebook);
     return QString(USER_AGENT).arg(d->locale.isEmpty() ? "" : d->locale).toUtf8();
 }
-
-

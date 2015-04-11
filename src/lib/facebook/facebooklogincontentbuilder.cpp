@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebookauthcontentbuilder.h"
+#include "facebooklogincontentbuilder.h"
 #include <QtCore/QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -40,13 +40,22 @@ static const char *SESSION_KEY_KEY = "session_key";
 static const char *SECRET_KEY = "secret";
 static const char *ACCESS_TOKEN_KEY = "access_token";
 
-FacebookAuthContentBuilder::FacebookAuthContentBuilder(QObject *parent)
+FacebookLoginContentBuilder::FacebookLoginContentBuilder(QObject *parent)
     : SocialContentBuilder(parent)
 {
 }
 
-void FacebookAuthContentBuilder::build(SocialContentItem &contentItem, const QByteArray &data)
+void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
+                                       QNetworkReply::NetworkError error,
+                                       const QString &errorString,
+                                       const QByteArray &data)
 {
+    if (!error == QNetworkReply::NoError) {
+        qWarning() << data;
+        setError(contentItem, SocialContentItem::NetworkError, errorString);
+        return;
+    }
+
     QJsonDocument document = QJsonDocument::fromJson(data);
     if (!document.isObject()) {
         setError(contentItem, SocialContentItem::DataError, "Cannot convert to JSON");
@@ -80,13 +89,4 @@ void FacebookAuthContentBuilder::build(SocialContentItem &contentItem, const QBy
         }
     }
     setObject(contentItem, properties);
-}
-
-void FacebookAuthContentBuilder::buildError(SocialContentItem &contentItem,
-                                            QNetworkReply::NetworkError error,
-                                            const QString &errorString, const QByteArray &data)
-{
-    Q_UNUSED(error);
-    qWarning() << data;
-    setError(contentItem, SocialContentItem::NetworkError, errorString);
 }

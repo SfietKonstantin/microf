@@ -97,8 +97,14 @@ public:
     {
     }
 protected:
-    void build(SocialContentItem &contentItem, const QByteArray &data) override
+    void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
+               const QString &errorString, const QByteArray &data) override
     {
+        if (error != QNetworkReply::NoError) {
+            setError(contentItem, SocialContentItem::NetworkError, errorString);
+            return;
+        }
+
         QJsonDocument document = QJsonDocument::fromJson(data);
         if (!document.isObject()) {
             setError(contentItem, SocialContentItem::DataError, "Cannot convert to JSON");
@@ -106,13 +112,6 @@ protected:
         }
 
         setObject(contentItem, document.object().toVariantMap());
-    }
-    void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                    const QString &errorString, const QByteArray &data) override
-    {
-        Q_UNUSED(error);
-        Q_UNUSED(data);
-        setError(contentItem, SocialContentItem::NetworkError, errorString);
     }
 };
 

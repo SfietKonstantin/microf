@@ -29,24 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKAUTHCONTENTBUILDER_H
-#define FACEBOOKAUTHCONTENTBUILDER_H
+#ifndef FACEBOOKCONFIRMATIONCONTENTBUILDER_H
+#define FACEBOOKCONFIRMATIONCONTENTBUILDER_H
 
 #include "socialcontentbuilder.h"
 
-class FacebookAuthContentBuilder : public SocialContentBuilder
+class FacebookConfirmationContentBuilder : public SocialContentBuilder
 {
     Q_OBJECT
 public:
-    explicit FacebookAuthContentBuilder(QObject *parent = 0);
+    explicit FacebookConfirmationContentBuilder(QObject *parent = 0);
 protected:
-    void build(SocialContentItem &contentItem, const QByteArray &data) override;
-    void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                    const QString &errorString, const QByteArray &data) override;
+    void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
+               const QString &errorString, const QByteArray &data) override;
 };
 
-
-
-
-
-#endif // FACEBOOKAUTHCONTENTBUILDER_H
+#endif // FACEBOOKCONFIRMATIONCONTENTBUILDER_H

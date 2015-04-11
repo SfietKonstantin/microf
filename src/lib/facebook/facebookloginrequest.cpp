@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebookauthrequest.h"
+#include "facebookloginrequest.h"
 #include "socialrequest_p.h"
 #include "facebook.h"
 #include <QtCore/QLocale>
@@ -81,92 +81,92 @@ static QString sigSuffix()
     return returned;
 }
 
-class FacebookAuthRequestPrivate: public SocialRequestPrivate
+class FacebookLoginRequestPrivate: public SocialRequestPrivate
 {
 public:
-    explicit FacebookAuthRequestPrivate(FacebookAuthRequest *q);
+    explicit FacebookLoginRequestPrivate(FacebookLoginRequest *q);
     QString email;
     QString password;
     QString deviceId;
     QString machineId;
 };
 
-FacebookAuthRequestPrivate::FacebookAuthRequestPrivate(FacebookAuthRequest *q)
+FacebookLoginRequestPrivate::FacebookLoginRequestPrivate(FacebookLoginRequest *q)
     : SocialRequestPrivate(q)
 {
 }
 
-FacebookAuthRequest::FacebookAuthRequest(QObject *parent)
-    : SocialRequest(*(new FacebookAuthRequestPrivate(this)), parent)
+FacebookLoginRequest::FacebookLoginRequest(QObject *parent)
+    : SocialRequest(*(new FacebookLoginRequestPrivate(this)), parent)
 {
 }
 
-SocialRequest::Type FacebookAuthRequest::type() const
+SocialRequest::Type FacebookLoginRequest::type() const
 {
     return SocialRequest::Post;
 }
 
-QString FacebookAuthRequest::email() const
+QString FacebookLoginRequest::email() const
 {
-    Q_D(const FacebookAuthRequest);
+    Q_D(const FacebookLoginRequest);
     return d->email;
 }
 
-void FacebookAuthRequest::setEmail(const QString &email)
+void FacebookLoginRequest::setEmail(const QString &email)
 {
-    Q_D(FacebookAuthRequest);
+    Q_D(FacebookLoginRequest);
     if (d->email != email) {
         d->email = email;
         emit emailChanged();
     }
 }
 
-QString FacebookAuthRequest::password() const
+QString FacebookLoginRequest::password() const
 {
-    Q_D(const FacebookAuthRequest);
+    Q_D(const FacebookLoginRequest);
     return d->password;
 }
 
-void FacebookAuthRequest::setPassword(const QString &password)
+void FacebookLoginRequest::setPassword(const QString &password)
 {
-    Q_D(FacebookAuthRequest);
+    Q_D(FacebookLoginRequest);
     if (d->password != password) {
         d->password = password;
         emit passwordChanged();
     }
 }
 
-QString FacebookAuthRequest::deviceId() const
+QString FacebookLoginRequest::deviceId() const
 {
-    Q_D(const FacebookAuthRequest);
+    Q_D(const FacebookLoginRequest);
     return d->deviceId;
 }
 
-void FacebookAuthRequest::setDeviceId(const QString &deviceId)
+void FacebookLoginRequest::setDeviceId(const QString &deviceId)
 {
-    Q_D(FacebookAuthRequest);
+    Q_D(FacebookLoginRequest);
     if (d->deviceId != deviceId) {
         d->deviceId = deviceId;
         emit deviceIdChanged();
     }
 }
 
-QString FacebookAuthRequest::machineId() const
+QString FacebookLoginRequest::machineId() const
 {
-    Q_D(const FacebookAuthRequest);
+    Q_D(const FacebookLoginRequest);
     return d->machineId;
 }
 
-void FacebookAuthRequest::setMachineId(const QString &machineId)
+void FacebookLoginRequest::setMachineId(const QString &machineId)
 {
-    Q_D(FacebookAuthRequest);
+    Q_D(FacebookLoginRequest);
     if (d->machineId != machineId) {
         d->machineId = machineId;
         emit machineIdChanged();
     }
 }
 
-QNetworkRequest FacebookAuthRequest::createRequest(const SocialNetwork &socialNetwork,
+QNetworkRequest FacebookLoginRequest::createRequest(const SocialNetwork &socialNetwork,
                                                    const QByteArray &postData) const
 {
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
@@ -184,18 +184,17 @@ QNetworkRequest FacebookAuthRequest::createRequest(const SocialNetwork &socialNe
     return request;
 }
 
-QByteArray FacebookAuthRequest::createPostData(const SocialNetwork &socialNetwork) const
+QByteArray FacebookLoginRequest::createPostData(const SocialNetwork &socialNetwork) const
 {
-    Q_D(const FacebookAuthRequest);
+    Q_D(const FacebookLoginRequest);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {
         return QByteArray();
     }
 
-    QString countryCode = QLocale::countryToString(QLocale(facebook->locale()).country()).toUpper();
     QMap<QString, QString> parameters;
     parameters.insert("api_key", facebook->apiKey());
-    parameters.insert("client_country_code", countryCode);
+    parameters.insert("client_country_code", facebook->countryCode());
     parameters.insert("credentials_type", "password");
     parameters.insert("device_id", d->deviceId);
     parameters.insert("email", d->email);

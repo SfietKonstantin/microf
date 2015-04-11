@@ -29,42 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_H
-#define FACEBOOK_H
+#include "facebookconfirmationcontentbuilder.h"
 
-#include "socialnetwork.h"
-
-class FacebookPrivate;
-class Facebook : public SocialNetwork
+FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *parent)
+    : SocialContentBuilder(parent)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString locale READ locale CONSTANT)
-    Q_PROPERTY(QString countryCode READ countryCode CONSTANT)
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(QString sessionKey READ sessionKey WRITE setSessionKey NOTIFY sessionKeyChanged)
-    Q_PROPERTY(QString secret READ secret WRITE setSecret NOTIFY secretChanged)
-    Q_PROPERTY(QString accessToken READ accessToken WRITE setAccessToken NOTIFY accessTokenChanged)
-public:
-    explicit Facebook(QObject *parent = 0);
-    QString apiKey() const;
-    QString locale() const;
-    QString countryCode() const;
-    QString userId() const;
-    void setUserId(const QString &userId);
-    QString sessionKey() const;
-    void setSessionKey(const QString &sessionKey);
-    QString secret() const;
-    void setSecret(const QString &secret);
-    QString accessToken() const;
-    void setAccessToken(const QString &accessToken);
-    QByteArray userAgent() const;
-Q_SIGNALS:
-    void userIdChanged();
-    void sessionKeyChanged();
-    void secretChanged();
-    void accessTokenChanged();
-private:
-    Q_DECLARE_PRIVATE(Facebook)
-};
 
-#endif // FACEBOOK_H
+}
+
+void FacebookConfirmationContentBuilder::build(SocialContentItem &contentItem,
+                                               QNetworkReply::NetworkError error,
+                                               const QString &errorString, const QByteArray &data)
+{
+    Q_UNUSED(data);
+    if (error != QNetworkReply::NoError) {
+        setError(contentItem, SocialContentItem::NetworkError, errorString);
+        return;
+    }
+
+    setObject(contentItem, QVariantMap());
+}
+
+

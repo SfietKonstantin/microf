@@ -48,9 +48,8 @@ public:
     void componentComplete() override;
 protected:
     explicit SocialContentBuilder(QObject *parent = 0);
-    virtual void build(SocialContentItem &contentItem, const QByteArray &data) = 0;
-    virtual void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                            const QString &errorString, const QByteArray &data) = 0;
+    virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
+                       const QString &errorString, const QByteArray &data) = 0;
     void setObject(SocialContentItem &contentItem, const QVariantMap &properties);
     void setError(SocialContentItem &contentItem, SocialContentItem::ErrorType error,
                   const QString &errorString);

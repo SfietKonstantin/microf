@@ -29,42 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_H
-#define FACEBOOK_H
+#ifndef FACEBOOKLOGINREQUEST_H
+#define FACEBOOKLOGINREQUEST_H
 
-#include "socialnetwork.h"
+#include "socialrequest.h"
 
-class FacebookPrivate;
-class Facebook : public SocialNetwork
+class FacebookLoginRequestPrivate;
+class FacebookLoginRequest : public SocialRequest
 {
     Q_OBJECT
-    Q_PROPERTY(QString locale READ locale CONSTANT)
-    Q_PROPERTY(QString countryCode READ countryCode CONSTANT)
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(QString sessionKey READ sessionKey WRITE setSessionKey NOTIFY sessionKeyChanged)
-    Q_PROPERTY(QString secret READ secret WRITE setSecret NOTIFY secretChanged)
-    Q_PROPERTY(QString accessToken READ accessToken WRITE setAccessToken NOTIFY accessTokenChanged)
+    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
+    Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
 public:
-    explicit Facebook(QObject *parent = 0);
-    QString apiKey() const;
-    QString locale() const;
-    QString countryCode() const;
-    QString userId() const;
-    void setUserId(const QString &userId);
-    QString sessionKey() const;
-    void setSessionKey(const QString &sessionKey);
-    QString secret() const;
-    void setSecret(const QString &secret);
-    QString accessToken() const;
-    void setAccessToken(const QString &accessToken);
-    QByteArray userAgent() const;
+    explicit FacebookLoginRequest(QObject *parent = 0);
+    Type type() const;
+    QString email() const;
+    void setEmail(const QString &email);
+    QString password() const;
+    void setPassword(const QString &password);
+    QString deviceId() const;
+    void setDeviceId(const QString &deviceId);
+    QString machineId() const;
+    void setMachineId(const QString &machineId);
 Q_SIGNALS:
-    void userIdChanged();
-    void sessionKeyChanged();
-    void secretChanged();
-    void accessTokenChanged();
+    void emailChanged();
+    void passwordChanged();
+    void deviceIdChanged();
+    void machineIdChanged();
+protected:
+    QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
+                                  const QByteArray &postData) const override;
+    QByteArray createPostData(const SocialNetwork &socialNetwork) const override;
 private:
-    Q_DECLARE_PRIVATE(Facebook)
+    Q_DECLARE_PRIVATE(FacebookLoginRequest)
 };
 
-#endif // FACEBOOK_H
+#endif // FACEBOOKLOGINREQUEST_H

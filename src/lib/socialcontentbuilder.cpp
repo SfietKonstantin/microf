@@ -39,17 +39,11 @@ SocialContentBuilderPrivate::SocialContentBuilderPrivate(SocialContentBuilder *q
 }
 
 void SocialContentBuilderPrivate::build(SocialContentBuilder &builder,
-                                        SocialContentItem &contentItem, const QByteArray &data)
+                                        SocialContentItem &contentItem,
+                                        QNetworkReply::NetworkError error,
+                                        const QString &errorString, const QByteArray &data)
 {
-    builder.build(contentItem, data);
-}
-
-void SocialContentBuilderPrivate::buildError(SocialContentBuilder &builder,
-                                             SocialContentItem &contentItem,
-                                             QNetworkReply::NetworkError error,
-                                             const QString &errorString, const QByteArray &data)
-{
-    builder.buildError(contentItem, error, errorString, data);
+    builder.build(contentItem, error, errorString, data);
 }
 
 SocialContentBuilder::SocialContentBuilder(QObject *parent)

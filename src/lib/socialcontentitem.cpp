@@ -81,11 +81,7 @@ void SocialContentItemPrivate::handleNetworkReply(QNetworkReply::NetworkError er
         return;
     }
 
-    if (error == QNetworkReply::NoError) {
-        SocialContentBuilderPrivate::build(*m_builder, *q, data);
-    } else {
-        SocialContentBuilderPrivate::buildError(*m_builder, *q, error, errorString, data);
-    }
+    SocialContentBuilderPrivate::build(*m_builder, *q, error, errorString, data);
 
     if (m_status == SocialContentItem::Busy) {
         qWarning() << "SocialContentItemPrivate::setData() builder did not perform an action";

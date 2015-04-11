@@ -30,52 +30,80 @@
  */
 
 #include <QtWidgets/QApplication>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QSettings>
 #include <QtCore/QUuid>
+#include <QtCore/QUrlQuery>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/qqml.h>
 #include <socialcontentitem.h>
 #include <socialobject.h>
 #include <facebook/facebook.h>
-#include <facebook/facebookauthrequest.h>
-#include <facebook/facebookauthcontentbuilder.h>
+#include <facebook/facebookloginrequest.h>
+#include <facebook/facebooklogincontentbuilder.h>
+#include <facebook/facebooklogoutrequest.h>
+#include <facebook/facebookconfirmationcontentbuilder.h>
 
 class AuthHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
     Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
     Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
     Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
     Q_PROPERTY(QString sessionKey READ sessionKey WRITE setSessionKey NOTIFY sessionKeyChanged)
     Q_PROPERTY(QString secret READ secret WRITE setSecret NOTIFY secretChanged)
-    Q_PROPERTY(QString token READ token WRITE setToken NOTIFY tokenChanged)
+    Q_PROPERTY(QString accessToken READ accessToken WRITE setAccessToken NOTIFY accessTokenChanged)
 public:
     explicit AuthHelper(QObject *parent = 0)
         : QObject(parent)
     {
         QSettings settings;
-        m_locale = settings.value("General/locale").toString();
+        m_email = settings.value("General/email").toString();
         m_deviceId = settings.value("General/deviceId").toString();
         m_machineId = settings.value("General/machineId").toString();
         m_userId = settings.value("General/userId").toString();
         m_sessionKey = settings.value("General/sessionKey").toString();
         m_secret = settings.value("General/secret").toString();
-        m_token = settings.value("General/token").toString();
+        m_accessToken = settings.value("General/accessToken").toString();
     }
     ~AuthHelper() {}
     Q_INVOKABLE static QString generateMachineId()
     {
         return QUuid::createUuid().toString().remove("{").remove("}");
     }
-    QString locale() const { return m_locale; }
-    void setLocale(const QString &locale)
+    Q_INVOKABLE static QString parseUrlQuery(const QString &queryString)
     {
-        if (m_locale != locale) {
-            m_locale = locale;
-            emit localeChanged();
+        QString result;
+        QUrlQuery query(queryString);
+        for (QPair<QString, QString> queryEntry : query.queryItems(QUrl::FullyDecoded)) {
+            result.append("<p><b>");
+            result.append(queryEntry.first);
+            result.append("</b>");
+            result.append(" = ");
+            result.append(QUrl::fromPercentEncoding(queryEntry.second.toLocal8Bit()));
+            result.append("</p>");
+        }
+        return result;
+    }
+    Q_INVOKABLE static QString formatJson(const QString &json)
+    {
+        QJsonParseError error;
+        QJsonDocument document = QJsonDocument::fromJson(json.toLocal8Bit(), &error);
+        if (error.error != QJsonParseError::NoError) {
+            return error.errorString();
+        }
+        return document.toJson(QJsonDocument::Indented);
+    }
+    QString email() const { return m_email; }
+    void setEmail(const QString &email)
+    {
+        if (m_email != email) {
+            m_email = email;
+            emit emailChanged();
         }
     }
+
     QString deviceId() const { return m_deviceId; }
     void setDeviceId(const QString &deviceId)
     {
@@ -116,42 +144,51 @@ public:
             emit secretChanged();
         }
     }
-    QString token() const { return m_token; }
-    void setToken(const QString &token)
+    QString accessToken() const { return m_accessToken; }
+    void setAccessToken(const QString &accessToken)
     {
-        if (m_token != token) {
-            m_token = token;
-            emit tokenChanged();
+        if (m_accessToken != accessToken) {
+            m_accessToken = accessToken;
+            emit accessTokenChanged();
         }
     }
 public slots:
     void save()
     {
         QSettings settings;
-        settings.setValue("General/locale", m_locale);
+        settings.setValue("General/email", m_email);
         settings.setValue("General/deviceId", m_deviceId);
         settings.setValue("General/machineId", m_machineId);
         settings.setValue("General/userId", m_userId);
         settings.setValue("General/sessionKey", m_sessionKey);
         settings.setValue("General/secret", m_secret);
-        settings.setValue("General/token", m_token);
+        settings.setValue("General/accessToken", m_accessToken);
     }
+    void logout()
+    {
+        setUserId(QString());
+        setSessionKey(QString());
+        setSecret(QString());
+        setAccessToken(QString());
+        save();
+    }
+
 signals:
-    void localeChanged();
+    void emailChanged();
     void deviceIdChanged();
     void machineIdChanged();
     void userIdChanged();
     void sessionKeyChanged();
     void secretChanged();
-    void tokenChanged();
+    void accessTokenChanged();
 private:
-    QString m_locale;
+    QString m_email;
     QString m_deviceId;
     QString m_machineId;
     QString m_userId;
     QString m_sessionKey;
     QString m_secret;
-    QString m_token;
+    QString m_accessToken;
 };
 
 int main(int argc, char **argv)
@@ -163,8 +200,10 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<SocialContentBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentBuilder", "Abstract type");
     qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
     qmlRegisterType<SocialContentItem>("org.sfietkonstantin.microf", 1, 0, "SocialContentItem");
-    qmlRegisterType<FacebookAuthRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookAuthRequest");
-    qmlRegisterType<FacebookAuthContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookAuthContentBuilder");
+    qmlRegisterType<FacebookLoginRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginRequest");
+    qmlRegisterType<FacebookLoginContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginContentBuilder");
+    qmlRegisterType<FacebookLogoutRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLogoutRequest");
+    qmlRegisterType<FacebookConfirmationContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookConfirmationContentBuilder");
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
     app.setOrganizationName("microf");
     app.setApplicationName("apitester");

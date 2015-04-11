@@ -18,3 +18,6 @@ OTHER_FILES += \
     main.qml \
     Token.qml
 
+DISTFILES += \
+    Tools.qml
+
