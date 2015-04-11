@@ -59,6 +59,7 @@ Q_SIGNALS:
     void builderChanged();
     void objectChanged();
     void statusChanged();
+    void finished(bool ok);
     void errorChanged();
     void errorStringChanged();
 protected:

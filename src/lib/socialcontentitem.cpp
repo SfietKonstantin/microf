@@ -22,10 +22,9 @@ void SocialContentItemPrivate::handleNetworkReply(SocialContentItem &contentItem
 }
 
 void SocialContentItemPrivate::setContentItemObject(SocialContentItem &contentItem,
-                                                    const QJsonObject &json,
-                                                    IPropertiesAdaptor::Ptr adaptor)
+                                                    const QVariantMap &properties)
 {
-    contentItem.d_func()->setContentItemObject(json, adaptor);
+    contentItem.d_func()->setContentItemObject(properties);
 }
 
 void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentItem,
@@ -35,15 +34,15 @@ void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentIte
     contentItem.d_func()->setError(error, errorString);
 }
 
-void SocialContentItemPrivate::setContentItemObject(const QJsonObject &json,
-                                                    IPropertiesAdaptor::Ptr adaptor)
+void SocialContentItemPrivate::setContentItemObject(const QVariantMap &properties)
 {
     Q_Q(SocialContentItem);
-    for (const QString &key : json.keys()) {
-        QVariant value = adaptor->adaptProperty(key, json.value(key));
+    for (const QString &key : properties.keys()) {
+        const QVariant &value = properties.value(key);
         SocialObjectPrivate::setProperty(m_object, key.toLocal8Bit(), value);
     }
     setStatus(SocialContentItem::Ready);
+    emit q->finished(true);
 }
 
 
@@ -60,7 +59,6 @@ void SocialContentItemPrivate::setError(SocialContentItem::ErrorType error,
                                         const QString &errorString)
 {
     Q_Q(SocialContentItem);
-    setStatus(SocialContentItem::Error);
     if (m_error != error) {
         m_error = error;
         emit q->errorChanged();
@@ -69,6 +67,8 @@ void SocialContentItemPrivate::setError(SocialContentItem::ErrorType error,
         m_errorString = errorString;
         emit q->errorStringChanged();
     }
+    setStatus(SocialContentItem::Error);
+    emit q->finished(false);
 }
 
 void SocialContentItemPrivate::handleNetworkReply(QNetworkReply::NetworkError error,

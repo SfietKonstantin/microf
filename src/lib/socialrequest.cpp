@@ -38,9 +38,10 @@ SocialRequestPrivate::SocialRequestPrivate(SocialRequest *q)
 }
 
 QNetworkRequest SocialRequestPrivate::createRequest(const SocialRequest &request,
-                                                    const SocialNetwork &socialNetwork)
+                                                    const SocialNetwork &socialNetwork,
+                                                    const QByteArray &postData)
 {
-    return request.createRequest(socialNetwork);
+    return request.createRequest(socialNetwork, postData);
 }
 
 QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
@@ -51,6 +52,11 @@ QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
 
 SocialRequest::SocialRequest(QObject *parent)
     : QObject(parent), d_ptr(new SocialRequestPrivate(this))
+{
+}
+
+SocialRequest::SocialRequest(SocialRequestPrivate &dd, QObject *parent)
+    : QObject(parent), d_ptr(&dd)
 {
 }
 

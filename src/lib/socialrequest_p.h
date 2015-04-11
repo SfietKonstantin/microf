@@ -42,7 +42,7 @@ class SocialRequestPrivate
 public:
     explicit SocialRequestPrivate(SocialRequest *q);
     static QNetworkRequest createRequest(const SocialRequest &request,
-                                         const SocialNetwork &socialNetwork);
+                                         const SocialNetwork &socialNetwork, const QByteArray &postData);
     static QByteArray createPostData(const SocialRequest &request,
                                      const SocialNetwork &socialNetwork);
 protected:

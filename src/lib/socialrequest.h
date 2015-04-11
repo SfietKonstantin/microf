@@ -54,7 +54,9 @@ public:
     virtual Type type() const = 0;
 protected:
     explicit SocialRequest(QObject *parent = 0);
-    virtual QNetworkRequest createRequest(const SocialNetwork &socialNetwork) const = 0;
+    explicit SocialRequest(SocialRequestPrivate &dd,QObject *parent = 0);
+    virtual QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
+                                          const QByteArray &postData) const = 0;
     virtual QByteArray createPostData(const SocialNetwork &socialNetwork) const = 0;
     QScopedPointer<SocialRequestPrivate> d_ptr;
 private:

@@ -29,20 +29,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IPROPERTIESADAPTOR
-#define IPROPERTIESADAPTOR
+#ifndef FACEBOOK_H
+#define FACEBOOK_H
 
-#include <QtCore/QJsonValue>
-#include <QtCore/QVariant>
-#include <QtCore/QSharedPointer>
+#include "socialnetwork.h"
 
-class IPropertiesAdaptor
+class FacebookPrivate;
+class Facebook : public SocialNetwork
 {
+    Q_OBJECT
+    Q_PROPERTY(QString locale READ locale WRITE setLocale NOTIFY localeChanged)
 public:
-    typedef QSharedPointer<IPropertiesAdaptor> Ptr;
-    virtual ~IPropertiesAdaptor() {}
-    virtual QVariant adaptProperty(const QString &key, const QJsonValue &value) const = 0;
+    explicit Facebook(QObject *parent = 0);
+    QString apiKey() const;
+    QString locale() const;
+    void setLocale(const QString &locale);
+    QByteArray userAgent() const;
+Q_SIGNALS:
+    void localeChanged();
+private:
+    Q_DECLARE_PRIVATE(Facebook)
 };
 
-#endif // IPROPERTIESADAPTOR
-
+#endif // FACEBOOK_H

@@ -29,26 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "propertiesadaptor.h"
+#ifndef FACEBOOKAUTHCONTENTBUILDER_H
+#define FACEBOOKAUTHCONTENTBUILDER_H
 
-IPropertiesAdaptor::Ptr PropertiesAdaptor::create()
-{
-    return IPropertiesAdaptor::Ptr(new PropertiesAdaptor());
-}
+#include "socialcontentbuilder.h"
 
-QVariant PropertiesAdaptor::adaptProperty(const QString &key, const QJsonValue &value) const
+class FacebookAuthContentBuilder : public SocialContentBuilder
 {
-    Q_UNUSED(key)
-    if (value.isArray()) {
-        return QVariant();
-    } else if (value.isBool()) {
-        return QVariant(value.toBool());
-    } else if (value.isDouble()) {
-        return QVariant(value.toDouble());
-    } else if (value.isObject()) {
-        return QVariant();
-    } else if (value.isString()) {
-        return QVariant(value.toString());
-    }
-    return QVariant();
-}
+    Q_OBJECT
+public:
+    explicit FacebookAuthContentBuilder(QObject *parent = 0);
+protected:
+    void build(SocialContentItem &contentItem, const QByteArray &data) override;
+    void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
+                    const QString &errorString, const QByteArray &data) override;
+};
+
+
+
+
+
+#endif // FACEBOOKAUTHCONTENTBUILDER_H

@@ -33,7 +33,6 @@
 #define SOCIALCONTENTITEM_P_H
 
 #include "socialcontentitem.h"
-#include "ipropertiesadaptor.h"
 #include <QtNetwork/QNetworkReply>
 
 class SocialContentItemPrivate
@@ -43,8 +42,7 @@ public:
     static void handleNetworkReply(SocialContentItem &contentItem,
                                    QNetworkReply::NetworkError error, const QString &errorString,
                                    const QByteArray &data);
-    static void setContentItemObject(SocialContentItem &contentItem, const QJsonObject &json,
-                                     IPropertiesAdaptor::Ptr adaptor);
+    static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties);
     static void setContentItemError(SocialContentItem &contentItem,
                                     SocialContentItem::ErrorType error, const QString &errorString);
 protected:
@@ -52,10 +50,9 @@ protected:
 private:
     void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorString,
                             const QByteArray &data);
-    void setContentItemObject(const QJsonObject &json, IPropertiesAdaptor::Ptr adaptor);
+    void setContentItemObject(const QVariantMap &properties);
     void setStatus(SocialContentItem::Status status);
     void setError(SocialContentItem::ErrorType error, const QString &errorString);
-    void setObject(SocialObject *object);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentBuilder *m_builder;

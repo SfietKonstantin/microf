@@ -48,6 +48,7 @@ public:
     void classBegin() override;
     void componentComplete() override;
 protected:
+    explicit SocialNetwork(SocialNetworkPrivate &dd, QObject *parent = 0);
     QScopedPointer<SocialNetworkPrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(SocialNetwork)

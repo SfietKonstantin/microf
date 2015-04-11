@@ -41,7 +41,6 @@
 #include "socialnetwork.h"
 #include "socialobject.h"
 #include "socialrequest.h"
-#include "propertiesadaptor.h"
 
 static const char *NPM_EXEC = "/usr/bin/npm";
 static const char *NPM_INSTALL_ARGS = "install";
@@ -72,9 +71,11 @@ public:
         return SocialRequest::Post;
     }
 protected:
-    QNetworkRequest createRequest(const SocialNetwork &socialNetwork) const override
+    QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
+                                  const QByteArray &postData) const override
     {
         Q_UNUSED(socialNetwork);
+        Q_UNUSED(postData);
         QNetworkRequest request;
         request.setUrl(m_url);
         return request;
@@ -104,7 +105,7 @@ protected:
             return;
         }
 
-        setObject(contentItem, document.object(), PropertiesAdaptor::create());
+        setObject(contentItem, document.object().toVariantMap());
     }
     void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                     const QString &errorString, const QByteArray &data) override

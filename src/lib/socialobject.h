@@ -3,7 +3,6 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QJsonObject>
-#include "ipropertiesadaptor.h"
 
 class SocialObjectPrivate;
 class SocialObject: public QObject

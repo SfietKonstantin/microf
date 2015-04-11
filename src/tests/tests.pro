@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = unit server
+SUBDIRS = unit server apitester

@@ -29,16 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef PROPERTIESADAPTOR_H
-#define PROPERTIESADAPTOR_H
+#ifndef FACEBOOKAUTHREQUEST_H
+#define FACEBOOKAUTHREQUEST_H
 
-#include "ipropertiesadaptor.h"
+#include "socialrequest.h"
 
-class PropertiesAdaptor : public IPropertiesAdaptor
+class FacebookAuthRequestPrivate;
+class FacebookAuthRequest : public SocialRequest
 {
+    Q_OBJECT
+    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
+    Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
 public:
-    static Ptr create();
-    QVariant adaptProperty(const QString &key, const QJsonValue &value) const override;
+    explicit FacebookAuthRequest(QObject *parent = 0);
+    Type type() const;
+    QString email() const;
+    void setEmail(const QString &email);
+    QString password() const;
+    void setPassword(const QString &password);
+    QString deviceId() const;
+    void setDeviceId(const QString &deviceId);
+    QString machineId() const;
+    void setMachineId(const QString &machineId);
+Q_SIGNALS:
+    void emailChanged();
+    void passwordChanged();
+    void deviceIdChanged();
+    void machineIdChanged();
+protected:
+    QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
+                                  const QByteArray &postData) const override;
+    QByteArray createPostData(const SocialNetwork &socialNetwork) const override;
+private:
+    Q_DECLARE_PRIVATE(FacebookAuthRequest)
 };
 
-#endif // PROPERTIESADAPTOR_H
+#endif // FACEBOOKAUTHREQUEST_H

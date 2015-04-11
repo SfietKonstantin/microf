@@ -55,16 +55,19 @@ bool SocialNetworkPrivate::contentItemLoad(SocialContentItem &contentItem, const
         return false;
     }
 
-    QNetworkRequest networkRequest = SocialRequestPrivate::createRequest(request, *q);
-    QNetworkReply *reply = 0;
+    QByteArray postData;
     SocialRequest::Type type = request.type();
+    if (type == SocialRequest::Post) {
+        postData = SocialRequestPrivate::createPostData(request, *q);
+    }
+    QNetworkRequest networkRequest = SocialRequestPrivate::createRequest(request, *q, postData);
+    QNetworkReply *reply = 0;
     switch (type) {
     case SocialRequest::Get:
         reply = m_networkAccess->get(networkRequest);
         break;
     case SocialRequest::Post:
-        reply = m_networkAccess->post(networkRequest,
-                                      SocialRequestPrivate::createPostData(request, *q));
+        reply = m_networkAccess->post(networkRequest, postData);
         break;
     case SocialRequest::Delete:
         reply = m_networkAccess->deleteResource(networkRequest);
@@ -89,6 +92,13 @@ bool SocialNetworkPrivate::contentItemLoad(SocialContentItem &contentItem, const
 
 SocialNetwork::SocialNetwork(QObject *parent)
     : QObject(parent), d_ptr(new SocialNetworkPrivate(this))
+{
+    Q_D(SocialNetwork);
+    d->m_networkAccess = new QNetworkAccessManager(this);
+}
+
+SocialNetwork::SocialNetwork(SocialNetworkPrivate &dd, QObject *parent)
+    : QObject(parent), d_ptr(&dd)
 {
     Q_D(SocialNetwork);
     d->m_networkAccess = new QNetworkAccessManager(this);

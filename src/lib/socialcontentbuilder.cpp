@@ -69,10 +69,9 @@ void SocialContentBuilder::componentComplete()
 {
 }
 
-void SocialContentBuilder::setObject(SocialContentItem &contentItem, const QJsonObject &json,
-                                     IPropertiesAdaptor::Ptr adaptor)
+void SocialContentBuilder::setObject(SocialContentItem &contentItem, const QVariantMap &properties)
 {
-    SocialContentItemPrivate::setContentItemObject(contentItem, json, adaptor);
+    SocialContentItemPrivate::setContentItemObject(contentItem, properties);
 }
 
 void SocialContentBuilder::setError(SocialContentItem &contentItem,

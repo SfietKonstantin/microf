@@ -35,7 +35,6 @@
 #include <QtCore/QObject>
 #include <QtNetwork/QNetworkReply>
 #include <QtQml/QQmlParserStatus>
-#include "ipropertiesadaptor.h"
 #include "socialcontentitem.h"
 
 class SocialContentBuilderPrivate;
@@ -52,8 +51,7 @@ protected:
     virtual void build(SocialContentItem &contentItem, const QByteArray &data) = 0;
     virtual void buildError(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                             const QString &errorString, const QByteArray &data) = 0;
-    void setObject(SocialContentItem &contentItem, const QJsonObject &json,
-                   IPropertiesAdaptor::Ptr adaptor);
+    void setObject(SocialContentItem &contentItem, const QVariantMap &properties);
     void setError(SocialContentItem &contentItem, SocialContentItem::ErrorType error,
                   const QString &errorString);
     QScopedPointer<SocialContentBuilderPrivate> d_ptr;
