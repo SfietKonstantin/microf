@@ -31,26 +31,89 @@
 
 #include "socialnetwork.h"
 #include "socialnetwork_p.h"
+#include "abstractsocialcontent_p.h"
 #include "socialrequest.h"
 #include "socialrequest_p.h"
 #include "socialcontentitem_p.h"
 #include <QtCore/QDebug>
+
+AbstractSocialContentPrivate::AbstractSocialContentPrivate(ISocialContent *q)
+    : q_ptr(q), status(SocialNetworkStatus::Null) , error(SocialNetworkError::No)
+{
+}
+
+AbstractSocialContentPrivate::~AbstractSocialContentPrivate()
+{
+}
+
+void AbstractSocialContentPrivate::handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
+                                                      QNetworkReply::NetworkError error,
+                                                      const QString &errorString,
+                                                      const QByteArray &data)
+{
+    contentPrivate.handleNetworkReply(error, errorString, data);
+}
+
+void AbstractSocialContentPrivate::setStatus(SocialNetworkStatus::type status)
+{
+    Q_Q(ISocialContent);
+    if (this->status != status) {
+        this->status = status;
+        emit q->statusChanged();
+    }
+}
+
+void AbstractSocialContentPrivate::setError(SocialNetworkError::type error,
+                                            const QString &errorString)
+{
+    Q_Q(ISocialContent);
+    if (this->error != error) {
+        this->error = error;
+        emit q->errorChanged();
+    }
+    if (this->errorString != errorString) {
+        this->errorString = errorString;
+        emit q->errorStringChanged();
+    }
+    setStatus(SocialNetworkStatus::Error);
+    emit q->finished(false);
+}
+
+void AbstractSocialContentPrivate::handleNetworkReply(QNetworkReply::NetworkError error,
+                                                      const QString &errorString,
+                                                      const QByteArray &data)
+{
+    Q_Q(ISocialContent);
+    if (!build(error, errorString, data)) {
+        qWarning() << "AbstractSocialContentPrivate::setData() failure to build";
+        setError(SocialNetworkError::Internal, "Internal error");
+        return;
+    }
+
+    if (status == SocialNetworkStatus::Busy) {
+        qWarning() << "AbstractSocialContentPrivate::setData() builder did not perform an action";
+        setError(SocialNetworkError::Internal, "Builder did not perform an action");
+    }
+}
+
 
 SocialNetworkPrivate::SocialNetworkPrivate(SocialNetwork *q)
     : q_ptr(q), m_networkAccess(0)
 {
 }
 
-bool SocialNetworkPrivate::contentItemLoad(SocialNetwork &socialNetwork, SocialContentItem &contentItem,
-                                const SocialRequest &request)
+bool SocialNetworkPrivate::socialContentLoad(SocialNetwork &socialNetwork,
+                                             AbstractSocialContentPrivate &socialContent,
+                                             const SocialRequest &request)
 {
-    return socialNetwork.d_func()->contentItemLoad(contentItem, request);
+    return socialNetwork.d_func()->socialContentLoad(socialContent, request);
 }
 
-bool SocialNetworkPrivate::contentItemLoad(SocialContentItem &contentItem, const SocialRequest &request)
+bool SocialNetworkPrivate::socialContentLoad(AbstractSocialContentPrivate &socialContent,
+                                             const SocialRequest &request)
 {
     Q_Q(SocialNetwork);
-    if (m_replies.contains(&contentItem)) {
+    if (m_loadingContent.contains(&socialContent)) {
         qDebug() << "SocialNetworkPrivate::load() called when SocialContentItem is already loading";
         return false;
     }
@@ -79,12 +142,12 @@ bool SocialNetworkPrivate::contentItemLoad(SocialContentItem &contentItem, const
         return false;
     }
 
-    m_replies.insert(&contentItem);
-    QObject::connect(reply, &QNetworkReply::finished, [this, &contentItem, reply]{
-        SocialContentItemPrivate::handleNetworkReply(contentItem, reply->error(),
-                                                     reply->errorString(), reply->readAll());
+    m_loadingContent.insert(&socialContent);
+    QObject::connect(reply, &QNetworkReply::finished, [this, &socialContent, reply]{
+        AbstractSocialContentPrivate::handleNetworkReply(socialContent, reply->error(),
+                                                         reply->errorString(), reply->readAll());
         reply->deleteLater();
-        m_replies.remove(&contentItem);
+        m_loadingContent.remove(&socialContent);
     });
 
     return true;

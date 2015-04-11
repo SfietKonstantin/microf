@@ -29,35 +29,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALCONTENTITEM_P_H
-#define SOCIALCONTENTITEM_P_H
+#ifndef ABSTRACTSOCIALCONTENT_P_H
+#define ABSTRACTSOCIALCONTENT_P_H
 
-#include "abstractsocialcontent_p.h"
+#include <QtNetwork/QNetworkReply>
+#include "socialnetworkstatus.h"
+#include "socialnetworkerror.h"
+#include "isocialcontent.h"
 
-class SocialNetwork;
-class SocialObject;
-class SocialRequest;
-class SocialContentItemBuilder;
-class SocialContentItem;
-class SocialContentItemPrivate: public AbstractSocialContentPrivate
+class AbstractSocialContentPrivate
 {
 public:
-    explicit SocialContentItemPrivate(SocialContentItem *q);
-    static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties);
-    static void setContentItemError(SocialContentItem &contentItem,
-                                    SocialNetworkError::type error, const QString &errorString);
+    virtual ~AbstractSocialContentPrivate();
+    static void handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
+                                   QNetworkReply::NetworkError error, const QString &errorString,
+                                   const QByteArray &data);
 protected:
-    bool build(QNetworkReply::NetworkError error, const QString &errorString,
-               const QByteArray &data) override;
-    SocialContentItem * const q_ptr;
+    explicit AbstractSocialContentPrivate(ISocialContent *q);
+    void setStatus(SocialNetworkStatus::type status);
+    void setError(SocialNetworkError::type error, const QString &errorString);
+    virtual bool build(QNetworkReply::NetworkError error, const QString &errorString,
+                       const QByteArray &data) = 0;
+    ISocialContent * const q_ptr;
+    SocialNetworkStatus::type status;
+    SocialNetworkError::type error;
+    QString errorString;
 private:
-    void setContentItemObject(const QVariantMap &properties);
-    SocialNetwork *m_socialNetwork;
-    SocialRequest *m_request;
-    SocialContentItemBuilder *m_builder;
-    SocialObject *m_object;
-    Q_DECLARE_PUBLIC(SocialContentItem)
+    void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorString,
+                            const QByteArray &data);
+    Q_DECLARE_PUBLIC(ISocialContent)
 };
 
-#endif // SOCIALCONTENTITEM_P_H
+
+#endif // ABSTRACTSOCIALCONTENT_P_H
 

@@ -16,6 +16,7 @@ HEADERS += \
     socialobject_p.h \
     socialrequest.h \
     socialrequest_p.h \
+    abstractsocialcontent_p.h \
     socialcontentitem.h \
     socialcontentitem_p.h \
     socialcontentitembuilder.h \
@@ -24,7 +25,8 @@ HEADERS += \
     facebook/facebooklogoutrequest.h \
     facebook/facebookloginrequest.h \
     facebook/facebooklogincontentbuilder.h \
-    facebook/facebookconfirmationcontentbuilder.h
+    facebook/facebookconfirmationcontentbuilder.h \
+    isocialcontent.h
 
 SOURCES += \
     socialnetwork.cpp \

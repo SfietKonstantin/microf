@@ -8,17 +8,9 @@
 #include "socialcontentitembuilder_p.h"
 
 SocialContentItemPrivate::SocialContentItemPrivate(SocialContentItem *q)
-    : q_ptr(q), m_socialNetwork(0), m_request(0), m_builder(0), m_object(0)
-    , m_status(SocialNetworkStatus::Null) , m_error(SocialNetworkError::No)
+    : AbstractSocialContentPrivate(q), q_ptr(q), m_socialNetwork(0), m_request(0), m_builder(0)
+    , m_object(0)
 {
-}
-
-void SocialContentItemPrivate::handleNetworkReply(SocialContentItem &contentItem,
-                                                  QNetworkReply::NetworkError error,
-                                                  const QString &errorString,
-                                                  const QByteArray &data)
-{
-    contentItem.d_func()->handleNetworkReply(error, errorString, data);
 }
 
 void SocialContentItemPrivate::setContentItemObject(SocialContentItem &contentItem,
@@ -34,6 +26,17 @@ void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentIte
     contentItem.d_func()->setError(error, errorString);
 }
 
+bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QString &errorString,
+                                     const QByteArray &data)
+{
+    Q_Q(SocialContentItem);
+    if (!m_builder) {
+        return false;
+    }
+    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data);
+    return true;
+}
+
 void SocialContentItemPrivate::setContentItemObject(const QVariantMap &properties)
 {
     Q_Q(SocialContentItem);
@@ -43,50 +46,6 @@ void SocialContentItemPrivate::setContentItemObject(const QVariantMap &propertie
     }
     setStatus(SocialNetworkStatus::Ready);
     emit q->finished(true);
-}
-
-
-void SocialContentItemPrivate::setStatus(SocialNetworkStatus::type status)
-{
-    Q_Q(SocialContentItem);
-    if (m_status != status) {
-        m_status = status;
-        emit q->statusChanged();
-    }
-}
-
-void SocialContentItemPrivate::setError(SocialNetworkError::type error,
-                                        const QString &errorString)
-{
-    Q_Q(SocialContentItem);
-    if (m_error != error) {
-        m_error = error;
-        emit q->errorChanged();
-    }
-    if (m_errorString != errorString) {
-        m_errorString = errorString;
-        emit q->errorStringChanged();
-    }
-    setStatus(SocialNetworkStatus::Error);
-    emit q->finished(false);
-}
-
-void SocialContentItemPrivate::handleNetworkReply(QNetworkReply::NetworkError error,
-                                                  const QString &errorString, const QByteArray &data)
-{
-    Q_Q(SocialContentItem);
-    if (!m_builder) {
-        qWarning() << "SocialContentItemPrivate::setData() called without replyParser";
-        setError(SocialNetworkError::Internal, "Internal error");
-        return;
-    }
-
-    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data);
-
-    if (m_status == SocialNetworkStatus::Busy) {
-        qWarning() << "SocialContentItemPrivate::setData() builder did not perform an action";
-        setError(SocialNetworkError::Internal, "Builder did not perform an action");
-    }
 }
 
 SocialContentItem::SocialContentItem(QObject *parent)
@@ -162,25 +121,25 @@ SocialObject *SocialContentItem::object() const
 SocialNetworkStatus::type SocialContentItem::status() const
 {
     Q_D(const SocialContentItem);
-    return d->m_status;
+    return d->status;
 }
 
 SocialNetworkError::type SocialContentItem::error() const
 {
     Q_D(const SocialContentItem);
-    return d->m_error;
+    return d->error;
 }
 
 QString SocialContentItem::errorString() const
 {
     Q_D(const SocialContentItem);
-    return d->m_errorString;
+    return d->errorString;
 }
 
 bool SocialContentItem::load()
 {
     Q_D(SocialContentItem);
-    if (d->m_status == SocialNetworkStatus::Busy) {
+    if (d->status == SocialNetworkStatus::Busy) {
         qWarning() << "SocialContentItem::load() called while status is Busy";
         return false;
     }
@@ -200,7 +159,7 @@ bool SocialContentItem::load()
         return false;
     }
 
-    bool ok = SocialNetworkPrivate::contentItemLoad(*d->m_socialNetwork, *this, *d->m_request);
+    bool ok = SocialNetworkPrivate::socialContentLoad(*d->m_socialNetwork, *d, *d->m_request);
     if (ok) {
         d->setStatus(SocialNetworkStatus::Busy);
     }

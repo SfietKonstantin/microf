@@ -5,13 +5,14 @@
 #include <QtQml/QQmlParserStatus>
 #include "socialnetworkstatus.h"
 #include "socialnetworkerror.h"
+#include "isocialcontent.h"
 
 class SocialNetwork;
 class SocialObject;
 class SocialRequest;
 class SocialContentItemBuilder;
 class SocialContentItemPrivate;
-class SocialContentItem: public QObject, public QQmlParserStatus
+class SocialContentItem: public QObject, public ISocialContent, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
@@ -47,10 +48,10 @@ Q_SIGNALS:
     void requestChanged();
     void builderChanged();
     void objectChanged();
-    void statusChanged();
-    void finished(bool ok);
-    void errorChanged();
-    void errorStringChanged();
+    void statusChanged() override;
+    void errorChanged() override;
+    void errorStringChanged() override;
+    void finished(bool ok) override;
 protected:
     QScopedPointer<SocialContentItemPrivate> d_ptr;
 private:

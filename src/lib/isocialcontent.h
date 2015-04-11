@@ -29,35 +29,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALCONTENTITEM_P_H
-#define SOCIALCONTENTITEM_P_H
+#ifndef ISOCIALCONTENT_H
+#define ISOCIALCONTENT_H
 
-#include "abstractsocialcontent_p.h"
+#include <QtCore/qobjectdefs.h>
 
-class SocialNetwork;
-class SocialObject;
-class SocialRequest;
-class SocialContentItemBuilder;
-class SocialContentItem;
-class SocialContentItemPrivate: public AbstractSocialContentPrivate
+class ISocialContent
 {
 public:
-    explicit SocialContentItemPrivate(SocialContentItem *q);
-    static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties);
-    static void setContentItemError(SocialContentItem &contentItem,
-                                    SocialNetworkError::type error, const QString &errorString);
-protected:
-    bool build(QNetworkReply::NetworkError error, const QString &errorString,
-               const QByteArray &data) override;
-    SocialContentItem * const q_ptr;
-private:
-    void setContentItemObject(const QVariantMap &properties);
-    SocialNetwork *m_socialNetwork;
-    SocialRequest *m_request;
-    SocialContentItemBuilder *m_builder;
-    SocialObject *m_object;
-    Q_DECLARE_PUBLIC(SocialContentItem)
+    virtual ~ISocialContent() {}
+Q_SIGNALS:
+    virtual void statusChanged() = 0;
+    virtual void errorChanged() = 0;
+    virtual void errorStringChanged() = 0;
+    virtual void finished(bool ok) = 0;
 };
 
-#endif // SOCIALCONTENTITEM_P_H
+#endif // ISOCIALCONTENT_H
 
