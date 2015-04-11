@@ -52,13 +52,13 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
 {
     if (!error == QNetworkReply::NoError) {
         qWarning() << data;
-        setError(contentItem, SocialContentItem::NetworkError, errorString);
+        setError(contentItem, SocialNetworkError::Network, errorString);
         return;
     }
 
     QJsonDocument document = QJsonDocument::fromJson(data);
     if (!document.isObject()) {
-        setError(contentItem, SocialContentItem::DataError, "Cannot convert to JSON");
+        setError(contentItem, SocialNetworkError::Data, "Cannot convert to JSON");
         return;
     }
 

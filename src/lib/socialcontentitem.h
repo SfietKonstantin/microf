@@ -3,12 +3,14 @@
 
 #include <QtCore/QObject>
 #include <QtQml/QQmlParserStatus>
+#include "socialnetworkstatus.h"
+#include "socialnetworkerror.h"
 
 class SocialNetwork;
 class SocialObject;
 class SocialRequest;
-class SocialContentItemPrivate;
 class SocialContentBuilder;
+class SocialContentItemPrivate;
 class SocialContentItem: public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -18,25 +20,12 @@ class SocialContentItem: public QObject, public QQmlParserStatus
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
     Q_PROPERTY(SocialContentBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
     Q_PROPERTY(SocialObject * object READ object CONSTANT)
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
-    Q_PROPERTY(ErrorType error READ error NOTIFY errorChanged)
+    Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
+    Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_ENUMS(Status)
     Q_ENUMS(ErrorType)
 public:
-    enum Status {
-        Null,
-        Busy,
-        Ready,
-        Error
-    };
-    enum ErrorType {
-        NoError = 0,
-        NetworkError = 1, // Network error
-        DataError = 2, // Failed to process data coming from the social network
-        SocialNetworkError = 3, // The social network emitted an error
-        InternalError = 4 // Error in microf
-    };
     explicit SocialContentItem(QObject *parent = 0);
     virtual ~SocialContentItem();
     void classBegin() override;
@@ -48,8 +37,8 @@ public:
     SocialContentBuilder * builder() const;
     void setBuilder(SocialContentBuilder * builder);
     SocialObject * object() const;
-    Status status() const;
-    ErrorType error() const;
+    SocialNetworkStatus::type status() const;
+    SocialNetworkError::type error() const;
     QString errorString() const;
 public Q_SLOTS:
     bool load();

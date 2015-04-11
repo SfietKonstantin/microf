@@ -194,8 +194,10 @@ private:
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    qmlRegisterUncreatableType<SocialObject>("org.sfietkonstantin.microf", 1, 0, "SocialObject", "Abstract type");
     qmlRegisterUncreatableType<SocialNetwork>("org.sfietkonstantin.microf", 1, 0, "SocialNetwork", "Abstract type");
+    qmlRegisterUncreatableType<SocialNetworkStatus>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkStatus", "Abstract type");
+    qmlRegisterUncreatableType<SocialNetworkError>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkError", "Abstract type");
+    qmlRegisterUncreatableType<SocialObject>("org.sfietkonstantin.microf", 1, 0, "SocialObject", "Abstract type");
     qmlRegisterUncreatableType<SocialRequest>("org.sfietkonstantin.microf", 1, 0, "SocialRequest", "Abstract type");
     qmlRegisterUncreatableType<SocialContentBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentBuilder", "Abstract type");
     qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");

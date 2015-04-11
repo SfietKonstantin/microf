@@ -32,9 +32,15 @@
 #ifndef SOCIALCONTENTITEM_P_H
 #define SOCIALCONTENTITEM_P_H
 
-#include "socialcontentitem.h"
 #include <QtNetwork/QNetworkReply>
+#include "socialnetworkstatus.h"
+#include "socialnetworkerror.h"
 
+class SocialNetwork;
+class SocialObject;
+class SocialRequest;
+class SocialContentBuilder;
+class SocialContentItem;
 class SocialContentItemPrivate
 {
 public:
@@ -44,21 +50,21 @@ public:
                                    const QByteArray &data);
     static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties);
     static void setContentItemError(SocialContentItem &contentItem,
-                                    SocialContentItem::ErrorType error, const QString &errorString);
+                                    SocialNetworkError::type error, const QString &errorString);
 protected:
     SocialContentItem * const q_ptr;
 private:
     void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorString,
                             const QByteArray &data);
     void setContentItemObject(const QVariantMap &properties);
-    void setStatus(SocialContentItem::Status status);
-    void setError(SocialContentItem::ErrorType error, const QString &errorString);
+    void setStatus(SocialNetworkStatus::type status);
+    void setError(SocialNetworkError::type error, const QString &errorString);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentBuilder *m_builder;
     SocialObject *m_object;
-    SocialContentItem::Status m_status;
-    SocialContentItem::ErrorType m_error;
+    SocialNetworkStatus::type m_status;
+    SocialNetworkError::type m_error;
     QString m_errorString;
     Q_DECLARE_PUBLIC(SocialContentItem)
 };

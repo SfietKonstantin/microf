@@ -101,13 +101,13 @@ protected:
                const QString &errorString, const QByteArray &data) override
     {
         if (error != QNetworkReply::NoError) {
-            setError(contentItem, SocialContentItem::NetworkError, errorString);
+            setError(contentItem, SocialNetworkError::Network, errorString);
             return;
         }
 
         QJsonDocument document = QJsonDocument::fromJson(data);
         if (!document.isObject()) {
-            setError(contentItem, SocialContentItem::DataError, "Cannot convert to JSON");
+            setError(contentItem, SocialNetworkError::Data, "Cannot convert to JSON");
             return;
         }
 
@@ -192,7 +192,7 @@ void TstSocialNetwork::tstSimple()
         QTest::qWait(200);
     }
 
-    QCOMPARE(socialContentItem.status(), SocialContentItem::Ready);
+    QCOMPARE(socialContentItem.status(), SocialNetworkStatus::Ready);
 
     // Check the object
     SocialObject *object = socialContentItem.object();
@@ -232,8 +232,8 @@ void TstSocialNetwork::tstError()
         QTest::qWait(200);
     }
 
-    QCOMPARE(socialContentItem.status(), SocialContentItem::Error);
-    QCOMPARE(socialContentItem.error(), SocialContentItem::NetworkError);
+    QCOMPARE(socialContentItem.status(), SocialNetworkStatus::Error);
+    QCOMPARE(socialContentItem.error(), SocialNetworkError::Network);
     QVERIFY(!socialContentItem.errorString().isEmpty());
 }
 

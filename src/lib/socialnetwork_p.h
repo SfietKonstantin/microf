@@ -33,9 +33,9 @@
 #define SOCIALNETWORK_P_H
 
 #include <QtCore/QtGlobal>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
+#include <QtCore/QSet>
 
+class QNetworkAccessManager;
 class SocialRequest;
 class SocialContentItem;
 class SocialNetwork;

@@ -29,25 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebookconfirmationcontentbuilder.h"
+#include "socialnetworkerror.h"
 
-FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *parent)
-    : SocialContentBuilder(parent)
+SocialNetworkError::SocialNetworkError(QObject *parent)
+    : QObject(parent)
 {
-
 }
-
-void FacebookConfirmationContentBuilder::build(SocialContentItem &contentItem,
-                                               QNetworkReply::NetworkError error,
-                                               const QString &errorString, const QByteArray &data)
-{
-    Q_UNUSED(data);
-    if (error != QNetworkReply::NoError) {
-        setError(contentItem, SocialNetworkError::Network, errorString);
-        return;
-    }
-
-    setObject(contentItem, QVariantMap());
-}
-
 

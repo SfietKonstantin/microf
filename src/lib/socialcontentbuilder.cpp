@@ -69,7 +69,7 @@ void SocialContentBuilder::setObject(SocialContentItem &contentItem, const QVari
 }
 
 void SocialContentBuilder::setError(SocialContentItem &contentItem,
-                                    SocialContentItem::ErrorType error, const QString &errorString)
+                                    SocialNetworkError::type error, const QString &errorString)
 {
     SocialContentItemPrivate::setContentItemError(contentItem, error, errorString);
 }

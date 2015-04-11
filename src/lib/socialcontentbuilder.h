@@ -35,8 +35,9 @@
 #include <QtCore/QObject>
 #include <QtNetwork/QNetworkReply>
 #include <QtQml/QQmlParserStatus>
-#include "socialcontentitem.h"
+#include "socialnetworkerror.h"
 
+class SocialContentItem;
 class SocialContentBuilderPrivate;
 class SocialContentBuilder : public QObject, public QQmlParserStatus
 {
@@ -51,7 +52,7 @@ protected:
     virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                        const QString &errorString, const QByteArray &data) = 0;
     void setObject(SocialContentItem &contentItem, const QVariantMap &properties);
-    void setError(SocialContentItem &contentItem, SocialContentItem::ErrorType error,
+    void setError(SocialContentItem &contentItem, SocialNetworkError::type error,
                   const QString &errorString);
     QScopedPointer<SocialContentBuilderPrivate> d_ptr;
 private:

@@ -29,25 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebookconfirmationcontentbuilder.h"
+#ifndef SOCIALNETWORKSTATUS_H
+#define SOCIALNETWORKSTATUS_H
 
-FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *parent)
-    : SocialContentBuilder(parent)
+#include <QtCore/QObject>
+
+class SocialNetworkStatus : public QObject
 {
+    Q_OBJECT
+    Q_ENUMS(type)
+public:
+    enum type {
+        Null,
+        Busy,
+        Ready,
+        Error
+    };
+    explicit SocialNetworkStatus(QObject *parent = 0);
+};
 
-}
-
-void FacebookConfirmationContentBuilder::build(SocialContentItem &contentItem,
-                                               QNetworkReply::NetworkError error,
-                                               const QString &errorString, const QByteArray &data)
-{
-    Q_UNUSED(data);
-    if (error != QNetworkReply::NoError) {
-        setError(contentItem, SocialNetworkError::Network, errorString);
-        return;
-    }
-
-    setObject(contentItem, QVariantMap());
-}
-
-
+#endif // SOCIALNETWORKSTATUS_H

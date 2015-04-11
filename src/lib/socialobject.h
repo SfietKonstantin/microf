@@ -2,7 +2,6 @@
 #define SOCIALOBJECT_H
 
 #include <QtCore/QObject>
-#include <QtCore/QJsonObject>
 
 class SocialObjectPrivate;
 class SocialObject: public QObject

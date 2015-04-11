@@ -5,7 +5,7 @@ import org.sfietkonstantin.microf 1.0
 
 Item {
     id: container
-    property bool busy: login.status == SocialContentItem.Busy || logout == SocialContentItem.Busy
+    property bool busy: login.status === SocialNetworkStatus.Busy || logout === SocialNetworkStatus.Busy
     property bool canLogin: !busy && authHelper.accessToken === "" && emailField.text !== ""
                             && passwordField.text !== "" && authHelper.deviceId !== ""
     property bool canLogout: !busy && authHelper.accessToken !== ""

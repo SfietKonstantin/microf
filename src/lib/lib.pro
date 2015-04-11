@@ -10,6 +10,8 @@ include(../config.pri)
 HEADERS += \
     socialnetwork.h \
     socialnetwork_p.h \
+    socialnetworkstatus.h \
+    socialnetworkerror.h \
     socialcontentitem.h \
     socialcontentitem_p.h \
     socialobject.h \
@@ -26,6 +28,8 @@ HEADERS += \
 
 SOURCES += \
     socialnetwork.cpp \
+    socialnetworkstatus.cpp \
+    socialnetworkerror.cpp \
     socialcontentitem.cpp \
     socialobject.cpp \
     socialrequest.cpp \

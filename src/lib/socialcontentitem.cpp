@@ -9,7 +9,7 @@
 
 SocialContentItemPrivate::SocialContentItemPrivate(SocialContentItem *q)
     : q_ptr(q), m_socialNetwork(0), m_request(0), m_builder(0), m_object(0)
-    , m_status(SocialContentItem::Null) , m_error(SocialContentItem::NoError)
+    , m_status(SocialNetworkStatus::Null) , m_error(SocialNetworkError::No)
 {
 }
 
@@ -28,7 +28,7 @@ void SocialContentItemPrivate::setContentItemObject(SocialContentItem &contentIt
 }
 
 void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentItem,
-                                                   SocialContentItem::ErrorType error,
+                                                   SocialNetworkError::type error,
                                                    const QString &errorString)
 {
     contentItem.d_func()->setError(error, errorString);
@@ -41,12 +41,12 @@ void SocialContentItemPrivate::setContentItemObject(const QVariantMap &propertie
         const QVariant &value = properties.value(key);
         SocialObjectPrivate::setProperty(m_object, key.toLocal8Bit(), value);
     }
-    setStatus(SocialContentItem::Ready);
+    setStatus(SocialNetworkStatus::Ready);
     emit q->finished(true);
 }
 
 
-void SocialContentItemPrivate::setStatus(SocialContentItem::Status status)
+void SocialContentItemPrivate::setStatus(SocialNetworkStatus::type status)
 {
     Q_Q(SocialContentItem);
     if (m_status != status) {
@@ -55,7 +55,7 @@ void SocialContentItemPrivate::setStatus(SocialContentItem::Status status)
     }
 }
 
-void SocialContentItemPrivate::setError(SocialContentItem::ErrorType error,
+void SocialContentItemPrivate::setError(SocialNetworkError::type error,
                                         const QString &errorString)
 {
     Q_Q(SocialContentItem);
@@ -67,7 +67,7 @@ void SocialContentItemPrivate::setError(SocialContentItem::ErrorType error,
         m_errorString = errorString;
         emit q->errorStringChanged();
     }
-    setStatus(SocialContentItem::Error);
+    setStatus(SocialNetworkStatus::Error);
     emit q->finished(false);
 }
 
@@ -77,15 +77,15 @@ void SocialContentItemPrivate::handleNetworkReply(QNetworkReply::NetworkError er
     Q_Q(SocialContentItem);
     if (!m_builder) {
         qWarning() << "SocialContentItemPrivate::setData() called without replyParser";
-        setError(SocialContentItem::InternalError, "Internal error");
+        setError(SocialNetworkError::Internal, "Internal error");
         return;
     }
 
     SocialContentBuilderPrivate::build(*m_builder, *q, error, errorString, data);
 
-    if (m_status == SocialContentItem::Busy) {
+    if (m_status == SocialNetworkStatus::Busy) {
         qWarning() << "SocialContentItemPrivate::setData() builder did not perform an action";
-        setError(SocialContentItem::InternalError, "Builder did not perform an action");
+        setError(SocialNetworkError::Internal, "Builder did not perform an action");
     }
 }
 
@@ -159,13 +159,13 @@ SocialObject *SocialContentItem::object() const
     return d->m_object;
 }
 
-SocialContentItem::Status SocialContentItem::status() const
+SocialNetworkStatus::type SocialContentItem::status() const
 {
     Q_D(const SocialContentItem);
     return d->m_status;
 }
 
-SocialContentItem::ErrorType SocialContentItem::error() const
+SocialNetworkError::type SocialContentItem::error() const
 {
     Q_D(const SocialContentItem);
     return d->m_error;
@@ -180,7 +180,7 @@ QString SocialContentItem::errorString() const
 bool SocialContentItem::load()
 {
     Q_D(SocialContentItem);
-    if (d->m_status == Busy) {
+    if (d->m_status == SocialNetworkStatus::Busy) {
         qWarning() << "SocialContentItem::load() called while status is Busy";
         return false;
     }
@@ -202,7 +202,7 @@ bool SocialContentItem::load()
 
     bool ok = SocialNetworkPrivate::contentItemLoad(*d->m_socialNetwork, *this, *d->m_request);
     if (ok) {
-        d->setStatus(Busy);
+        d->setStatus(SocialNetworkStatus::Busy);
     }
     return ok;
 }

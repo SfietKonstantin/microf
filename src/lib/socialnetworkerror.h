@@ -29,25 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebookconfirmationcontentbuilder.h"
+#ifndef SOCIALNETWORKERROR_H
+#define SOCIALNETWORKERROR_H
 
-FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *parent)
-    : SocialContentBuilder(parent)
+#include <QtCore/QObject>
+
+class SocialNetworkError : public QObject
 {
+    Q_OBJECT
+public:
+    enum type {
+        No = 0, // No error
+        Network = 1, // Network error
+        Data = 2, // Failed to process data coming from the social network
+        SocialNetwork = 3, // The social network emitted an error
+        Internal = 4 // Error in microf
+    };
+    explicit SocialNetworkError(QObject *parent = 0);
+};
 
-}
-
-void FacebookConfirmationContentBuilder::build(SocialContentItem &contentItem,
-                                               QNetworkReply::NetworkError error,
-                                               const QString &errorString, const QByteArray &data)
-{
-    Q_UNUSED(data);
-    if (error != QNetworkReply::NoError) {
-        setError(contentItem, SocialNetworkError::Network, errorString);
-        return;
-    }
-
-    setObject(contentItem, QVariantMap());
-}
-
-
+#endif // SOCIALNETWORKERROR_H
