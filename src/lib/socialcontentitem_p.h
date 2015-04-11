@@ -39,7 +39,7 @@
 class SocialNetwork;
 class SocialObject;
 class SocialRequest;
-class SocialContentBuilder;
+class SocialContentItemBuilder;
 class SocialContentItem;
 class SocialContentItemPrivate
 {
@@ -61,7 +61,7 @@ private:
     void setError(SocialNetworkError::type error, const QString &errorString);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
-    SocialContentBuilder *m_builder;
+    SocialContentItemBuilder *m_builder;
     SocialObject *m_object;
     SocialNetworkStatus::type m_status;
     SocialNetworkError::type m_error;

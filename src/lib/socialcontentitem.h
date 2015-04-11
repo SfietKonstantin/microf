@@ -9,7 +9,7 @@
 class SocialNetwork;
 class SocialObject;
 class SocialRequest;
-class SocialContentBuilder;
+class SocialContentItemBuilder;
 class SocialContentItemPrivate;
 class SocialContentItem: public QObject, public QQmlParserStatus
 {
@@ -18,7 +18,7 @@ class SocialContentItem: public QObject, public QQmlParserStatus
     Q_PROPERTY(SocialNetwork * socialNetwork READ socialNetwork WRITE setSocialNetwork
                NOTIFY socialNetworkChanged)
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
-    Q_PROPERTY(SocialContentBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
+    Q_PROPERTY(SocialContentItemBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
     Q_PROPERTY(SocialObject * object READ object CONSTANT)
     Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
     Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
@@ -34,8 +34,8 @@ public:
     void setSocialNetwork(SocialNetwork *socialNetwork);
     SocialRequest * request() const;
     void setRequest(SocialRequest *request);
-    SocialContentBuilder * builder() const;
-    void setBuilder(SocialContentBuilder * builder);
+    SocialContentItemBuilder * builder() const;
+    void setBuilder(SocialContentItemBuilder * builder);
     SocialObject * object() const;
     SocialNetworkStatus::type status() const;
     SocialNetworkError::type error() const;

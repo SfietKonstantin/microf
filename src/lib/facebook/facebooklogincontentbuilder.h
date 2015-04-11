@@ -32,9 +32,9 @@
 #ifndef FACEBOOKLOGINCONTENTBUILDER_H
 #define FACEBOOKLOGINCONTENTBUILDER_H
 
-#include "socialcontentbuilder.h"
+#include "socialcontentitembuilder.h"
 
-class FacebookLoginContentBuilder : public SocialContentBuilder
+class FacebookLoginContentBuilder : public SocialContentItemBuilder
 {
     Q_OBJECT
 public:

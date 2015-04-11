@@ -32,9 +32,9 @@
 #ifndef FACEBOOKCONFIRMATIONCONTENTBUILDER_H
 #define FACEBOOKCONFIRMATIONCONTENTBUILDER_H
 
-#include "socialcontentbuilder.h"
+#include "socialcontentitembuilder.h"
 
-class FacebookConfirmationContentBuilder : public SocialContentBuilder
+class FacebookConfirmationContentBuilder : public SocialContentItemBuilder
 {
     Q_OBJECT
 public:

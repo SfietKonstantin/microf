@@ -4,8 +4,8 @@
 #include "socialnetwork_p.h"
 #include "socialobject.h"
 #include "socialobject_p.h"
-#include "socialcontentbuilder.h"
-#include "socialcontentbuilder_p.h"
+#include "socialcontentitembuilder.h"
+#include "socialcontentitembuilder_p.h"
 
 SocialContentItemPrivate::SocialContentItemPrivate(SocialContentItem *q)
     : q_ptr(q), m_socialNetwork(0), m_request(0), m_builder(0), m_object(0)
@@ -81,7 +81,7 @@ void SocialContentItemPrivate::handleNetworkReply(QNetworkReply::NetworkError er
         return;
     }
 
-    SocialContentBuilderPrivate::build(*m_builder, *q, error, errorString, data);
+    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data);
 
     if (m_status == SocialNetworkStatus::Busy) {
         qWarning() << "SocialContentItemPrivate::setData() builder did not perform an action";
@@ -138,13 +138,13 @@ void SocialContentItem::setRequest(SocialRequest *request)
     }
 }
 
-SocialContentBuilder * SocialContentItem::builder() const
+SocialContentItemBuilder * SocialContentItem::builder() const
 {
     Q_D(const SocialContentItem);
     return d->m_builder;
 }
 
-void SocialContentItem::setBuilder(SocialContentBuilder *replyParser)
+void SocialContentItem::setBuilder(SocialContentItemBuilder *replyParser)
 {
     Q_D(SocialContentItem);
     if (d->m_builder != replyParser) {

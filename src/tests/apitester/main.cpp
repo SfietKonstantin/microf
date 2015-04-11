@@ -199,7 +199,7 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<SocialNetworkError>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkError", "Abstract type");
     qmlRegisterUncreatableType<SocialObject>("org.sfietkonstantin.microf", 1, 0, "SocialObject", "Abstract type");
     qmlRegisterUncreatableType<SocialRequest>("org.sfietkonstantin.microf", 1, 0, "SocialRequest", "Abstract type");
-    qmlRegisterUncreatableType<SocialContentBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentBuilder", "Abstract type");
+    qmlRegisterUncreatableType<SocialContentItemBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentBuilder", "Abstract type");
     qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
     qmlRegisterType<SocialContentItem>("org.sfietkonstantin.microf", 1, 0, "SocialContentItem");
     qmlRegisterType<FacebookLoginRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginRequest");

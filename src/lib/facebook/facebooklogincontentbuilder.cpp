@@ -41,7 +41,7 @@ static const char *SECRET_KEY = "secret";
 static const char *ACCESS_TOKEN_KEY = "access_token";
 
 FacebookLoginContentBuilder::FacebookLoginContentBuilder(QObject *parent)
-    : SocialContentBuilder(parent)
+    : SocialContentItemBuilder(parent)
 {
 }
 

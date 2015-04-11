@@ -12,14 +12,14 @@ HEADERS += \
     socialnetwork_p.h \
     socialnetworkstatus.h \
     socialnetworkerror.h \
-    socialcontentitem.h \
-    socialcontentitem_p.h \
     socialobject.h \
     socialobject_p.h \
     socialrequest.h \
     socialrequest_p.h \
-    socialcontentbuilder.h \
-    socialcontentbuilder_p.h \
+    socialcontentitem.h \
+    socialcontentitem_p.h \
+    socialcontentitembuilder.h \
+    socialcontentitembuilder_p.h \
     facebook/facebook.h \
     facebook/facebooklogoutrequest.h \
     facebook/facebookloginrequest.h \
@@ -30,10 +30,10 @@ SOURCES += \
     socialnetwork.cpp \
     socialnetworkstatus.cpp \
     socialnetworkerror.cpp \
-    socialcontentitem.cpp \
     socialobject.cpp \
     socialrequest.cpp \
-    socialcontentbuilder.cpp \
+    socialcontentitem.cpp \
+    socialcontentitembuilder.cpp \
     facebook/facebook.cpp \
     facebook/facebooklogoutrequest.cpp \
     facebook/facebookloginrequest.cpp \

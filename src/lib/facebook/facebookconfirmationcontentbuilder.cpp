@@ -32,7 +32,7 @@
 #include "facebookconfirmationcontentbuilder.h"
 
 FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *parent)
-    : SocialContentBuilder(parent)
+    : SocialContentItemBuilder(parent)
 {
 
 }

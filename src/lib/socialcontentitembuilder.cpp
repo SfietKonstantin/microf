@@ -29,47 +29,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "socialcontentbuilder.h"
-#include "socialcontentbuilder_p.h"
+#include "socialcontentitembuilder.h"
+#include "socialcontentitembuilder_p.h"
 #include "socialcontentitem_p.h"
 
-SocialContentBuilderPrivate::SocialContentBuilderPrivate(SocialContentBuilder *q)
+SocialContentItemBuilderPrivate::SocialContentItemBuilderPrivate(SocialContentItemBuilder *q)
     : q_ptr(q)
 {
 }
 
-void SocialContentBuilderPrivate::build(SocialContentBuilder &builder,
-                                        SocialContentItem &contentItem,
-                                        QNetworkReply::NetworkError error,
-                                        const QString &errorString, const QByteArray &data)
+void SocialContentItemBuilderPrivate::build(SocialContentItemBuilder &builder,
+                                            SocialContentItem &contentItem,
+                                            QNetworkReply::NetworkError error,
+                                            const QString &errorString, const QByteArray &data)
 {
     builder.build(contentItem, error, errorString, data);
 }
 
-SocialContentBuilder::SocialContentBuilder(QObject *parent)
-    : QObject(parent), d_ptr(new SocialContentBuilderPrivate(this))
+SocialContentItemBuilder::SocialContentItemBuilder(QObject *parent)
+    : QObject(parent), d_ptr(new SocialContentItemBuilderPrivate(this))
 {
 }
 
-SocialContentBuilder::~SocialContentBuilder()
+SocialContentItemBuilder::~SocialContentItemBuilder()
 {
 }
 
-void SocialContentBuilder::classBegin()
+void SocialContentItemBuilder::classBegin()
 {
 }
 
-void SocialContentBuilder::componentComplete()
+void SocialContentItemBuilder::componentComplete()
 {
 }
 
-void SocialContentBuilder::setObject(SocialContentItem &contentItem, const QVariantMap &properties)
+void SocialContentItemBuilder::setObject(SocialContentItem &contentItem,
+                                         const QVariantMap &properties)
 {
     SocialContentItemPrivate::setContentItemObject(contentItem, properties);
 }
 
-void SocialContentBuilder::setError(SocialContentItem &contentItem,
-                                    SocialNetworkError::type error, const QString &errorString)
+void SocialContentItemBuilder::setError(SocialContentItem &contentItem,
+                                        SocialNetworkError::type error, const QString &errorString)
 {
     SocialContentItemPrivate::setContentItemError(contentItem, error, errorString);
 }

@@ -29,24 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALCONTENTBUILDER_P_H
-#define SOCIALCONTENTBUILDER_P_H
+#ifndef SOCIALCONTENTBUILDER_H
+#define SOCIALCONTENTBUILDER_H
 
+#include <QtCore/QObject>
 #include <QtNetwork/QNetworkReply>
+#include <QtQml/QQmlParserStatus>
+#include "socialnetworkerror.h"
 
-class QByteArray;
 class SocialContentItem;
-class SocialContentBuilder;
-class SocialContentBuilderPrivate
+class SocialContentItemBuilderPrivate;
+class SocialContentItemBuilder : public QObject, public QQmlParserStatus
 {
+    Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 public:
-    SocialContentBuilderPrivate(SocialContentBuilder *q);
-    static void build(SocialContentBuilder &builder, SocialContentItem &contentItem,
-                      QNetworkReply::NetworkError error, const QString &errorString,
-                      const QByteArray &data);
+    virtual ~SocialContentItemBuilder();
+    void classBegin() override;
+    void componentComplete() override;
 protected:
-    SocialContentBuilder * const q_ptr;
+    explicit SocialContentItemBuilder(QObject *parent = 0);
+    virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
+                       const QString &errorString, const QByteArray &data) = 0;
+    void setObject(SocialContentItem &contentItem, const QVariantMap &properties);
+    void setError(SocialContentItem &contentItem, SocialNetworkError::type error,
+                  const QString &errorString);
+    QScopedPointer<SocialContentItemBuilderPrivate> d_ptr;
+private:
+    Q_DECLARE_PRIVATE(SocialContentItemBuilder)
 };
 
-#endif // SOCIALCONTENTBUILDER_P_H
-
+#endif // SOCIALCONTENTBUILDER_H

@@ -36,7 +36,7 @@
 #include <QtCore/QProcess>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTemporaryDir>
-#include "socialcontentbuilder.h"
+#include "socialcontentitembuilder.h"
 #include "socialcontentitem.h"
 #include "socialnetwork.h"
 #include "socialobject.h"
@@ -89,11 +89,11 @@ private:
     QUrl m_url;
 };
 
-class SimpleBuilder: public SocialContentBuilder
+class SimpleBuilder: public SocialContentItemBuilder
 {
 public:
     explicit SimpleBuilder(QObject *parent = 0)
-        : SocialContentBuilder(parent)
+        : SocialContentItemBuilder(parent)
     {
     }
 protected:
