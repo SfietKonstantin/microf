@@ -32,14 +32,11 @@
 #ifndef SOCIALNETWORK_P_H
 #define SOCIALNETWORK_P_H
 
-#include <QtCore/QtGlobal>
 #include <QtCore/QSet>
+#include "socialnetwork.h"
 
 class QNetworkAccessManager;
 class AbstractSocialContentPrivate;
-class SocialRequest;
-class SocialContentItem;
-class SocialNetwork;
 class SocialNetworkPrivate
 {
 public:

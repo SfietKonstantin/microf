@@ -46,6 +46,16 @@ AbstractSocialContentPrivate::~AbstractSocialContentPrivate()
 {
 }
 
+const QVariantMap & AbstractSocialContentPrivate::metadata() const
+{
+    return m_metadata;
+}
+
+void AbstractSocialContentPrivate::setMetadata(const QVariantMap &metadata)
+{
+    m_metadata = metadata;
+}
+
 void AbstractSocialContentPrivate::handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
                                                       QNetworkReply::NetworkError error,
                                                       const QString &errorString,
@@ -85,7 +95,7 @@ void AbstractSocialContentPrivate::handleNetworkReply(QNetworkReply::NetworkErro
 {
     Q_Q(ISocialContent);
     if (!build(error, errorString, data)) {
-        qWarning() << "AbstractSocialContentPrivate::setData() failure to build";
+        qWarning() << "AbstractSocialContentPrivate::handleNetworkReply() failure to build";
         setError(SocialNetworkError::Internal, "Internal error");
         return;
     }
@@ -121,9 +131,10 @@ bool SocialNetworkPrivate::socialContentLoad(AbstractSocialContentPrivate &socia
     QByteArray postData;
     SocialRequest::Type type = request.type();
     if (type == SocialRequest::Post) {
-        postData = SocialRequestPrivate::createPostData(request, *q);
+        postData = SocialRequestPrivate::createPostData(request, *q, socialContent.metadata());
     }
-    QNetworkRequest networkRequest = SocialRequestPrivate::createRequest(request, *q, postData);
+    QNetworkRequest networkRequest = SocialRequestPrivate::createRequest(request, *q, postData,
+                                                                         socialContent.metadata());
     QNetworkReply *reply = 0;
     switch (type) {
     case SocialRequest::Get:

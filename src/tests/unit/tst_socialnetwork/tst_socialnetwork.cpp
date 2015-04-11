@@ -38,6 +38,8 @@
 #include <QtCore/QTemporaryDir>
 #include "socialcontentitembuilder.h"
 #include "socialcontentitem.h"
+#include "socialcontentmodel.h"
+#include "socialcontentmodelbuilder.h"
 #include "socialnetwork.h"
 #include "socialobject.h"
 #include "socialrequest.h"
@@ -54,6 +56,7 @@ private Q_SLOTS:
     void initTestCase();
     void tstSimple();
     void tstError();
+    void tstSimpleList();
 private:
     QSharedPointer<QTemporaryDir> m_tempDir;
     QSharedPointer<QProcess> m_process;
@@ -72,17 +75,28 @@ public:
     }
 protected:
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
-                                  const QByteArray &postData) const override
+                                  const QByteArray &postData,
+                                  const QVariantMap &metadata) const override
     {
         Q_UNUSED(socialNetwork);
         Q_UNUSED(postData);
+        Q_UNUSED(metadata);
         QNetworkRequest request;
+        request.setRawHeader("Content-Type", "application/json;charset=UTF-8");
         request.setUrl(m_url);
         return request;
     }
-    QByteArray createPostData(const SocialNetwork &socialNetwork) const override
+    QByteArray createPostData(const SocialNetwork &socialNetwork,
+                              const QVariantMap &metadata) const override
     {
         Q_UNUSED(socialNetwork);
+
+        if (!metadata.isEmpty()) {
+            QJsonObject object = QJsonObject::fromVariantMap(metadata);
+            QJsonDocument document;
+            document.setObject(object);
+            return document.toJson(QJsonDocument::Compact);
+        }
         return QByteArray();
     }
 private:
@@ -115,6 +129,43 @@ protected:
     }
 };
 
+class SimpleModelBuilder: public SocialContentModelBuilder
+{
+public:
+    explicit SimpleModelBuilder(QObject *parent = 0)
+        : SocialContentModelBuilder(parent)
+    {
+    }
+protected:
+    void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
+               const QString &errorString, const QByteArray &data) override
+    {
+        if (error != QNetworkReply::NoError) {
+            setError(contentModel, SocialNetworkError::Network, errorString);
+            return;
+        }
+
+        QJsonDocument document = QJsonDocument::fromJson(data);
+        if (!document.isObject()) {
+            setError(contentModel, SocialNetworkError::Data, "Cannot convert to JSON");
+            return;
+        }
+        const QJsonObject object = document.object();
+
+        bool haveNext = object.value("have_next").toBool(false);
+        QJsonArray array = object.value("values").toArray();
+
+        QList<QVariantMap> modelData;
+        for (const QJsonValue &value : array) {
+            modelData.append(value.toObject().toVariantMap());
+        }
+
+        QVariantMap metadata;
+        metadata.insert("next", haveNext);
+        setData(contentModel, modelData, haveNext, false, metadata);
+    }
+};
+
 void TstSocialNetwork::initTestCase()
 {
     // Install the server
@@ -142,7 +193,7 @@ void TstSocialNetwork::initTestCase()
     m_process->start(NODE_EXEC, nodeArgs);
     QVERIFY(m_process->waitForStarted(-1));
 
-    QTest::qWait(1000); // Wait for Node to start
+    QTest::qWait(2000); // Wait for Node to start
 }
 
 void TstSocialNetwork::tstSimple()
@@ -235,6 +286,135 @@ void TstSocialNetwork::tstError()
     QCOMPARE(socialContentItem.status(), SocialNetworkStatus::Error);
     QCOMPARE(socialContentItem.error(), SocialNetworkError::Network);
     QVERIFY(!socialContentItem.errorString().isEmpty());
+}
+
+void TstSocialNetwork::tstSimpleList()
+{
+    SocialContentModel socialContentModel;
+    socialContentModel.classBegin();
+    socialContentModel.componentComplete();
+
+    QVERIFY(!socialContentModel.load()); // No social network
+
+    QSignalSpy socialNetworkSpy (&socialContentModel, SIGNAL(socialNetworkChanged()));
+    SocialNetwork socialNetwork;
+    socialNetwork.classBegin();
+    socialNetwork.componentComplete();
+    socialContentModel.setSocialNetwork(&socialNetwork);
+    QCOMPARE(socialContentModel.socialNetwork(), &socialNetwork);
+    QCOMPARE(socialNetworkSpy.count(), 1);
+
+    QVERIFY(!socialContentModel.load()); // No request
+
+    QSignalSpy requestSpy (&socialContentModel, SIGNAL(requestChanged()));
+    SimpleRequest request (QUrl("http://localhost:8080/api/postsimplelist"));
+    request.classBegin();
+    request.componentComplete();
+    socialContentModel.setRequest(&request);
+    QCOMPARE(socialContentModel.request(), &request);
+    QCOMPARE(requestSpy.count(), 1);
+
+    QVERIFY(!socialContentModel.load()); // No builder
+
+    QSignalSpy builderSpy (&socialContentModel, SIGNAL(builderChanged()));
+    SimpleModelBuilder builder;
+    builder.classBegin();
+    builder.componentComplete();
+    socialContentModel.setBuilder(&builder);
+    QCOMPARE(socialContentModel.builder(), &builder);
+    QCOMPARE(builderSpy.count(), 1);
+
+    QSignalSpy statusSpy (&socialContentModel, SIGNAL(statusChanged()));
+    QSignalSpy modelSpy (&socialContentModel, SIGNAL(countChanged()));
+    QVERIFY(socialContentModel.load());
+    QCOMPARE(statusSpy.count(), 1);
+    statusSpy.clear();
+
+    QVERIFY(!socialContentModel.load()); // Busy
+
+    while (statusSpy.count() < 1) {
+        QTest::qWait(200);
+    }
+
+    QCOMPARE(modelSpy.count(), 1);
+    QCOMPARE(socialContentModel.status(), SocialNetworkStatus::Ready);
+
+    // Check the model
+    QCOMPARE(socialContentModel.count(), 2);
+    QVariant value0 = socialContentModel.data(socialContentModel.index(0),
+                                              SocialContentModel::ObjectRole);
+    QObject *object0 = value0.value<QObject *>();
+    const QMetaObject *meta0 = object0->metaObject();
+    const QMetaProperty &meta0Index = meta0->property(meta0->indexOfProperty("id"));
+    QCOMPARE(meta0Index.read(object0), QVariant(0));
+    const QMetaProperty &meta0Text = meta0->property(meta0->indexOfProperty("text"));
+    QCOMPARE(meta0Text.read(object0), QVariant("Entry 0"));
+
+    QVariant value1 = socialContentModel.data(socialContentModel.index(1),
+                                              SocialContentModel::ObjectRole);
+    QObject *object1 = value1.value<QObject *>();
+    const QMetaObject *meta1 = object1->metaObject();
+    const QMetaProperty &meta1Index = meta1->property(meta1->indexOfProperty("id"));
+    QCOMPARE(meta1Index.read(object1), QVariant(1));
+    const QMetaProperty &meta1Text = meta1->property(meta1->indexOfProperty("text"));
+    QCOMPARE(meta1Text.read(object1), QVariant("Entry 1"));
+
+    QVERIFY(socialContentModel.haveNext());
+    QVERIFY(!socialContentModel.havePrevious());
+
+    // Load next
+    QVERIFY(socialContentModel.loadNext());
+    QCOMPARE(statusSpy.count(), 2);
+    statusSpy.clear();
+    modelSpy.clear();
+
+    while (statusSpy.count() < 1) {
+        QTest::qWait(200);
+    }
+
+    QCOMPARE(modelSpy.count(), 1);
+    QCOMPARE(socialContentModel.status(), SocialNetworkStatus::Ready);
+
+    // Check the model
+    QCOMPARE(socialContentModel.count(), 4);
+    QVariant newValue0 = socialContentModel.data(socialContentModel.index(0),
+                                              SocialContentModel::ObjectRole);
+    QObject *newObject0 = newValue0.value<QObject *>();
+    const QMetaObject *newMeta0 = newObject0->metaObject();
+    const QMetaProperty &newMeta0Index = newMeta0->property(newMeta0->indexOfProperty("id"));
+    QCOMPARE(newMeta0Index.read(newObject0), QVariant(0));
+    const QMetaProperty &newMeta0Text = newMeta0->property(newMeta0->indexOfProperty("text"));
+    QCOMPARE(newMeta0Text.read(newObject0), QVariant("Entry 0"));
+
+    QVariant newValue1 = socialContentModel.data(socialContentModel.index(1),
+                                              SocialContentModel::ObjectRole);
+    QObject *newObject1 = newValue1.value<QObject *>();
+    const QMetaObject *newMeta1 = newObject1->metaObject();
+    const QMetaProperty &newMeta1Index = newMeta1->property(newMeta1->indexOfProperty("id"));
+    QCOMPARE(newMeta1Index.read(newObject1), QVariant(1));
+    const QMetaProperty &newMeta1Text = newMeta1->property(newMeta1->indexOfProperty("text"));
+    QCOMPARE(newMeta1Text.read(newObject1), QVariant("Entry 1"));
+
+    QVariant newValue2 = socialContentModel.data(socialContentModel.index(2),
+                                              SocialContentModel::ObjectRole);
+    QObject *newObject2 = newValue2.value<QObject *>();
+    const QMetaObject *newMeta2 = newObject2->metaObject();
+    const QMetaProperty &newMeta2Index = newMeta2->property(newMeta2->indexOfProperty("id"));
+    QCOMPARE(newMeta2Index.read(newObject2), QVariant(2));
+    const QMetaProperty &newMeta2Text = newMeta2->property(newMeta2->indexOfProperty("text"));
+    QCOMPARE(newMeta2Text.read(newObject2), QVariant("Entry 2"));
+
+    QVariant newValue3 = socialContentModel.data(socialContentModel.index(3),
+                                              SocialContentModel::ObjectRole);
+    QObject *newObject3 = newValue3.value<QObject *>();
+    const QMetaObject *newMeta3 = newObject3->metaObject();
+    const QMetaProperty &newMeta3Index = newMeta3->property(newMeta3->indexOfProperty("id"));
+    QCOMPARE(newMeta3Index.read(newObject3), QVariant(3));
+    const QMetaProperty &newMeta3Text = newMeta3->property(newMeta3->indexOfProperty("text"));
+    QCOMPARE(newMeta3Text.read(newObject3), QVariant("Entry 3"));
+
+    QVERIFY(!socialContentModel.haveNext());
+    QVERIFY(!socialContentModel.havePrevious());
 }
 
 QTEST_MAIN(TstSocialNetwork)

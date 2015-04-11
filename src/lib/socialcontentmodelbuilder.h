@@ -29,29 +29,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALOBJECT_P_H
-#define SOCIALOBJECT_P_H
+#ifndef SOCIALCONTENTMODELBUILDER_H
+#define SOCIALCONTENTMODELBUILDER_H
 
-#include "socialobject.h"
+#include <QtCore/QObject>
+#include <QtNetwork/QNetworkReply>
+#include <QtQml/QQmlParserStatus>
+#include "socialnetworkerror.h"
 
-class QVariant;
-class SocialObjectMetaObject;
-class SocialObject;
-class SocialObjectPrivate
+class SocialContentModel;
+class SocialContentModelBuilderPrivate;
+class SocialContentModelBuilder : public QObject, public QQmlParserStatus
 {
+    Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
 public:
-    explicit SocialObjectPrivate(SocialObject *q);
-    ~SocialObjectPrivate();
-    static void setProperty(SocialObject *object, const char *name, const QVariant &value);
-    static void clear(SocialObject *object);
+    virtual ~SocialContentModelBuilder();
+    void classBegin() override;
+    void componentComplete() override;
 protected:
-    SocialObject * const q_ptr;
+    explicit SocialContentModelBuilder(QObject *parent = 0);
+    virtual void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
+                       const QString &errorString, const QByteArray &data) = 0;
+    void setData(SocialContentModel &contentModel, const QList<QVariantMap> &data,
+                 bool haveNext, bool havePrevious, const QVariantMap &metadata = QVariantMap());
+    void setError(SocialContentModel &contentModel, SocialNetworkError::type error,
+                  const QString &errorString);
+    QScopedPointer<SocialContentModelBuilderPrivate> d_ptr;
 private:
-    void setProperty(const char *name, const QVariant &value);
-    void clear();
-    SocialObjectMetaObject *m_meta;
-    Q_DECLARE_PUBLIC(SocialObject)
+    Q_DECLARE_PRIVATE(SocialContentModelBuilder)
 };
 
-#endif // SOCIALOBJECT_P_H
-
+#endif // SOCIALCONTENTMODELBUILDER_H

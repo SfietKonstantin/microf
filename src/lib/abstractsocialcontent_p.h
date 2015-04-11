@@ -41,6 +41,8 @@ class AbstractSocialContentPrivate
 {
 public:
     virtual ~AbstractSocialContentPrivate();
+    const QVariantMap & metadata() const;
+    void setMetadata(const QVariantMap &metadata);
     static void handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
                                    QNetworkReply::NetworkError error, const QString &errorString,
                                    const QByteArray &data);
@@ -57,6 +59,7 @@ protected:
 private:
     void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorString,
                             const QByteArray &data);
+    QVariantMap m_metadata;
     Q_DECLARE_PUBLIC(ISocialContent)
 };
 

@@ -2,21 +2,20 @@
 #include "socialcontentitem_p.h"
 #include <QtCore/QDebug>
 #include "socialnetwork_p.h"
-#include "socialobject.h"
 #include "socialobject_p.h"
-#include "socialcontentitembuilder.h"
 #include "socialcontentitembuilder_p.h"
 
 SocialContentItemPrivate::SocialContentItemPrivate(SocialContentItem *q)
-    : AbstractSocialContentPrivate(q), q_ptr(q), m_socialNetwork(0), m_request(0), m_builder(0)
+    : AbstractSocialContentPrivate(q), m_socialNetwork(0), m_request(0), m_builder(0)
     , m_object(0)
 {
 }
 
 void SocialContentItemPrivate::setContentItemObject(SocialContentItem &contentItem,
-                                                    const QVariantMap &properties)
+                                                    const QVariantMap &properties,
+                                                    const QVariantMap &metadata)
 {
-    contentItem.d_func()->setContentItemObject(properties);
+    contentItem.d_func()->setContentItemObject(properties, metadata);
 }
 
 void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentItem,
@@ -37,13 +36,15 @@ bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QS
     return true;
 }
 
-void SocialContentItemPrivate::setContentItemObject(const QVariantMap &properties)
+void SocialContentItemPrivate::setContentItemObject(const QVariantMap &properties,
+                                                    const QVariantMap &metadata)
 {
     Q_Q(SocialContentItem);
     for (const QString &key : properties.keys()) {
         const QVariant &value = properties.value(key);
         SocialObjectPrivate::setProperty(m_object, key.toLocal8Bit(), value);
     }
+    setMetadata(metadata);
     setStatus(SocialNetworkStatus::Ready);
     emit q->finished(true);
 }

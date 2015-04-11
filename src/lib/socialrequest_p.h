@@ -34,17 +34,18 @@
 
 #include <QtCore/QtGlobal>
 #include <QtNetwork/QNetworkRequest>
+#include "socialrequest.h"
 
-class SocialNetwork;
-class SocialRequest;
 class SocialRequestPrivate
 {
 public:
     explicit SocialRequestPrivate(SocialRequest *q);
     static QNetworkRequest createRequest(const SocialRequest &request,
-                                         const SocialNetwork &socialNetwork, const QByteArray &postData);
+                                         const SocialNetwork &socialNetwork,
+                                         const QByteArray &postData, const QVariantMap &metadata);
     static QByteArray createPostData(const SocialRequest &request,
-                                     const SocialNetwork &socialNetwork);
+                                     const SocialNetwork &socialNetwork,
+                                     const QVariantMap &metadata);
 protected:
     SocialRequest * const q_ptr;
 private:

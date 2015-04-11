@@ -3,8 +3,6 @@
 
 #include <QtCore/QObject>
 #include <QtQml/QQmlParserStatus>
-#include "socialnetworkstatus.h"
-#include "socialnetworkerror.h"
 #include "isocialcontent.h"
 
 class SocialNetwork;
@@ -38,9 +36,9 @@ public:
     SocialContentItemBuilder * builder() const;
     void setBuilder(SocialContentItemBuilder * builder);
     SocialObject * object() const;
-    SocialNetworkStatus::type status() const;
-    SocialNetworkError::type error() const;
-    QString errorString() const;
+    SocialNetworkStatus::type status() const override;
+    SocialNetworkError::type error() const override;
+    QString errorString() const override;
 public Q_SLOTS:
     bool load();
 Q_SIGNALS:

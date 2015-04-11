@@ -33,25 +33,21 @@
 #define SOCIALCONTENTITEM_P_H
 
 #include "abstractsocialcontent_p.h"
+#include "socialcontentitem.h"
 
-class SocialNetwork;
-class SocialObject;
-class SocialRequest;
-class SocialContentItemBuilder;
-class SocialContentItem;
 class SocialContentItemPrivate: public AbstractSocialContentPrivate
 {
 public:
     explicit SocialContentItemPrivate(SocialContentItem *q);
-    static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties);
+    static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties,
+                                     const QVariantMap &metadata);
     static void setContentItemError(SocialContentItem &contentItem,
                                     SocialNetworkError::type error, const QString &errorString);
 protected:
     bool build(QNetworkReply::NetworkError error, const QString &errorString,
                const QByteArray &data) override;
-    SocialContentItem * const q_ptr;
 private:
-    void setContentItemObject(const QVariantMap &properties);
+    void setContentItemObject(const QVariantMap &properties, const QVariantMap &metadata);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentItemBuilder *m_builder;

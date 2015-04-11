@@ -33,10 +33,8 @@
 #define SOCIALCONTENTBUILDER_P_H
 
 #include <QtNetwork/QNetworkReply>
+#include "socialcontentitembuilder.h"
 
-class QByteArray;
-class SocialContentItem;
-class SocialContentItemBuilder;
 class SocialContentItemBuilderPrivate
 {
 public:

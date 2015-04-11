@@ -29,52 +29,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "socialcontentitembuilder.h"
-#include "socialcontentitembuilder_p.h"
-#include "socialcontentitem_p.h"
+#include "socialcontentmodelbuilder.h"
+#include "socialcontentmodelbuilder_p.h"
+#include "socialcontentmodel_p.h"
 
-SocialContentItemBuilderPrivate::SocialContentItemBuilderPrivate(SocialContentItemBuilder *q)
+SocialContentModelBuilderPrivate::SocialContentModelBuilderPrivate(SocialContentModelBuilder *q)
     : q_ptr(q)
 {
 }
 
-void SocialContentItemBuilderPrivate::build(SocialContentItemBuilder &builder,
-                                            SocialContentItem &contentItem,
-                                            QNetworkReply::NetworkError error,
-                                            const QString &errorString, const QByteArray &data)
+void SocialContentModelBuilderPrivate::build(SocialContentModelBuilder &builder,
+                                             SocialContentModel &contentModel,
+                                             QNetworkReply::NetworkError error,
+                                             const QString &errorString, const QByteArray &data)
 {
-    builder.build(contentItem, error, errorString, data);
+    builder.build(contentModel, error, errorString, data);
 }
 
-SocialContentItemBuilder::SocialContentItemBuilder(QObject *parent)
-    : QObject(parent), d_ptr(new SocialContentItemBuilderPrivate(this))
-{
-}
-
-SocialContentItemBuilder::~SocialContentItemBuilder()
+SocialContentModelBuilder::SocialContentModelBuilder(QObject *parent)
+    : QObject(parent), d_ptr(new SocialContentModelBuilderPrivate(this))
 {
 }
 
-void SocialContentItemBuilder::classBegin()
+SocialContentModelBuilder::~SocialContentModelBuilder()
 {
 }
 
-void SocialContentItemBuilder::componentComplete()
+void SocialContentModelBuilder::classBegin()
 {
 }
 
-void SocialContentItemBuilder::setObject(SocialContentItem &contentItem,
-                                         const QVariantMap &properties,
-                                         const QVariantMap &metadata)
+void SocialContentModelBuilder::componentComplete()
 {
-    SocialContentItemPrivate::setContentItemObject(contentItem, properties, metadata);
 }
 
-void SocialContentItemBuilder::setError(SocialContentItem &contentItem,
-                                        SocialNetworkError::type error, const QString &errorString)
+void SocialContentModelBuilder::setData(SocialContentModel &contentModel,
+                                        const QList<QVariantMap> &data,
+                                        bool haveNext, bool havePrevious,
+                                        const QVariantMap &metadata)
 {
-    SocialContentItemPrivate::setContentItemError(contentItem, error, errorString);
+    SocialContentModelPrivate::setContentModelData(contentModel, data, haveNext, havePrevious,
+                                                   metadata);
+
 }
 
+void SocialContentModelBuilder::setError(SocialContentModel &contentModel,
+                                         SocialNetworkError::type error, const QString &errorString)
+{
+    SocialContentModelPrivate::setContentModelError(contentModel, error, errorString);
 
+}
 

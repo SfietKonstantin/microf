@@ -29,29 +29,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALOBJECT_P_H
-#define SOCIALOBJECT_P_H
+#ifndef SOCIALCONTENTMODEL_P_H
+#define SOCIALCONTENTMODEL_P_H
 
-#include "socialobject.h"
+#include <QtNetwork/QNetworkReply>
+#include "abstractsocialcontent_p.h"
+#include "socialcontentmodel.h"
 
-class QVariant;
-class SocialObjectMetaObject;
-class SocialObject;
-class SocialObjectPrivate
+class SocialContentModelPrivate: public AbstractSocialContentPrivate
 {
 public:
-    explicit SocialObjectPrivate(SocialObject *q);
-    ~SocialObjectPrivate();
-    static void setProperty(SocialObject *object, const char *name, const QVariant &value);
-    static void clear(SocialObject *object);
+    enum UpdateMode {
+        Replace,
+        Append,
+        Prepend
+    };
+    explicit SocialContentModelPrivate(SocialContentModel *q);
+    static void setContentModelData(SocialContentModel &contentModel,
+                                    const QList<QVariantMap> &data,
+                                    bool haveNext, bool havePrevious,
+                                    const QVariantMap &metadata);
+    static void setContentModelError(SocialContentModel &contentModel,
+                                     SocialNetworkError::type error, const QString &errorString);
 protected:
-    SocialObject * const q_ptr;
+    bool build(QNetworkReply::NetworkError error, const QString &errorString,
+               const QByteArray &data) override;
 private:
-    void setProperty(const char *name, const QVariant &value);
-    void clear();
-    SocialObjectMetaObject *m_meta;
-    Q_DECLARE_PUBLIC(SocialObject)
+    bool load(UpdateMode updateMode);
+    void setContentModelData(const QList<QVariantMap> &data, bool haveNext, bool havePrevious,
+                             const QVariantMap &metadata);
+    void setNewData(const QList<SocialObject *> &data);
+    void appendNewData(const QList<SocialObject *> &data);
+    void prependNewData(const QList<SocialObject *> &data);
+    bool m_haveNext;
+    bool m_havePrevious;
+    UpdateMode m_updateMode;
+    SocialNetwork *m_socialNetwork;
+    SocialRequest *m_request;
+    SocialContentModelBuilder *m_builder;
+    QList<SocialObject *> m_data;
+    Q_DECLARE_PUBLIC(SocialContentModel)
 };
 
-#endif // SOCIALOBJECT_P_H
+#endif // SOCIALCONTENTMODEL_P_H
 

@@ -44,8 +44,10 @@ SocialRequest::Type FacebookLogoutRequest::type() const
 }
 
 QNetworkRequest FacebookLogoutRequest::createRequest(const SocialNetwork &socialNetwork,
-                                                     const QByteArray &postData) const
+                                                     const QByteArray &postData,
+                                                     const QVariantMap &metadata) const
 {
+    Q_UNUSED(metadata);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {
         return QNetworkRequest();
@@ -68,8 +70,10 @@ QNetworkRequest FacebookLogoutRequest::createRequest(const SocialNetwork &social
     return request;
 }
 
-QByteArray FacebookLogoutRequest::createPostData(const SocialNetwork &socialNetwork) const
+QByteArray FacebookLogoutRequest::createPostData(const SocialNetwork &socialNetwork,
+                                                 const QVariantMap &metadata) const
 {
+    Q_UNUSED(metadata);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {
         return QByteArray();

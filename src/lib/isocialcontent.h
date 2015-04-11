@@ -33,11 +33,16 @@
 #define ISOCIALCONTENT_H
 
 #include <QtCore/qobjectdefs.h>
+#include "socialnetworkstatus.h"
+#include "socialnetworkerror.h"
 
 class ISocialContent
 {
 public:
     virtual ~ISocialContent() {}
+    virtual SocialNetworkStatus::type status() const = 0;
+    virtual SocialNetworkError::type error() const = 0;
+    virtual QString errorString() const = 0;
 Q_SIGNALS:
     virtual void statusChanged() = 0;
     virtual void errorChanged() = 0;

@@ -29,29 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALOBJECT_P_H
-#define SOCIALOBJECT_P_H
+#ifndef SOCIALCONTENTMODELBUILDER_P_H
+#define SOCIALCONTENTMODELBUILDER_P_H
 
-#include "socialobject.h"
+#include <QtNetwork/QNetworkReply>
+#include "socialcontentmodelbuilder.h"
 
-class QVariant;
-class SocialObjectMetaObject;
-class SocialObject;
-class SocialObjectPrivate
+class SocialContentModelBuilderPrivate
 {
 public:
-    explicit SocialObjectPrivate(SocialObject *q);
-    ~SocialObjectPrivate();
-    static void setProperty(SocialObject *object, const char *name, const QVariant &value);
-    static void clear(SocialObject *object);
+    SocialContentModelBuilderPrivate(SocialContentModelBuilder *q);
+    static void build(SocialContentModelBuilder &builder, SocialContentModel &contentModel,
+                      QNetworkReply::NetworkError error, const QString &errorString,
+                      const QByteArray &data);
 protected:
-    SocialObject * const q_ptr;
-private:
-    void setProperty(const char *name, const QVariant &value);
-    void clear();
-    SocialObjectMetaObject *m_meta;
-    Q_DECLARE_PUBLIC(SocialObject)
+    SocialContentModelBuilder * const q_ptr;
 };
 
-#endif // SOCIALOBJECT_P_H
+#endif // SOCIALCONTENTMODELBUILDER_P_H
 

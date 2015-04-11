@@ -39,15 +39,17 @@ SocialRequestPrivate::SocialRequestPrivate(SocialRequest *q)
 
 QNetworkRequest SocialRequestPrivate::createRequest(const SocialRequest &request,
                                                     const SocialNetwork &socialNetwork,
-                                                    const QByteArray &postData)
+                                                    const QByteArray &postData,
+                                                    const QVariantMap &metadata)
 {
-    return request.createRequest(socialNetwork, postData);
+    return request.createRequest(socialNetwork, postData, metadata);
 }
 
 QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
-                                                const SocialNetwork &socialNetwork)
+                                                const SocialNetwork &socialNetwork,
+                                                const QVariantMap &metadata)
 {
-    return request.createPostData(socialNetwork);
+    return request.createPostData(socialNetwork, metadata);
 }
 
 SocialRequest::SocialRequest(QObject *parent)

@@ -39,10 +39,12 @@ class FacebookLogoutRequest : public SocialRequest
     Q_OBJECT
 public:
     explicit FacebookLogoutRequest(QObject *parent = 0);
-    Type type() const;
+    Type type() const override;
 protected:
-    QNetworkRequest createRequest(const SocialNetwork &socialNetwork, const QByteArray &postData) const;
-    QByteArray createPostData(const SocialNetwork &socialNetwork) const;
+    QNetworkRequest createRequest(const SocialNetwork &socialNetwork, const QByteArray &postData,
+                                  const QVariantMap &metadata) const override;
+    QByteArray createPostData(const SocialNetwork &socialNetwork,
+                              const QVariantMap &metadata) const override;
 };
 
 #endif // FACEBOOKLOGOUTREQUEST_H
