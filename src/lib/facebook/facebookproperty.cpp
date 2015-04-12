@@ -29,40 +29,75 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#include "facebookproperty.h"
+#include "facebookproperty_p.h"
+#include <QtCore/QStringList>
+#include <QtCore/QVariant>
 
-#include "abstractfacebookrequest.h"
-
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+FacebookPropertyPrivate::FacebookPropertyPrivate(FacebookProperty *q)
+    : q_ptr(q)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
-public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
-private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
-};
+}
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, const QString &path)
+{
+    QStringList splittedPath = path.split("/");
+    QJsonValue currentValue = QJsonValue(object);
+    while (!splittedPath.isEmpty()) {
+        const QString &step = splittedPath.takeFirst();
+        currentValue = currentValue.toObject().value(step);
+    }
+
+    if (!currentValue.isBool() && currentValue.isDouble() && currentValue.isString()) {
+        return QVariant();
+    }
+    return currentValue.toVariant();
+}
+
+FacebookProperty::FacebookProperty(QObject *parent)
+    : QObject(parent), d_ptr(new FacebookPropertyPrivate(this))
+{
+}
+
+FacebookProperty::~FacebookProperty()
+{
+}
+
+void FacebookProperty::classBegin()
+{
+}
+
+void FacebookProperty::componentComplete()
+{
+}
+
+QString FacebookProperty::path() const
+{
+    Q_D(const FacebookProperty);
+    return d->path;
+}
+
+void FacebookProperty::setPath(const QString &path)
+{
+    Q_D(FacebookProperty);
+    if (d->path != path) {
+        d->path = path;
+        emit pathChanged();
+    }
+}
+
+QString FacebookProperty::name() const
+{
+    Q_D(const FacebookProperty);
+    return d->name;
+}
+
+void FacebookProperty::setName(const QString &name)
+{
+    Q_D(FacebookProperty);
+    if (d->name != name) {
+        d->name = name;
+        emit nameChanged();
+    }
+}
+

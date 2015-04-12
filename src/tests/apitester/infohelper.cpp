@@ -29,40 +29,71 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#include "infohelper.h"
+#include <QtCore/QMetaProperty>
+#include <QtCore/QUrl>
 
-#include "abstractfacebookrequest.h"
-
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+InfoHelper::InfoHelper(QObject *parent)
+    : QObject(parent)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
-public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
-private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
-};
+}
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+InfoHelper::~InfoHelper()
+{
+}
+
+QObject * InfoHelper::object() const
+{
+    return m_object;
+}
+
+void InfoHelper::setObject(QObject *object)
+{
+    if (m_object != object) {
+        m_object = object;
+        emit objectChanged();
+        generateText();
+    }
+}
+
+QString InfoHelper::text() const
+{
+    return m_text;
+}
+
+QStringList InfoHelper::urls() const
+{
+    return m_urls;
+}
+
+void InfoHelper::generateText()
+{
+    if (!m_object) {
+        return;
+    }
+    const QMetaObject *meta = m_object->metaObject();
+    int offset = meta->propertyOffset();
+    int count = meta->propertyCount();
+
+    QString text;
+    QStringList urls;
+    for (int i = offset; i < count; ++i) {
+        const QMetaProperty &metaProperty = meta->property(i);
+        QString value = metaProperty.read(m_object).toString();
+        text.append(QString("<p><b>%1</b>: %2</p>").arg(metaProperty.name(), value));
+        QUrl url (value, QUrl::StrictMode);
+        if (url.isValid() && url.scheme().startsWith("http")) {
+            urls.append(value);
+        }
+    }
+
+    if (m_text != text) {
+        m_text = text;
+        emit textChanged();
+    }
+
+    if (m_urls != urls) {
+        m_urls = urls;
+        emit urlsChanged();
+    }
+}

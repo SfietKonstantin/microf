@@ -38,13 +38,14 @@ class FacebookFriendListRequestPrivate: public SocialRequestPrivate
 private:
     explicit FacebookFriendListRequestPrivate(FacebookFriendListRequest *q);
     QString userId;
-    int size;
+    int count;
+    int profilePictureSize;
 private:
     Q_DECLARE_PUBLIC(FacebookFriendListRequest)
 };
 
 FacebookFriendListRequestPrivate::FacebookFriendListRequestPrivate(FacebookFriendListRequest *q)
-    : SocialRequestPrivate(q), size(20)
+    : SocialRequestPrivate(q), count(20), profilePictureSize(196)
 {
 }
 
@@ -68,18 +69,33 @@ void FacebookFriendListRequest::setUserId(const QString &userId)
     }
 }
 
-int FacebookFriendListRequest::size() const
+int FacebookFriendListRequest::count() const
 {
     Q_D(const FacebookFriendListRequest);
-    return d->size;
+    return d->count;
 }
 
-void FacebookFriendListRequest::setSize(int size)
+void FacebookFriendListRequest::setCount(int count)
 {
     Q_D(FacebookFriendListRequest);
-    if (d->size != size) {
-        d->size = size;
-        emit sizeChanged();
+    if (d->count != count) {
+        d->count = count;
+        emit countChanged();
+    }
+}
+
+int FacebookFriendListRequest::profilePictureSize() const
+{
+    Q_D(const FacebookFriendListRequest);
+    return d->profilePictureSize;
+}
+
+void FacebookFriendListRequest::setProfilePictureSize(int profilePictureSize)
+{
+    Q_D(FacebookFriendListRequest);
+    if (d->profilePictureSize != profilePictureSize) {
+        d->profilePictureSize = profilePictureSize;
+        emit profilePictureSizeChanged();
     }
 }
 
@@ -106,12 +122,12 @@ QJsonObject FacebookFriendListRequest::queryParameters(Mode mode, const QVariant
     Q_D(const FacebookFriendListRequest);
     QJsonObject returned;
     returned.insert("0", d->userId);
-    returned.insert("1", "");
+    returned.insert("1", ""); // ??? Maybe for startCursor ?
     if (mode == LoadNext) {
         returned.insert("2", metadata.value("endCursor").toString());
     }
-    returned.insert("3", QString::number(d->size));
-    returned.insert("4", "196");
+    returned.insert("3", QString::number(d->count));
+    returned.insert("4", QString::number(d->profilePictureSize));
     return returned;
 }
 

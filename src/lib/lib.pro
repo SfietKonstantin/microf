@@ -33,7 +33,9 @@ HEADERS += \
     facebook/facebookconfirmationcontentbuilder.h \
     facebook/abstractfacebookrequest.h \
     facebook/facebookfriendlistrequest.h \
-    facebook/facebookmodelbuilder.h
+    facebook/facebookmodelbuilder.h \
+    facebook/facebookproperty.h \
+    facebook/facebookproperty_p.h
 
 SOURCES += \
     socialnetwork.cpp \
@@ -52,4 +54,5 @@ SOURCES += \
     facebook/facebookconfirmationcontentbuilder.cpp \
     facebook/abstractfacebookrequest.cpp \
     facebook/facebookfriendlistrequest.cpp \
-    facebook/facebookmodelbuilder.cpp
+    facebook/facebookmodelbuilder.cpp \
+    facebook/facebookproperty.cpp

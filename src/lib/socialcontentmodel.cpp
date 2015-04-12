@@ -151,6 +151,9 @@ void SocialContentModelPrivate::setNewData(const QList<SocialObject *> &data)
         q->beginRemoveRows(QModelIndex(), 0, q->rowCount() - 1);
         qDeleteAll(m_data);
         m_data.clear();
+        if (data.isEmpty()) {
+            emit q->countChanged();
+        }
         q->endRemoveRows();
     }
 

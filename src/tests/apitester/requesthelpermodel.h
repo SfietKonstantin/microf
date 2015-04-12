@@ -29,40 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef REQUESTHELPERMODEL_H
+#define REQUESTHELPERMODEL_H
 
-#include "abstractfacebookrequest.h"
+#include <QtCore/QAbstractListModel>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class SocialRequest;
+class RequestHelperModelData;
+class RequestHelperModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_ENUMS(Type)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
+    enum Roles {
+        TextRole = Qt::UserRole + 1,
+        RequestRole,
+        TypeRole
+    };
+    enum Type {
+        Invalid,
+        Object,
+        Model
+    };
+    explicit RequestHelperModel(QObject *parent = 0);
+    virtual ~RequestHelperModel();
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
+    Q_INVOKABLE SocialRequest * request(int index) const;
+    Q_INVOKABLE Type type(int index) const;
+signals:
     void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    QList<RequestHelperModelData *> m_data;
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+#endif // REQUESTHELPERMODEL_H

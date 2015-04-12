@@ -29,40 +29,62 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef AUTHHELPER_H
+#define AUTHHELPER_H
 
-#include "abstractfacebookrequest.h"
+#include <QtCore/QObject>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class AuthHelper: public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
+    Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
+    Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
     Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
+    Q_PROPERTY(QString sessionKey READ sessionKey WRITE setSessionKey NOTIFY sessionKeyChanged)
+    Q_PROPERTY(QString secret READ secret WRITE setSecret NOTIFY secretChanged)
+    Q_PROPERTY(QString accessToken READ accessToken WRITE setAccessToken NOTIFY accessTokenChanged)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
+    explicit AuthHelper(QObject *parent = 0);
+    ~AuthHelper();
+    Q_INVOKABLE static QString generateMachineId();
+    Q_INVOKABLE static QString parseUrlQuery(const QString &queryString);
+    Q_INVOKABLE static QString formatJson(const QString &json);
+    QString email() const;
+    void setEmail(const QString &email);
+    QString deviceId() const;
+    void setDeviceId(const QString &deviceId);
+    QString machineId() const;
+    void setMachineId(const QString &machineId);
     QString userId() const;
     void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
+    QString sessionKey() const;
+    void setSessionKey(const QString &sessionKey);
+    QString secret() const;
+    void setSecret(const QString &secret);
+    QString accessToken() const;
+    void setAccessToken(const QString &accessToken);
+public slots:
+    void save();
+    void logout();
+signals:
+    void emailChanged();
+    void deviceIdChanged();
+    void machineIdChanged();
     void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+    void sessionKeyChanged();
+    void secretChanged();
+    void accessTokenChanged();
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    QString m_email;
+    QString m_deviceId;
+    QString m_machineId;
+    QString m_userId;
+    QString m_sessionKey;
+    QString m_secret;
+    QString m_accessToken;
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+
+
+#endif // AUTHHELPER_H

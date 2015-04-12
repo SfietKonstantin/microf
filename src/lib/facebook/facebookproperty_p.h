@@ -29,40 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef FACEBOOKPROPERTY_P_H
+#define FACEBOOKPROPERTY_P_H
 
-#include "abstractfacebookrequest.h"
+#include "facebookproperty.h"
+#include <QtCore/QJsonObject>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class FacebookPropertyPrivate
 {
-    Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
+    explicit FacebookPropertyPrivate(FacebookProperty *q);
+    static QVariant propertyFromPath(const QJsonObject &object, const QString &path);
 protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+    FacebookProperty * const q_ptr;
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    Q_DECLARE_PUBLIC(FacebookProperty)
+    QString path;
+    QString name;
+
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+#endif // FACEBOOKPROPERTY_P_H
+

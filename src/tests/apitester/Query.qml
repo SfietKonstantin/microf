@@ -5,25 +5,53 @@ import org.sfietkonstantin.microf 1.0
 
 Item {
     id: container
-    property bool busy: model.status === SocialNetworkStatus.Busy
+    property bool busy: item.status === SocialNetworkStatus.Busy || model.status === SocialNetworkStatus.Busy
     property bool canQuery: !busy && authHelper.accessToken !== ""
+    property int type: RequestHelperModel.Invalid
+    property var request: null
     anchors.fill: parent
 
-    FacebookFriendListRequest {
-        id: friendsRequest
-        userId: authHelper.userId
-        size: 10
+    SocialContentItem {
+        id: item
+        socialNetwork: facebook
+        request: container.request
+
+        onFinished: {
+            if (!ok) {
+                errorLabel.text = model.errorString
+            }
+        }
     }
 
     SocialContentModel {
         id: model
         socialNetwork: facebook
+        request: container.request
         builder: FacebookModelBuilder {}
         onFinished: {
             if (!ok) {
                 errorLabel.text = model.errorString
             }
         }
+    }
+
+    RequestHelperModel {
+        id: requestModel
+    }
+
+    RequestPropertyHelperModel {
+        id: requestPropertyModel
+        request: container.request
+    }
+
+    IntValidator {
+        id: intValidator
+        bottom: 0
+    }
+
+    DoubleValidator {
+        id: doubleValidator
+        bottom: 0
     }
 
     SplitView {
@@ -50,29 +78,73 @@ Item {
                         title: "Request"
                         anchors.left: parent.left; anchors.right: parent.right
 
-                        ColumnLayout {
+                        Column {
                             spacing: 3
-                            anchors.fill: parent
+                            anchors.left: parent.left; anchors.right: parent.right
                             ComboBox {
+                                anchors.left: parent.left; anchors.right: parent.right
                                 id: typeField
                                 function setRequest() {
-                                    var mapping = [friendsRequest]
-                                    model.request = mapping[currentIndex]
+                                    container.request = requestModel.request(currentIndex)
+                                    container.type = requestModel.type(currentIndex)
                                 }
+                                textRole: "text"
                                 enabled: !container.busy
                                 Layout.fillWidth: true
                                 currentIndex: 0
                                 onCurrentIndexChanged: setRequest()
                                 Component.onCompleted: setRequest()
-                                model: ListModel {
-                                    id: queryModel
-                                    ListElement { text: "Friends" }
+                                model: requestModel
+                            }
+
+                            Repeater {
+                                anchors.left: parent.left; anchors.right: parent.right
+                                model: requestPropertyModel
+                                delegate: TextField {
+                                    function save() {
+                                        requestPropertyModel.save(model.index, text)
+                                    }
+
+                                    anchors.left: parent.left; anchors.right: parent.right
+                                    placeholderText: model.name
+                                    Component.onCompleted: {
+                                        if (model.name === "userId") {
+                                            text = authHelper.userId
+                                            save()
+                                        } else {
+                                            text = model.value
+                                        }
+                                    }
+                                    onEditingFinished: save()
+                                    validator: {
+                                        switch (model.type) {
+                                        case RequestPropertyHelperModel.Int:
+                                            return intValidator
+                                        case RequestPropertyHelperModel.Double:
+                                            return doubleValidator
+                                        default:
+                                            return null
+                                        }
+                                    }
+                                    visible: model.type !== RequestPropertyHelperModel.Unknown
                                 }
                             }
                         }
                     }
 
                     Column {
+                        id: buttons
+                        function prepareLoad() {
+                            switch (container.type) {
+                            case RequestHelperModel.Object:
+                                modelView.visible = false
+                                break
+                            case RequestHelperModel.Model:
+                                modelView.visible = true
+                                break
+                            }
+                        }
+
                         anchors.left: parent.left; anchors.right: parent.right
                         spacing: 3
 
@@ -81,22 +153,32 @@ Item {
                             enabled: container.canQuery
                             text: "Request"
                             onClicked: {
-                                model.load()
+                                buttons.prepareLoad()
+                                switch (container.type) {
+                                case RequestHelperModel.Object:
+                                    item.load()
+                                    break
+                                case RequestHelperModel.Model:
+                                    model.load()
+                                    break
+                                }
                             }
                         }
                         Button {
                             anchors.left: parent.left; anchors.right: parent.right
-                            enabled: container.canQuery && model.hasNext
+                            enabled: container.canQuery && type === RequestHelperModel.Model && model.hasNext
                             text: "Request next"
                             onClicked: {
+                                buttons.prepareLoad()
                                 model.loadNext()
                             }
                         }
                         Button {
                             anchors.left: parent.left; anchors.right: parent.right
-                            enabled: container.canQuery && model.hasPrevious
+                            enabled: container.canQuery && type === RequestHelperModel.Model && model.hasPrevious
                             text: "Request previous"
                             onClicked: {
+                                buttons.prepareLoad()
                                 model.loadPrevious()
                             }
                         }
@@ -113,12 +195,12 @@ Item {
         }
 
         ListView {
-            id: view
+            id: modelView
             Layout.minimumWidth: 200
             width: parent.width
             model: model
             delegate: Item {
-                width: view.width
+                width: modelView.width
                 height: rect.height + rect.anchors.margins
 
                 Rectangle {

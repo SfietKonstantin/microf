@@ -29,40 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef INFOHELPER_H
+#define INFOHELPER_H
 
-#include "abstractfacebookrequest.h"
+#include <QtCore/QObject>
+#include <QtCore/QStringList>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class InfoHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
+    Q_PROPERTY(QObject * object READ object WRITE setObject NOTIFY objectChanged)
+    Q_PROPERTY(QString text READ text NOTIFY textChanged)
+    Q_PROPERTY(QStringList urls READ urls NOTIFY urlsChanged)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+    explicit InfoHelper(QObject *parent = 0);
+    ~InfoHelper();
+    QObject * object() const;
+    void setObject(QObject *object);
+    QString text() const;
+    QStringList urls() const;
+signals:
+    void objectChanged();
+    void textChanged();
+    void urlsChanged();
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    void generateText();
+    QObject * m_object;
+    QString m_text;
+    QStringList m_urls;
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+#endif // INFOHELPER_H

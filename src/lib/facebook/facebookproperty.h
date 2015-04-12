@@ -29,40 +29,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef FACEBOOKPROPERTY_H
+#define FACEBOOKPROPERTY_H
 
-#include "abstractfacebookrequest.h"
+#include <QtCore/QObject>
+#include <QtQml/QQmlParserStatus>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class FacebookPropertyPrivate;
+class FacebookProperty : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
+    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
+    explicit FacebookProperty(QObject *parent = 0);
+    virtual ~FacebookProperty();
+    void classBegin() override;
+    void componentComplete() override;
+    QString path() const;
+    void setPath(const QString &path);
+    QString name() const;
+    void setName(const QString &name);
 Q_SIGNALS:
-    void userIdChanged();
-    void countChanged();
-    void profilePictureSizeChanged();
+    void pathChanged();
+    void nameChanged();
 protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+    QScopedPointer<FacebookPropertyPrivate> d_ptr;
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    Q_DECLARE_PRIVATE(FacebookProperty)
+    QString m_path;
+    QString m_name;
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+#endif // FACEBOOKPROPERTY_H

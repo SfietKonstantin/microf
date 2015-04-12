@@ -29,40 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKFRIENDLISTREQUEST_H
-#define FACEBOOKFRIENDLISTREQUEST_H
+#ifndef REQUESTPROPERTYHELPERMODEL_H
+#define REQUESTPROPERTYHELPERMODEL_H
 
-#include "abstractfacebookrequest.h"
+#include <QtCore/QAbstractListModel>
 
-class FacebookFriendListRequestPrivate;
-class FacebookFriendListRequest : public AbstractFacebookRequest
+class SocialRequest;
+class RequestPropertyHelperModelData;
+class RequestPropertyHelperModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
-    Q_PROPERTY(int profilePictureSize READ profilePictureSize WRITE setProfilePictureSize
-               NOTIFY profilePictureSizeChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(QObject * request READ request WRITE setRequest NOTIFY requestChanged)
+    Q_ENUMS(Type)
 public:
-    explicit FacebookFriendListRequest(QObject *parent = 0);
-    QString userId() const;
-    void setUserId(const QString &userId);
+    enum Roles {
+        NameRole = Qt::UserRole + 1,
+        TypeRole,
+        ValueRole
+    };
+    enum Type {
+        Unknown,
+        Int,
+        Double,
+        String
+    };
+    explicit RequestPropertyHelperModel(QObject *parent = 0);
+    virtual ~RequestPropertyHelperModel();
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
     int count() const;
-    void setCount(int count);
-    int profilePictureSize() const;
-    void setProfilePictureSize(int profilePictureSize);
-Q_SIGNALS:
-    void userIdChanged();
+    QObject * request() const;
+    void setRequest(QObject *request);
+public slots:
+    void save(int index, const QVariant &value);
+signals:
     void countChanged();
-    void profilePictureSizeChanged();
-protected:
-    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+    void requestChanged();
 private:
-    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+    void clear(bool emitSignal);
+    void updateMetaObject();
+    QList<RequestPropertyHelperModelData *> m_data;
+    QObject * m_request;
 };
 
-#endif // FACEBOOKFRIENDLISTREQUEST_H
+
+
+#endif // REQUESTPROPERTYHELPERMODEL_H

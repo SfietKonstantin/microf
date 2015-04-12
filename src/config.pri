@@ -7,4 +7,3 @@ CONFIG(testing) {
 CONFIG(microfdebug) {
     DEFINES += MICROF_DEBUG
 }
-
