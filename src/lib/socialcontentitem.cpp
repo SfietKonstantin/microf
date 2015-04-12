@@ -40,13 +40,27 @@ void SocialContentItemPrivate::setContentItemObject(const QVariantMap &propertie
                                                     const QVariantMap &metadata)
 {
     Q_Q(SocialContentItem);
+    SocialObject *newSocialObject = new SocialObject(q);
     for (const QString &key : properties.keys()) {
         const QVariant &value = properties.value(key);
-        SocialObjectPrivate::setProperty(m_object, key.toLocal8Bit(), value);
+        SocialObjectPrivate::setProperty(newSocialObject, key.toLocal8Bit(), value);
     }
+    setObject(newSocialObject);
     setMetadata(metadata);
     setStatus(SocialNetworkStatus::Ready);
     emit q->finished(true);
+}
+
+void SocialContentItemPrivate::setObject(SocialObject *object)
+{
+    Q_Q(SocialContentItem);
+    if (m_object != object) {
+        if (m_object) {
+            m_object->deleteLater();
+        }
+        m_object = object;
+        emit q->objectChanged();
+    }
 }
 
 SocialContentItem::SocialContentItem(QObject *parent)

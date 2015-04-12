@@ -32,6 +32,7 @@
 #include "facebookmodelbuilder.h"
 #include "socialcontentmodelbuilder_p.h"
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include "facebook_p.h"
@@ -44,14 +45,17 @@ public:
     static int properties_count(QQmlListProperty<FacebookProperty> *list);
     static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
     static void properties_clear(QQmlListProperty<FacebookProperty> *list);
+    void setRawData(const QString &rawData);
 private:
     void clear();
     QList<FacebookProperty *> m_properties;
+    bool m_includeRawData;
+    QString m_rawData;
     Q_DECLARE_PUBLIC(FacebookModelBuilder)
 };
 
 FacebookModelBuilderPrivate::FacebookModelBuilderPrivate(FacebookModelBuilder *q)
-    : SocialContentModelBuilderPrivate(q)
+    : SocialContentModelBuilderPrivate(q), m_includeRawData(false)
 {
 }
 
@@ -98,6 +102,15 @@ void FacebookModelBuilderPrivate::properties_clear(QQmlListProperty<FacebookProp
     builder->d_func()->clear();
 }
 
+void FacebookModelBuilderPrivate::setRawData(const QString &rawData)
+{
+    Q_Q(FacebookModelBuilder);
+    if (m_rawData != rawData) {
+        m_rawData = rawData;
+        emit q->rawDataChanged();
+    }
+}
+
 void FacebookModelBuilderPrivate::clear()
 {
     qDeleteAll(m_properties);
@@ -123,8 +136,8 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
     SocialNetworkError::type outError = SocialNetworkError::No;
     QString outErrorString;
 
-    QJsonObject root = FacebookPrivate::prebuild(error, errorString, data, metadata, outError,
-                                                 outErrorString);
+    QJsonObject root = FacebookPrivate::prebuild(error, errorString, data, metadata,
+                                                 outError, outErrorString);
     if (outError != SocialNetworkError::No) {
         setError(contentModel, outError, outErrorString);
         return;
@@ -134,6 +147,11 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
     if (!root.contains(dataRoot)) {
         setError(contentModel, SocialNetworkError::Data, "Cannot find data root object");
         return;
+    }
+
+    if (d->m_includeRawData) {
+        QJsonDocument document = QJsonDocument::fromJson(data);
+        d->setRawData(document.toJson(QJsonDocument::Indented));
     }
 
     const QJsonObject &dataObject = root.value(dataRoot).toObject();
@@ -168,4 +186,25 @@ QQmlListProperty<FacebookProperty> FacebookModelBuilder::properties()
                                               &FacebookModelBuilderPrivate::properties_count,
                                               &FacebookModelBuilderPrivate::properties_at,
                                               &FacebookModelBuilderPrivate::properties_clear);
+}
+
+bool FacebookModelBuilder::includeRawData() const
+{
+    Q_D(const FacebookModelBuilder);
+    return d->m_includeRawData;
+}
+
+void FacebookModelBuilder::setIncludeRawData(bool includeRawData)
+{
+    Q_D(FacebookModelBuilder);
+    if (d->m_includeRawData != includeRawData) {
+        d->m_includeRawData = includeRawData;
+        emit includeRawDataChanged();
+    }
+}
+
+QString FacebookModelBuilder::rawData() const
+{
+    Q_D(const FacebookModelBuilder);
+    return d->m_rawData;
 }

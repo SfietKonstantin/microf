@@ -48,6 +48,7 @@ protected:
                const QByteArray &data) override;
 private:
     void setContentItemObject(const QVariantMap &properties, const QVariantMap &metadata);
+    void setObject(SocialObject *object);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentItemBuilder *m_builder;

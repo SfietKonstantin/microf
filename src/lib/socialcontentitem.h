@@ -18,7 +18,7 @@ class SocialContentItem: public QObject, public ISocialContent, public QQmlParse
                NOTIFY socialNetworkChanged)
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
     Q_PROPERTY(SocialContentItemBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
-    Q_PROPERTY(SocialObject * object READ object CONSTANT)
+    Q_PROPERTY(SocialObject * object READ object NOTIFY objectChanged)
     Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
     Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)

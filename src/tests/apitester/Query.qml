@@ -5,38 +5,55 @@ import org.sfietkonstantin.microf 1.0
 
 Item {
     id: container
-    property bool busy: item.status === SocialNetworkStatus.Busy || model.status === SocialNetworkStatus.Busy
+    property bool busy: socialItem.status === SocialNetworkStatus.Busy || socialModel.status === SocialNetworkStatus.Busy
     property bool canQuery: !busy && authHelper.accessToken !== ""
     property int type: RequestHelperModel.Invalid
     property var request: null
+    property string rawData
     anchors.fill: parent
+    onTypeChanged: {
+        switch (container.type) {
+        case RequestHelperModel.Object:
+            rawData = itemBuilder.rawData
+            break
+        case RequestHelperModel.Model:
+            rawData = modelBuilder.rawData
+            break
+        default:
+            break
+        }
+    }
 
     SocialContentItem {
-        id: item
+        id: socialItem
         socialNetwork: facebook
         request: container.request
         builder: FacebookItemBuilder {
             id: itemBuilder
+            includeRawData: true
         }
         onFinished: {
             if (!ok) {
-                errorLabel.text = model.errorString
+                errorLabel.text = socialItem.errorString
             } else {
-                itemDisplay.refresh()
+                container.rawData = itemBuilder.rawData
             }
         }
     }
 
     SocialContentModel {
-        id: model
+        id: socialModel
         socialNetwork: facebook
         request: container.request
         builder: FacebookModelBuilder {
             id: modelBuilder
+            includeRawData: true
         }
         onFinished: {
             if (!ok) {
-                errorLabel.text = model.errorString
+                errorLabel.text = socialModel.errorString
+            } else {
+                container.rawData = modelBuilder.rawData
             }
         }
     }
@@ -133,7 +150,7 @@ Item {
                                             return null
                                         }
                                     }
-                                    visible: model.type !== RequestPropertyHelperModel.Unknown
+                                    visible: container.type !== RequestPropertyHelperModel.Unknown
                                 }
                             }
 
@@ -149,19 +166,6 @@ Item {
 
                     Column {
                         id: buttons
-                        function prepareLoad() {
-                            switch (container.type) {
-                            case RequestHelperModel.Object:
-                                modelView.visible = false
-                                itemView.visible = true
-                                break
-                            case RequestHelperModel.Model:
-                                modelView.visible = true
-                                itemView.visible = false
-                                break
-                            }
-                        }
-
                         anchors.left: parent.left; anchors.right: parent.right
                         spacing: 3
 
@@ -170,33 +174,35 @@ Item {
                             enabled: container.canQuery
                             text: "Request"
                             onClicked: {
-                                buttons.prepareLoad()
+                                container.rawData = ""
                                 switch (container.type) {
                                 case RequestHelperModel.Object:
-                                    item.load()
+                                    socialItem.load()
                                     break
                                 case RequestHelperModel.Model:
-                                    model.load()
+                                    socialModel.load()
+                                    break
+                                default:
                                     break
                                 }
                             }
                         }
                         Button {
                             anchors.left: parent.left; anchors.right: parent.right
-                            enabled: container.canQuery && type === RequestHelperModel.Model && model.hasNext
+                            enabled: container.canQuery && type === RequestHelperModel.Model && socialModel.hasNext
                             text: "Request next"
                             onClicked: {
-                                buttons.prepareLoad()
-                                model.loadNext()
+                                container.rawData = ""
+                                socialModel.loadNext()
                             }
                         }
                         Button {
                             anchors.left: parent.left; anchors.right: parent.right
-                            enabled: container.canQuery && type === RequestHelperModel.Model && model.hasPrevious
+                            enabled: container.canQuery && type === RequestHelperModel.Model && socialModel.hasPrevious
                             text: "Request previous"
                             onClicked: {
-                                buttons.prepareLoad()
-                                model.loadPrevious()
+                                container.rawData = ""
+                                socialModel.loadPrevious()
                             }
                         }
                     }
@@ -214,28 +220,62 @@ Item {
         Item {
             Layout.minimumWidth: 200
 
-            ListView {
-                id: modelView
-                anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
-                width: parent.width
-                model: model
-                spacing: 8
-                delegate: Display {
-                    width: modelView.width
-                    object: model.object
+            TabView {
+                anchors.fill: parent
+                anchors.margins: 12
+
+                Tab {
+                    title: "Display"
+                    clip: true
+                    Item {
+                        ListView {
+                            id: modelView
+                            visible: container.type === RequestHelperModel.Model
+                            anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
+                            width: parent.width
+                            model: socialModel
+                            spacing: 8
+                            delegate: Display {
+                                width: modelView.width
+                                object: model.object
+                            }
+                        }
+
+                        Flickable {
+                            id: itemView
+                            visible: container.type === RequestHelperModel.Object
+                            anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
+                            width: parent.width
+                            contentHeight: itemDisplay.height
+
+                            Display {
+                                id: itemDisplay
+                                width: itemView.width
+                                object: socialItem.object
+
+//                                Connections {
+//                                    target: socialItem
+//                                    onFinished: {
+//                                        if (ok) {
+//                                            itemDisplay.refresh()
+//                                        }
+//                                    }
+//                                }
+                            }
+                        }
+                    }
                 }
-            }
 
-            Flickable {
-                id: itemView
-                anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
-                width: parent.width
-                contentHeight: itemDisplay.height
+                Tab {
+                    title: "Raw data"
+                    clip: true
 
-                Display {
-                    id: itemDisplay
-                    width: itemView.width
-                    object: item.object
+                    TextArea {
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        readOnly: true
+                        text: container.rawData
+                    }
                 }
             }
         }

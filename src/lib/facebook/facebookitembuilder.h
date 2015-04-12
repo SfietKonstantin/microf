@@ -41,6 +41,8 @@ class FacebookItemBuilder : public SocialContentItemBuilder
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
+    Q_PROPERTY(bool includeRawData READ includeRawData WRITE setIncludeRawData NOTIFY includeRawDataChanged)
+    Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
 public:
     explicit FacebookItemBuilder(QObject *parent = 0);
     ~FacebookItemBuilder();
@@ -48,6 +50,12 @@ public:
                const QString &errorString, const QByteArray &data,
                const QVariantMap &metadata) override;
     QQmlListProperty<FacebookProperty> properties();
+    bool includeRawData() const;
+    void setIncludeRawData(bool includeRawData);
+    QString rawData() const;
+Q_SIGNALS:
+    void includeRawDataChanged();
+    void rawDataChanged();
 private:
     Q_DECLARE_PRIVATE(FacebookItemBuilder)
 };

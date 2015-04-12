@@ -4,9 +4,9 @@ import QtQuick.Controls 1.2
 
 Item {
     id: container
-    function refresh() {
-        infoHelper.refresh()
-    }
+//    function refresh() {
+//        infoHelper.refresh()
+//    }
 
     property alias object: infoHelper.object
     visible: infoHelper.text !== ""
