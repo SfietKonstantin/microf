@@ -46,6 +46,7 @@ ApplicationWindow {
             id: queryPage
             title: "Query"
             enabled: authHelper.accessToken !== ""
+            Query {}
         }
         Tab {
             id: tools

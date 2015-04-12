@@ -114,13 +114,13 @@ SocialNetworkPrivate::SocialNetworkPrivate(SocialNetwork *q)
 
 bool SocialNetworkPrivate::socialContentLoad(SocialNetwork &socialNetwork,
                                              AbstractSocialContentPrivate &socialContent,
-                                             const SocialRequest &request)
+                                             const SocialRequest &request, SocialRequest::Mode mode)
 {
-    return socialNetwork.d_func()->socialContentLoad(socialContent, request);
+    return socialNetwork.d_func()->socialContentLoad(socialContent, request, mode);
 }
 
 bool SocialNetworkPrivate::socialContentLoad(AbstractSocialContentPrivate &socialContent,
-                                             const SocialRequest &request)
+                                             const SocialRequest &request, SocialRequest::Mode mode)
 {
     Q_Q(SocialNetwork);
     if (m_loadingContent.contains(&socialContent)) {
@@ -131,10 +131,14 @@ bool SocialNetworkPrivate::socialContentLoad(AbstractSocialContentPrivate &socia
     QByteArray postData;
     SocialRequest::Type type = request.type();
     if (type == SocialRequest::Post) {
-        postData = SocialRequestPrivate::createPostData(request, *q, socialContent.metadata());
+        postData = SocialRequestPrivate::createPostData(request, *q, mode,
+                                                        socialContent.metadata());
     }
     QNetworkRequest networkRequest = SocialRequestPrivate::createRequest(request, *q, postData,
+                                                                         mode,
                                                                          socialContent.metadata());
+    socialContent.setMetadata(SocialRequestPrivate::createMetadata(request, *q, mode,
+                                                                   socialContent.metadata()));
     QNetworkReply *reply = 0;
     switch (type) {
     case SocialRequest::Get:

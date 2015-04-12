@@ -50,7 +50,8 @@ public:
 protected:
     explicit SocialContentItemBuilder(QObject *parent = 0);
     virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                       const QString &errorString, const QByteArray &data) = 0;
+                       const QString &errorString, const QByteArray &data,
+                       const QVariantMap &metadata) = 0;
     void setObject(SocialContentItem &contentItem, const QVariantMap &properties,
                    const QVariantMap &metadata = QVariantMap());
     void setError(SocialContentItem &contentItem, SocialNetworkError::type error,

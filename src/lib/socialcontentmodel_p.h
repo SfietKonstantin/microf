@@ -35,19 +35,15 @@
 #include <QtNetwork/QNetworkReply>
 #include "abstractsocialcontent_p.h"
 #include "socialcontentmodel.h"
+#include "socialrequest.h"
 
 class SocialContentModelPrivate: public AbstractSocialContentPrivate
 {
 public:
-    enum UpdateMode {
-        Replace,
-        Append,
-        Prepend
-    };
     explicit SocialContentModelPrivate(SocialContentModel *q);
     static void setContentModelData(SocialContentModel &contentModel,
                                     const QList<QVariantMap> &data,
-                                    bool haveNext, bool havePrevious,
+                                    bool hasNext, bool hasPrevious,
                                     const QVariantMap &metadata);
     static void setContentModelError(SocialContentModel &contentModel,
                                      SocialNetworkError::type error, const QString &errorString);
@@ -55,15 +51,15 @@ protected:
     bool build(QNetworkReply::NetworkError error, const QString &errorString,
                const QByteArray &data) override;
 private:
-    bool load(UpdateMode updateMode);
-    void setContentModelData(const QList<QVariantMap> &data, bool haveNext, bool havePrevious,
+    bool load(SocialRequest::Mode mode);
+    void setContentModelData(const QList<QVariantMap> &data, bool hasNext, bool hasPrevious,
                              const QVariantMap &metadata);
     void setNewData(const QList<SocialObject *> &data);
     void appendNewData(const QList<SocialObject *> &data);
     void prependNewData(const QList<SocialObject *> &data);
-    bool m_haveNext;
-    bool m_havePrevious;
-    UpdateMode m_updateMode;
+    bool m_hasNext;
+    bool m_hasPrevious;
+    SocialRequest::Mode m_loadMode;
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentModelBuilder *m_builder;

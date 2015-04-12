@@ -29,23 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "facebooklogoutrequest.h"
+#include "abstractfacebookrequest.h"
 #include "facebook.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QUrlQuery>
 
-FacebookLogoutRequest::FacebookLogoutRequest(QObject *parent)
-    : SocialRequest(parent)
+AbstractFacebookRequest::AbstractFacebookRequest(SocialRequestPrivate &dd, QObject *parent)
+    : SocialRequest(dd, parent)
 {
 }
 
-SocialRequest::Type FacebookLogoutRequest::type() const
+SocialRequest::Type AbstractFacebookRequest::type() const
 {
-    return SocialRequest::Post;
+    return Post;
 }
 
-QNetworkRequest FacebookLogoutRequest::createRequest(const SocialNetwork &socialNetwork,
-                                                     const QByteArray &postData, Mode mode,
-                                                     const QVariantMap &metadata) const
+QNetworkRequest AbstractFacebookRequest::createRequest(const SocialNetwork &socialNetwork,
+                                                       const QByteArray &postData, Mode mode,
+                                                       const QVariantMap &metadata) const
 {
     Q_UNUSED(mode);
     Q_UNUSED(metadata);
@@ -60,35 +62,37 @@ QNetworkRequest FacebookLogoutRequest::createRequest(const SocialNetwork &social
     }
 
     accessToken.prepend("OAuth ");
-    QNetworkRequest request (QUrl("https://b-api.facebook.com/method/auth.expireSession"));
+    QNetworkRequest request (QUrl("https://graph.facebook.com/graphql"));
     request.setRawHeader("Authorization", accessToken);
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.setRawHeader("Host", "b-api.facebook.com");
+    request.setRawHeader("Host", "graph.facebook.com");
     request.setRawHeader("Connection", "Keep-Alive");
     request.setRawHeader("User-Agent", facebook->userAgent());
-    request.setRawHeader("Content-Length", QByteArray::number(postData.size()));
+    request.setRawHeader("X-FB-Connection-Type", "WIFI");
     request.setRawHeader("X-FB-HTTP-Engine", "Apache");
+    request.setRawHeader("Content-Length", QByteArray::number(postData.size()));
     return request;
 }
 
-QByteArray FacebookLogoutRequest::createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                                                 const QVariantMap &metadata) const
+QByteArray AbstractFacebookRequest::createPostData(const SocialNetwork &socialNetwork, Mode mode,
+                                                   const QVariantMap &metadata) const
 {
-    Q_UNUSED(mode);
-    Q_UNUSED(metadata);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {
         return QByteArray();
     }
 
     QUrlQuery query;
-    query.addQueryItem("reason", "USER_INITIATED");
+    query.addQueryItem("query_id", queryId());
+    query.addQueryItem("method", "get");
+    query.addQueryItem("strip_nulls", "true");
+    query.addQueryItem("strip_defaults", "true");
+    QJsonDocument document (queryParameters(mode, metadata));
+    query.addQueryItem("query_params", document.toJson(QJsonDocument::Compact));
     query.addQueryItem("locale", facebook->locale());
     query.addQueryItem("client_country_code", facebook->countryCode());
-    query.addQueryItem("method", "auth.expireSession");
-    query.addQueryItem("fb_api_req_friendly_name", "logout");
-    query.addQueryItem("fb_api_caller_class", "com.facebook.katana.server.handler.Fb4aAuthHandler");
+    query.addQueryItem("fb_api_req_friendly_name", requestName());
+    query.addQueryItem("fb_api_caller_class", apiCallerClass());
     return query.toString(QUrl::FullyEncoded).toLocal8Bit();
 }
-
 

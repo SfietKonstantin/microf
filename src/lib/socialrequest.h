@@ -48,6 +48,11 @@ public:
         Post,
         Delete
     };
+    enum Mode {
+        Load,
+        LoadNext,
+        LoadPrevious
+    };
     virtual ~SocialRequest();
     void classBegin() override;
     void componentComplete() override;
@@ -56,10 +61,12 @@ protected:
     explicit SocialRequest(QObject *parent = 0);
     explicit SocialRequest(SocialRequestPrivate &dd,QObject *parent = 0);
     virtual QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
-                                          const QByteArray &postData,
+                                          const QByteArray &postData, Mode mode,
                                           const QVariantMap &metadata) const = 0;
-    virtual QByteArray createPostData(const SocialNetwork &socialNetwork,
+    virtual QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
                                       const QVariantMap &metadata) const = 0;
+    virtual QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
+                                       const QVariantMap &metadata) const;
     QScopedPointer<SocialRequestPrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(SocialRequest)

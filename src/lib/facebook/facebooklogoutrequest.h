@@ -42,8 +42,8 @@ public:
     Type type() const override;
 protected:
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork, const QByteArray &postData,
-                                  const QVariantMap &metadata) const override;
-    QByteArray createPostData(const SocialNetwork &socialNetwork,
+                                  Mode mode, const QVariantMap &metadata) const override;
+    QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
                               const QVariantMap &metadata) const override;
 };
 

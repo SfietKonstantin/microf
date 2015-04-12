@@ -32,7 +32,7 @@ bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QS
     if (!m_builder) {
         return false;
     }
-    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data);
+    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data, metadata());
     return true;
 }
 
@@ -160,7 +160,8 @@ bool SocialContentItem::load()
         return false;
     }
 
-    bool ok = SocialNetworkPrivate::socialContentLoad(*d->m_socialNetwork, *d, *d->m_request);
+    bool ok = SocialNetworkPrivate::socialContentLoad(*d->m_socialNetwork, *d, *d->m_request,
+                                                      SocialRequest::Load);
     if (ok) {
         d->setStatus(SocialNetworkStatus::Busy);
     }

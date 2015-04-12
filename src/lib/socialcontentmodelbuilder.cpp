@@ -41,9 +41,10 @@ SocialContentModelBuilderPrivate::SocialContentModelBuilderPrivate(SocialContent
 void SocialContentModelBuilderPrivate::build(SocialContentModelBuilder &builder,
                                              SocialContentModel &contentModel,
                                              QNetworkReply::NetworkError error,
-                                             const QString &errorString, const QByteArray &data)
+                                             const QString &errorString, const QByteArray &data,
+                                             const QVariantMap &metadata)
 {
-    builder.build(contentModel, error, errorString, data);
+    builder.build(contentModel, error, errorString, data, metadata);
 }
 
 SocialContentModelBuilder::SocialContentModelBuilder(QObject *parent)
@@ -65,10 +66,10 @@ void SocialContentModelBuilder::componentComplete()
 
 void SocialContentModelBuilder::setData(SocialContentModel &contentModel,
                                         const QList<QVariantMap> &data,
-                                        bool haveNext, bool havePrevious,
+                                        bool hasNext, bool hasPrevious,
                                         const QVariantMap &metadata)
 {
-    SocialContentModelPrivate::setContentModelData(contentModel, data, haveNext, havePrevious,
+    SocialContentModelPrivate::setContentModelData(contentModel, data, hasNext, hasPrevious,
                                                    metadata);
 
 }

@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>Token.qml</file>
         <file>Tools.qml</file>
+        <file>Query.qml</file>
     </qresource>
 </RCC>

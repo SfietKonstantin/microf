@@ -29,43 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKLOGINREQUEST_H
-#define FACEBOOKLOGINREQUEST_H
+#ifndef FACEBOOKMODELBUILDER_H
+#define FACEBOOKMODELBUILDER_H
 
-#include "socialrequest.h"
+#include "socialcontentmodelbuilder.h"
 
-class FacebookLoginRequestPrivate;
-class FacebookLoginRequest : public SocialRequest
+class FacebookModelBuilder : public SocialContentModelBuilder
 {
     Q_OBJECT
-    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
-    Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
-    Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
 public:
-    explicit FacebookLoginRequest(QObject *parent = 0);
-    Type type() const;
-    QString email() const;
-    void setEmail(const QString &email);
-    QString password() const;
-    void setPassword(const QString &password);
-    QString deviceId() const;
-    void setDeviceId(const QString &deviceId);
-    QString machineId() const;
-    void setMachineId(const QString &machineId);
-Q_SIGNALS:
-    void emailChanged();
-    void passwordChanged();
-    void deviceIdChanged();
-    void machineIdChanged();
-protected:
-    QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
-                                  const QByteArray &postData, Mode mode,
-                                  const QVariantMap &metadata) const override;
-    QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                              const QVariantMap &metadata) const override;
-private:
-    Q_DECLARE_PRIVATE(FacebookLoginRequest)
+    explicit FacebookModelBuilder(QObject *parent = 0);
+    void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
+               const QString &errorString, const QByteArray &data,
+               const QVariantMap &metadata) override;
 };
 
-#endif // FACEBOOKLOGINREQUEST_H
+#endif // FACEBOOKMODELBUILDER_H

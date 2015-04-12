@@ -19,5 +19,6 @@ OTHER_FILES += \
     Token.qml
 
 DISTFILES += \
-    Tools.qml
+    Tools.qml \
+    Query.qml
 

@@ -34,6 +34,7 @@
 
 #include <QtCore/QSet>
 #include "socialnetwork.h"
+#include "socialrequest.h"
 
 class QNetworkAccessManager;
 class AbstractSocialContentPrivate;
@@ -43,11 +44,12 @@ public:
     explicit SocialNetworkPrivate(SocialNetwork *q);
     static bool socialContentLoad(SocialNetwork &socialNetwork,
                                   AbstractSocialContentPrivate &socialContent,
-                                  const SocialRequest &request);
+                                  const SocialRequest &request, SocialRequest::Mode mode);
 protected:
     SocialNetwork * const q_ptr;
 private:
-    bool socialContentLoad(AbstractSocialContentPrivate &socialContent, const SocialRequest &request);
+    bool socialContentLoad(AbstractSocialContentPrivate &socialContent,
+                           const SocialRequest &request, SocialRequest::Mode mode);
     QNetworkAccessManager *m_networkAccess;
     QSet<AbstractSocialContentPrivate *> m_loadingContent;
     Q_DECLARE_PUBLIC(SocialNetwork)

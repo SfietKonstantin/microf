@@ -75,21 +75,23 @@ public:
     }
 protected:
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
-                                  const QByteArray &postData,
+                                  const QByteArray &postData, Mode mode,
                                   const QVariantMap &metadata) const override
     {
         Q_UNUSED(socialNetwork);
         Q_UNUSED(postData);
+        Q_UNUSED(mode);
         Q_UNUSED(metadata);
         QNetworkRequest request;
         request.setRawHeader("Content-Type", "application/json;charset=UTF-8");
         request.setUrl(m_url);
         return request;
     }
-    QByteArray createPostData(const SocialNetwork &socialNetwork,
+    QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
                               const QVariantMap &metadata) const override
     {
         Q_UNUSED(socialNetwork);
+        Q_UNUSED(mode);
 
         if (!metadata.isEmpty()) {
             QJsonObject object = QJsonObject::fromVariantMap(metadata);
@@ -112,8 +114,10 @@ public:
     }
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data) override
+               const QString &errorString, const QByteArray &data,
+               const QVariantMap &metadata) override
     {
+        Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {
             setError(contentItem, SocialNetworkError::Network, errorString);
             return;
@@ -138,8 +142,10 @@ public:
     }
 protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data) override
+               const QString &errorString, const QByteArray &data,
+               const QVariantMap &metadata) override
     {
+        Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {
             setError(contentModel, SocialNetworkError::Network, errorString);
             return;
@@ -152,7 +158,7 @@ protected:
         }
         const QJsonObject object = document.object();
 
-        bool haveNext = object.value("have_next").toBool(false);
+        bool hasNext = object.value("has_next").toBool(false);
         QJsonArray array = object.value("values").toArray();
 
         QList<QVariantMap> modelData;
@@ -160,9 +166,9 @@ protected:
             modelData.append(value.toObject().toVariantMap());
         }
 
-        QVariantMap metadata;
-        metadata.insert("next", haveNext);
-        setData(contentModel, modelData, haveNext, false, metadata);
+        QVariantMap newMetadata;
+        newMetadata.insert("next", hasNext);
+        setData(contentModel, modelData, hasNext, false, newMetadata);
     }
 };
 
@@ -359,8 +365,8 @@ void TstSocialNetwork::tstSimpleList()
     const QMetaProperty &meta1Text = meta1->property(meta1->indexOfProperty("text"));
     QCOMPARE(meta1Text.read(object1), QVariant("Entry 1"));
 
-    QVERIFY(socialContentModel.haveNext());
-    QVERIFY(!socialContentModel.havePrevious());
+    QVERIFY(socialContentModel.hasNext());
+    QVERIFY(!socialContentModel.hasPrevious());
 
     // Load next
     QVERIFY(socialContentModel.loadNext());
@@ -413,8 +419,8 @@ void TstSocialNetwork::tstSimpleList()
     const QMetaProperty &newMeta3Text = newMeta3->property(newMeta3->indexOfProperty("text"));
     QCOMPARE(newMeta3Text.read(newObject3), QVariant("Entry 3"));
 
-    QVERIFY(!socialContentModel.haveNext());
-    QVERIFY(!socialContentModel.havePrevious());
+    QVERIFY(!socialContentModel.hasNext());
+    QVERIFY(!socialContentModel.hasPrevious());
 }
 
 QTEST_MAIN(TstSocialNetwork)

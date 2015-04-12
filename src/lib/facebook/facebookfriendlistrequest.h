@@ -29,43 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKLOGINREQUEST_H
-#define FACEBOOKLOGINREQUEST_H
+#ifndef FACEBOOKFRIENDLISTREQUEST_H
+#define FACEBOOKFRIENDLISTREQUEST_H
 
-#include "socialrequest.h"
+#include "abstractfacebookrequest.h"
 
-class FacebookLoginRequestPrivate;
-class FacebookLoginRequest : public SocialRequest
+class FacebookFriendListRequestPrivate;
+class FacebookFriendListRequest : public AbstractFacebookRequest
 {
     Q_OBJECT
-    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY emailChanged)
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
-    Q_PROPERTY(QString deviceId READ deviceId WRITE setDeviceId NOTIFY deviceIdChanged)
-    Q_PROPERTY(QString machineId READ machineId WRITE setMachineId NOTIFY machineIdChanged)
+    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
+    Q_PROPERTY(int size READ size WRITE setSize NOTIFY sizeChanged)
 public:
-    explicit FacebookLoginRequest(QObject *parent = 0);
-    Type type() const;
-    QString email() const;
-    void setEmail(const QString &email);
-    QString password() const;
-    void setPassword(const QString &password);
-    QString deviceId() const;
-    void setDeviceId(const QString &deviceId);
-    QString machineId() const;
-    void setMachineId(const QString &machineId);
+    explicit FacebookFriendListRequest(QObject *parent = 0);
+    QString userId() const;
+    void setUserId(const QString &userId);
+    int size() const;
+    void setSize(int size);
 Q_SIGNALS:
-    void emailChanged();
-    void passwordChanged();
-    void deviceIdChanged();
-    void machineIdChanged();
+    void userIdChanged();
+    void sizeChanged();
 protected:
-    QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
-                                  const QByteArray &postData, Mode mode,
-                                  const QVariantMap &metadata) const override;
-    QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                              const QVariantMap &metadata) const override;
+    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
+                               const QVariantMap &metadata) const override;
+    QString queryId() const override;
+    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
+    QString requestName() const override;
+    QString apiCallerClass() const override;
 private:
-    Q_DECLARE_PRIVATE(FacebookLoginRequest)
+    Q_DECLARE_PRIVATE(FacebookFriendListRequest)
+
 };
 
-#endif // FACEBOOKLOGINREQUEST_H
+#endif // FACEBOOKFRIENDLISTREQUEST_H

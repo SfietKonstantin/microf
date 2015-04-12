@@ -42,10 +42,14 @@ public:
     explicit SocialRequestPrivate(SocialRequest *q);
     static QNetworkRequest createRequest(const SocialRequest &request,
                                          const SocialNetwork &socialNetwork,
-                                         const QByteArray &postData, const QVariantMap &metadata);
+                                         const QByteArray &postData, SocialRequest::Mode mode,
+                                         const QVariantMap &metadata);
     static QByteArray createPostData(const SocialRequest &request,
-                                     const SocialNetwork &socialNetwork,
+                                     const SocialNetwork &socialNetwork, SocialRequest::Mode mode,
                                      const QVariantMap &metadata);
+    static QVariantMap createMetadata(const SocialRequest &request,
+                                      const SocialNetwork &socialNetwork, SocialRequest::Mode mode,
+                                      const QVariantMap &metadata);
 protected:
     SocialRequest * const q_ptr;
 private:

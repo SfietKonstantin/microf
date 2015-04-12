@@ -37,17 +37,17 @@
 #include "socialcontentmodelbuilder_p.h"
 
 SocialContentModelPrivate::SocialContentModelPrivate(SocialContentModel *q)
-    : AbstractSocialContentPrivate(q), m_haveNext(false), m_havePrevious(false)
-    , m_updateMode(Replace), m_socialNetwork(0), m_request(0), m_builder(0)
+    : AbstractSocialContentPrivate(q), m_hasNext(false), m_hasPrevious(false)
+    , m_loadMode(SocialRequest::Load), m_socialNetwork(0), m_request(0), m_builder(0)
 {
 }
 
 void SocialContentModelPrivate::setContentModelData(SocialContentModel &contentModel,
                                                     const QList<QVariantMap> &data,
-                                                    bool haveNext, bool havePrevious,
+                                                    bool hasNext, bool hasPrevious,
                                                     const QVariantMap &metadata)
 {
-    contentModel.d_func()->setContentModelData(data, haveNext, havePrevious, metadata);
+    contentModel.d_func()->setContentModelData(data, hasNext, hasPrevious, metadata);
 }
 
 void SocialContentModelPrivate::setContentModelError(SocialContentModel &contentModel,
@@ -64,11 +64,11 @@ bool SocialContentModelPrivate::build(QNetworkReply::NetworkError error, const Q
     if (!m_builder) {
         return false;
     }
-    SocialContentModelBuilderPrivate::build(*m_builder, *q, error, errorString, data);
+    SocialContentModelBuilderPrivate::build(*m_builder, *q, error, errorString, data, metadata());
     return true;
 }
 
-bool SocialContentModelPrivate::load(SocialContentModelPrivate::UpdateMode updateMode)
+bool SocialContentModelPrivate::load(SocialRequest::Mode mode)
 {
     if (status == SocialNetworkStatus::Busy) {
         qWarning() << "SocialContentModelPrivate::load() called while status is Busy";
@@ -90,16 +90,16 @@ bool SocialContentModelPrivate::load(SocialContentModelPrivate::UpdateMode updat
         return false;
     }
 
-    bool ok = SocialNetworkPrivate::socialContentLoad(*m_socialNetwork, *this, *m_request);
+    bool ok = SocialNetworkPrivate::socialContentLoad(*m_socialNetwork, *this, *m_request, mode);
     if (ok) {
-        m_updateMode = updateMode;
+        m_loadMode = mode;
         setStatus(SocialNetworkStatus::Busy);
     }
     return ok;
 }
 
 void SocialContentModelPrivate::setContentModelData(const QList<QVariantMap> &data,
-                                                    bool haveNext, bool havePrevious,
+                                                    bool hasNext, bool hasPrevious,
                                                     const QVariantMap &metadata)
 {
     Q_Q(SocialContentModel);
@@ -113,26 +113,26 @@ void SocialContentModelPrivate::setContentModelData(const QList<QVariantMap> &da
         newData.append(object);
     }
 
-    switch (m_updateMode) {
-    case Replace:
+    switch (m_loadMode) {
+    case SocialRequest::Load:
         setNewData(newData);
         break;
-    case Append:
+    case SocialRequest::LoadNext:
         appendNewData(newData);
         break;
-    case Prepend:
+    case SocialRequest::LoadPrevious:
         prependNewData(newData);
         break;
     }
 
-    if (m_haveNext != haveNext) {
-        m_haveNext = haveNext;
-        emit q->haveNextChanged();
+    if (m_hasNext != hasNext) {
+        m_hasNext = hasNext;
+        emit q->hasNextChanged();
     }
 
-    if (m_havePrevious != havePrevious) {
-        m_havePrevious = havePrevious;
-        emit q->havePreviousChanged();
+    if (m_hasPrevious != hasPrevious) {
+        m_hasPrevious = hasPrevious;
+        emit q->hasPreviousChanged();
     }
 
     setMetadata(metadata);
@@ -251,16 +251,16 @@ int SocialContentModel::count() const
     return d->m_data.count();
 }
 
-bool SocialContentModel::haveNext() const
+bool SocialContentModel::hasNext() const
 {
     Q_D(const SocialContentModel);
-    return d->m_haveNext;
+    return d->m_hasNext;
 }
 
-bool SocialContentModel::havePrevious() const
+bool SocialContentModel::hasPrevious() const
 {
     Q_D(const SocialContentModel);
-    return d->m_havePrevious;
+    return d->m_hasPrevious;
 }
 
 SocialNetwork * SocialContentModel::socialNetwork() const
@@ -329,18 +329,18 @@ QString SocialContentModel::errorString() const
 bool SocialContentModel::load()
 {
     Q_D(SocialContentModel);
-    return d->load(SocialContentModelPrivate::Replace);
+    return d->load(SocialRequest::Load);
 }
 
 bool SocialContentModel::loadNext()
 {
     Q_D(SocialContentModel);
-    return d->load(SocialContentModelPrivate::Append);
+    return d->load(SocialRequest::LoadNext);
 }
 
 bool SocialContentModel::loadPrevious()
 {
     Q_D(SocialContentModel);
-    return d->load(SocialContentModelPrivate::Prepend);
+    return d->load(SocialRequest::LoadPrevious);
 }
 

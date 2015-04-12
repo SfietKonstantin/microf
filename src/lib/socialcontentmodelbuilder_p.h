@@ -41,7 +41,7 @@ public:
     SocialContentModelBuilderPrivate(SocialContentModelBuilder *q);
     static void build(SocialContentModelBuilder &builder, SocialContentModel &contentModel,
                       QNetworkReply::NetworkError error, const QString &errorString,
-                      const QByteArray &data);
+                      const QByteArray &data, const QVariantMap &metadata);
 protected:
     SocialContentModelBuilder * const q_ptr;
 };

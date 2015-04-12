@@ -20,7 +20,7 @@ app.post '/api/postsimplelist', (req, res) ->
     if 'next' of req.body
         res.json {'values': [{id: 2, text: "Entry 2"}, {id: 3, text: "Entry 3"}]}
     else
-        res.json {'values': [{id: 0, text: "Entry 0"}, {id: 1, text: "Entry 1"}], 'have_next': true}
+        res.json {'values': [{id: 0, text: "Entry 0"}, {id: 1, text: "Entry 1"}], 'has_next': true}
 
 server = http.createServer(app).listen app.get('port')
 console.log("Server started on port #{app.get('port')}")

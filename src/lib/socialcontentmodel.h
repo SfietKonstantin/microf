@@ -46,8 +46,8 @@ class SocialContentModel : public QAbstractListModel, public ISocialContent, pub
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(bool haveNext READ haveNext NOTIFY haveNextChanged)
-    Q_PROPERTY(bool havePrevious READ havePrevious NOTIFY havePreviousChanged)
+    Q_PROPERTY(bool hasNext READ hasNext NOTIFY hasNextChanged)
+    Q_PROPERTY(bool hasPrevious READ hasPrevious NOTIFY hasPreviousChanged)
     Q_PROPERTY(SocialNetwork * socialNetwork READ socialNetwork WRITE setSocialNetwork
                NOTIFY socialNetworkChanged)
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
@@ -67,8 +67,8 @@ public:
     void classBegin() override;
     void componentComplete() override;
     int count() const;
-    bool haveNext() const;
-    bool havePrevious() const;
+    bool hasNext() const;
+    bool hasPrevious() const;
     SocialNetwork * socialNetwork() const;
     void setSocialNetwork(SocialNetwork *socialNetwork);
     SocialRequest * request() const;
@@ -84,8 +84,8 @@ public Q_SLOTS:
     bool loadPrevious();
 Q_SIGNALS:
     void countChanged();
-    void haveNextChanged();
-    void havePreviousChanged();
+    void hasNextChanged();
+    void hasPreviousChanged();
     void socialNetworkChanged();
     void requestChanged();
     void builderChanged();

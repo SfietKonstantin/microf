@@ -167,9 +167,10 @@ void FacebookLoginRequest::setMachineId(const QString &machineId)
 }
 
 QNetworkRequest FacebookLoginRequest::createRequest(const SocialNetwork &socialNetwork,
-                                                   const QByteArray &postData,
+                                                    const QByteArray &postData, Mode mode,
                                                     const QVariantMap &metadata) const
 {
+    Q_UNUSED(mode);
     Q_UNUSED(metadata);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {
@@ -186,10 +187,11 @@ QNetworkRequest FacebookLoginRequest::createRequest(const SocialNetwork &socialN
     return request;
 }
 
-QByteArray FacebookLoginRequest::createPostData(const SocialNetwork &socialNetwork,
+QByteArray FacebookLoginRequest::createPostData(const SocialNetwork &socialNetwork, Mode mode,
                                                 const QVariantMap &metadata) const
 {
     Q_D(const FacebookLoginRequest);
+    Q_UNUSED(mode);
     Q_UNUSED(metadata);
     const Facebook *facebook = qobject_cast<const Facebook *>(&socialNetwork);
     if (!facebook) {

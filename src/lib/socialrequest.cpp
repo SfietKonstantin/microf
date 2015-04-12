@@ -40,16 +40,26 @@ SocialRequestPrivate::SocialRequestPrivate(SocialRequest *q)
 QNetworkRequest SocialRequestPrivate::createRequest(const SocialRequest &request,
                                                     const SocialNetwork &socialNetwork,
                                                     const QByteArray &postData,
+                                                    SocialRequest::Mode mode,
                                                     const QVariantMap &metadata)
 {
-    return request.createRequest(socialNetwork, postData, metadata);
+    return request.createRequest(socialNetwork, postData, mode, metadata);
 }
 
 QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
                                                 const SocialNetwork &socialNetwork,
+                                                SocialRequest::Mode mode,
                                                 const QVariantMap &metadata)
 {
-    return request.createPostData(socialNetwork, metadata);
+    return request.createPostData(socialNetwork, mode, metadata);
+}
+
+QVariantMap SocialRequestPrivate::createMetadata(const SocialRequest &request,
+                                                 const SocialNetwork &socialNetwork,
+                                                 SocialRequest::Mode mode,
+                                                 const QVariantMap &metadata)
+{
+    return request.createMetadata(socialNetwork, mode, metadata);
 }
 
 SocialRequest::SocialRequest(QObject *parent)
@@ -60,6 +70,15 @@ SocialRequest::SocialRequest(QObject *parent)
 SocialRequest::SocialRequest(SocialRequestPrivate &dd, QObject *parent)
     : QObject(parent), d_ptr(&dd)
 {
+}
+
+QVariantMap SocialRequest::createMetadata(const SocialNetwork &socialNetwork, Mode mode,
+                                          const QVariantMap &metadata) const
+{
+    Q_UNUSED(socialNetwork);
+    Q_UNUSED(mode);
+    Q_UNUSED(metadata);
+    return QVariantMap();
 }
 
 SocialRequest::~SocialRequest()

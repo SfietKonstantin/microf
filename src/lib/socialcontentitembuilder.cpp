@@ -41,9 +41,10 @@ SocialContentItemBuilderPrivate::SocialContentItemBuilderPrivate(SocialContentIt
 void SocialContentItemBuilderPrivate::build(SocialContentItemBuilder &builder,
                                             SocialContentItem &contentItem,
                                             QNetworkReply::NetworkError error,
-                                            const QString &errorString, const QByteArray &data)
+                                            const QString &errorString, const QByteArray &data,
+                                            const QVariantMap &metadata)
 {
-    builder.build(contentItem, error, errorString, data);
+    builder.build(contentItem, error, errorString, data, metadata);
 }
 
 SocialContentItemBuilder::SocialContentItemBuilder(QObject *parent)

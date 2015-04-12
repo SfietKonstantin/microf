@@ -37,12 +37,15 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/qqml.h>
 #include <socialcontentitem.h>
+#include <socialcontentmodel.h>
 #include <socialobject.h>
 #include <facebook/facebook.h>
 #include <facebook/facebookloginrequest.h>
 #include <facebook/facebooklogincontentbuilder.h>
 #include <facebook/facebooklogoutrequest.h>
 #include <facebook/facebookconfirmationcontentbuilder.h>
+#include <facebook/facebookfriendlistrequest.h>
+#include <facebook/facebookmodelbuilder.h>
 
 class AuthHelper: public QObject
 {
@@ -172,7 +175,6 @@ public slots:
         setAccessToken(QString());
         save();
     }
-
 signals:
     void emailChanged();
     void deviceIdChanged();
@@ -191,6 +193,70 @@ private:
     QString m_accessToken;
 };
 
+class InfoHelper: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QObject * object READ object WRITE setObject NOTIFY objectChanged)
+    Q_PROPERTY(QString text READ text NOTIFY textChanged)
+    Q_PROPERTY(QStringList urls READ urls NOTIFY urlsChanged)
+public:
+    explicit InfoHelper(QObject *parent = 0)
+        : QObject(parent)
+    {
+    }
+    ~InfoHelper() {}
+    QObject * object() const { return m_object; }
+    void setObject(QObject *object)
+    {
+        if (m_object != object) {
+            m_object = object;
+            emit objectChanged();
+            generateText();
+        }
+    }
+    QString text() const { return m_text; }
+    QStringList urls() const { return m_urls; }
+signals:
+    void objectChanged();
+    void textChanged();
+    void urlsChanged();
+private:
+    void generateText()
+    {
+        if (!m_object) {
+            return;
+        }
+        const QMetaObject *meta = m_object->metaObject();
+        int offset = meta->propertyOffset();
+        int count = meta->propertyCount();
+
+        QString text;
+        QStringList urls;
+        for (int i = offset; i < count; ++i) {
+            const QMetaProperty &metaProperty = meta->property(i);
+            QString value = metaProperty.read(m_object).toString();
+            text.append(QString("<p><b>%1</b>: %2</p>").arg(metaProperty.name(), value));
+            QUrl url (value, QUrl::StrictMode);
+            if (url.isValid() && url.scheme().startsWith("http")) {
+                urls.append(value);
+            }
+        }
+
+        if (m_text != text) {
+            m_text = text;
+            emit textChanged();
+        }
+
+        if (m_urls != urls) {
+            m_urls = urls;
+            emit urlsChanged();
+        }
+    }
+    QObject * m_object;
+    QString m_text;
+    QStringList m_urls;
+};
+
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
@@ -199,14 +265,19 @@ int main(int argc, char **argv)
     qmlRegisterUncreatableType<SocialNetworkError>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkError", "Abstract type");
     qmlRegisterUncreatableType<SocialObject>("org.sfietkonstantin.microf", 1, 0, "SocialObject", "Abstract type");
     qmlRegisterUncreatableType<SocialRequest>("org.sfietkonstantin.microf", 1, 0, "SocialRequest", "Abstract type");
-    qmlRegisterUncreatableType<SocialContentItemBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentBuilder", "Abstract type");
-    qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
+    qmlRegisterUncreatableType<SocialContentItemBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentItemBuilder", "Abstract type");
+    qmlRegisterUncreatableType<SocialContentModelBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentModelBuilder", "Abstract type");
     qmlRegisterType<SocialContentItem>("org.sfietkonstantin.microf", 1, 0, "SocialContentItem");
+    qmlRegisterType<SocialContentModel>("org.sfietkonstantin.microf", 1, 0, "SocialContentModel");
+    qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
     qmlRegisterType<FacebookLoginRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginRequest");
     qmlRegisterType<FacebookLoginContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginContentBuilder");
     qmlRegisterType<FacebookLogoutRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLogoutRequest");
     qmlRegisterType<FacebookConfirmationContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookConfirmationContentBuilder");
+    qmlRegisterType<FacebookFriendListRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookFriendListRequest");
+    qmlRegisterType<FacebookModelBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookModelBuilder");
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
+    qmlRegisterType<InfoHelper>("org.sfietkonstantin.microf", 1, 0, "InfoHelper");
     app.setOrganizationName("microf");
     app.setApplicationName("apitester");
     QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));

@@ -50,9 +50,10 @@ public:
 protected:
     explicit SocialContentModelBuilder(QObject *parent = 0);
     virtual void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
-                       const QString &errorString, const QByteArray &data) = 0;
+                       const QString &errorString, const QByteArray &data,
+                       const QVariantMap &metadata) = 0;
     void setData(SocialContentModel &contentModel, const QList<QVariantMap> &data,
-                 bool haveNext, bool havePrevious, const QVariantMap &metadata = QVariantMap());
+                 bool hasNext, bool hasPrevious, const QVariantMap &metadata = QVariantMap());
     void setError(SocialContentModel &contentModel, SocialNetworkError::type error,
                   const QString &errorString);
     QScopedPointer<SocialContentModelBuilderPrivate> d_ptr;

@@ -39,9 +39,11 @@ FacebookConfirmationContentBuilder::FacebookConfirmationContentBuilder(QObject *
 
 void FacebookConfirmationContentBuilder::build(SocialContentItem &contentItem,
                                                QNetworkReply::NetworkError error,
-                                               const QString &errorString, const QByteArray &data)
+                                               const QString &errorString, const QByteArray &data,
+                                               const QVariantMap &metadata)
 {
     Q_UNUSED(data);
+    Q_UNUSED(metadata);
     if (error != QNetworkReply::NoError) {
         setError(contentItem, SocialNetworkError::Network, errorString);
         return;
