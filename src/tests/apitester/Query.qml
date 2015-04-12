@@ -27,7 +27,9 @@ Item {
         id: model
         socialNetwork: facebook
         request: container.request
-        builder: FacebookModelBuilder {}
+        builder: FacebookModelBuilder {
+            id: modelBuilder
+        }
         onFinished: {
             if (!ok) {
                 errorLabel.text = model.errorString
@@ -127,6 +129,14 @@ Item {
                                         }
                                     }
                                     visible: model.type !== RequestPropertyHelperModel.Unknown
+                                }
+                            }
+
+                            Label { text: "Properties to select" }
+                            TextArea {
+                                anchors.left: parent.left; anchors.right: parent.right
+                                onTextChanged: {
+                                    requestPropertyModel.setProperties(text, modelBuilder)
                                 }
                             }
                         }

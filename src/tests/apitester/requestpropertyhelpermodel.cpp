@@ -32,6 +32,8 @@
 #include "requestpropertyhelpermodel.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
+#include <facebook/facebookmodelbuilder.h>
+#include <facebook/facebookproperty.h>
 
 class RequestPropertyHelperModelData
 {
@@ -125,6 +127,29 @@ void RequestPropertyHelperModel::save(int index, const QVariant &value)
     const QMetaProperty &metaProperty = meta->property(data->propertyIndex);
     metaProperty.write(m_request, value);
     emit dataChanged(this->index(index), this->index(index));
+}
+
+void RequestPropertyHelperModel::setProperties(const QString &properties,
+                                               FacebookModelBuilder *modelBuilder)
+{
+    if (modelBuilder) {
+        QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
+        properties.clear(&properties);
+    }
+
+    QStringList splitted = properties.trimmed().split("\n");
+    for (const QString &line : splitted) {
+        QStringList splittedLine = line.split(":");
+        if (splittedLine.count() == 2) {
+            if (modelBuilder) {
+                QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
+                FacebookProperty *object = new FacebookProperty(modelBuilder);
+                object->setPath(splittedLine.at(0).trimmed());
+                object->setName(splittedLine.at(1).trimmed());
+                properties.append(&properties, object);
+            }
+        }
+    }
 }
 
 void RequestPropertyHelperModel::clear(bool emitSignal)

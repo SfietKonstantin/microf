@@ -30,8 +30,10 @@
  */
 
 #include "facebook.h"
-#include "socialnetwork_p.h"
+#include "facebook_p.h"
+#include <QtCore/QJsonDocument>
 #include <QtCore/QLocale>
+#include "facebookproperty_p.h"
 
 static const char *USER_AGENT = "Dalvik/2.1.0 (Linux; U; Android 5.0.2; Android on Emulator) [FBAN/FB4A;FBAV/29.0.0.23.13;FBBV/7888989;FBDM/{density=1.5,width=480,height=800};FBLC/%1;FBCR/Android;FBPN/com.facebook.katana;FBDV/Full Android on Emulator;FBSV/5.0.2;FBOP/1;FBCA/armeabi-v7a:armeabi;]";
 static const int API_KEY0 = 882;
@@ -47,27 +49,94 @@ static const char *API_KEY9 = "ddc";
 static const int API_KEY10 = 14;
 static const char *API_KEY11 = "d";
 
-class FacebookPrivate: public SocialNetworkPrivate
-{
-public:
-    explicit FacebookPrivate(Facebook *q);
-    void updateCountryCode();
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
-private:
-    Q_DECLARE_PUBLIC(Facebook)
-};
-
 FacebookPrivate::FacebookPrivate(Facebook *q)
     : SocialNetworkPrivate(q)
 {
     const QLocale &systemLocale = QLocale::system();
     countryCode = QLocale::countryToString(systemLocale.country());
     locale = QString("%1_%2").arg(QLocale::languageToString(systemLocale.language()), countryCode);
+}
+
+QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorString,
+                                      const QByteArray &data, const QVariantMap &metadata,
+                                      SocialNetworkError::type &outError, QString &outErrorString)
+{
+    if (error != QNetworkReply::NoError) {
+        outError = SocialNetworkError::Network;
+        outErrorString = errorString;
+        return QJsonObject();
+    }
+
+    QJsonDocument document = QJsonDocument::fromJson(data);
+    if (!document.isObject()) {
+        outError = SocialNetworkError::Data;
+        outErrorString = "Cannot convert to JSON";
+        return QJsonObject();
+    }
+
+    // First check metadata
+    const QJsonObject &root = document.object();
+    QString userId = metadata.value("userId").toString();
+
+    if (!root.contains(userId)) {
+        outError = SocialNetworkError::Data;
+        outErrorString = "Cannot find userId object";
+        return QJsonObject();
+    }
+
+    const QJsonObject &userIdData = root.value(userId).toObject();
+    QString type = metadata.value("type").toString();
+
+    if (userIdData.value("__type__").toObject().value("name").toString() != type) {
+        outError = SocialNetworkError::Data;
+        outErrorString = "Cannot match the type";
+        return QJsonObject();
+    }
+
+    return userIdData;
+}
+
+static void recursiveSetValues(const QJsonObject &object, const QString &prefix,
+                               QVariantMap &properties)
+{
+    for (const QString &key : object.keys()) {
+        const QJsonValue &value = object.value(key);
+        QString realKey;
+        if (!prefix.isEmpty()) {
+            realKey = QString("%1_%2").arg(prefix, key);
+        } else {
+            realKey = key;
+        }
+        if (value.isBool()) {
+            properties.insert(realKey, value.toBool());
+        } else if (value.isDouble()) {
+            properties.insert(realKey, value.toDouble());
+        } else if (value.isObject()) {
+            recursiveSetValues(value.toObject(), realKey, properties);
+        } else if (value.isString()) {
+            properties.insert(realKey, value.toString());
+        }
+    }
+}
+
+QVariantMap FacebookPrivate::recursiveValues(const QJsonObject &object)
+{
+    QVariantMap returned;
+    recursiveSetValues(object, "", returned);
+    return returned;
+}
+
+QVariantMap FacebookPrivate::buildProperties(const QJsonObject &object,
+                                             const QList<FacebookProperty *> &properties)
+{
+    QVariantMap returned;
+    for (FacebookProperty *property : properties) {
+        QVariant propertyVariant = FacebookPropertyPrivate::propertyFromPath(object, property->path());
+        if (!propertyVariant.isNull()) {
+            returned.insert(property->name(), propertyVariant);
+        }
+    }
+    return returned;
 }
 
 Facebook::Facebook(QObject *parent)

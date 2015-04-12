@@ -35,7 +35,8 @@ HEADERS += \
     facebook/facebookfriendlistrequest.h \
     facebook/facebookmodelbuilder.h \
     facebook/facebookproperty.h \
-    facebook/facebookproperty_p.h
+    facebook/facebookproperty_p.h \
+    facebook/facebook_p.h
 
 SOURCES += \
     socialnetwork.cpp \

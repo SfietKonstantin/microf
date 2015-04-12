@@ -42,6 +42,7 @@
 #include <facebook/facebookconfirmationcontentbuilder.h>
 #include <facebook/facebookfriendlistrequest.h>
 #include <facebook/facebookmodelbuilder.h>
+#include <facebook/facebookproperty.h>
 #include "authhelper.h"
 #include "infohelper.h"
 #include "requesthelpermodel.h"
@@ -65,6 +66,7 @@ static void registerTypes()
     qmlRegisterType<FacebookConfirmationContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookConfirmationContentBuilder");
     qmlRegisterType<FacebookFriendListRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookFriendListRequest");
     qmlRegisterType<FacebookModelBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookModelBuilder");
+    qmlRegisterType<FacebookProperty>("org.sfietkonstantin.microf", 1, 0, "FacebookProperty");
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
     qmlRegisterType<InfoHelper>("org.sfietkonstantin.microf", 1, 0, "InfoHelper");
     qmlRegisterType<RequestHelperModel>("org.sfietkonstantin.microf", 1, 0, "RequestHelperModel");

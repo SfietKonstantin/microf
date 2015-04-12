@@ -52,6 +52,13 @@ SocialContentModelBuilder::SocialContentModelBuilder(QObject *parent)
 {
 }
 
+SocialContentModelBuilder::SocialContentModelBuilder(SocialContentModelBuilderPrivate &dd,
+                                                     QObject *parent)
+    : QObject(parent), d_ptr(&dd)
+{
+
+}
+
 SocialContentModelBuilder::~SocialContentModelBuilder()
 {
 }

@@ -29,53 +29,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef REQUESTPROPERTYHELPERMODEL_H
-#define REQUESTPROPERTYHELPERMODEL_H
+#ifndef FACEBOOK_P_H
+#define FACEBOOK_P_H
 
-#include <QtCore/QAbstractListModel>
+#include "facebook.h"
+#include "socialnetwork_p.h"
+#include <QtNetwork/QNetworkReply>
+#include "socialnetworkerror.h"
 
-class FacebookModelBuilder;
-class SocialRequest;
-class RequestPropertyHelperModelData;
-class RequestPropertyHelperModel : public QAbstractListModel
+class FacebookProperty;
+class FacebookPrivate: public SocialNetworkPrivate
 {
-    Q_OBJECT
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(QObject * request READ request WRITE setRequest NOTIFY requestChanged)
-    Q_ENUMS(Type)
 public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        TypeRole,
-        ValueRole
-    };
-    enum Type {
-        Unknown,
-        Int,
-        Double,
-        String
-    };
-    explicit RequestPropertyHelperModel(QObject *parent = 0);
-    virtual ~RequestPropertyHelperModel();
-    QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    int count() const;
-    QObject * request() const;
-    void setRequest(QObject *request);
-public slots:
-    void save(int index, const QVariant &value);
-    void setProperties(const QString &properties, FacebookModelBuilder *modelBuilder);
-signals:
-    void countChanged();
-    void requestChanged();
+    explicit FacebookPrivate(Facebook *q);
+    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorString,
+                                const QByteArray &data, const QVariantMap &metadata,
+                                SocialNetworkError::type &outError, QString &outErrorString);
+    static QVariantMap recursiveValues(const QJsonObject &object);
+    static QVariantMap buildProperties(const QJsonObject &object,
+                                       const QList<FacebookProperty *> &properties);
+    QString locale;
+    QString countryCode;
+    QString userId;
+    QString sessionKey;
+    QString secret;
+    QString accessToken;
 private:
-    void clear(bool emitSignal);
-    void updateMetaObject();
-    QList<RequestPropertyHelperModelData *> m_data;
-    QObject * m_request;
+    Q_DECLARE_PUBLIC(Facebook)
 };
 
 
+#endif // FACEBOOK_P_H
 
-#endif // REQUESTPROPERTYHELPERMODEL_H

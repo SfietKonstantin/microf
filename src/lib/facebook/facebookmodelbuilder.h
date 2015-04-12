@@ -32,16 +32,24 @@
 #ifndef FACEBOOKMODELBUILDER_H
 #define FACEBOOKMODELBUILDER_H
 
+#include <QtQml/QQmlListProperty>
 #include "socialcontentmodelbuilder.h"
+#include "facebookproperty.h"
 
+class FacebookModelBuilderPrivate;
 class FacebookModelBuilder : public SocialContentModelBuilder
 {
     Q_OBJECT
+    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
 public:
     explicit FacebookModelBuilder(QObject *parent = 0);
+    ~FacebookModelBuilder();
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorString, const QByteArray &data,
                const QVariantMap &metadata) override;
+    QQmlListProperty<FacebookProperty> properties();
+private:
+    Q_DECLARE_PRIVATE(FacebookModelBuilder)
 };
 
 #endif // FACEBOOKMODELBUILDER_H

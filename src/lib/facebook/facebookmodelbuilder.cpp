@@ -30,85 +30,124 @@
  */
 
 #include "facebookmodelbuilder.h"
+#include "socialcontentmodelbuilder_p.h"
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
+#include "facebook_p.h"
 
-FacebookModelBuilder::FacebookModelBuilder(QObject *parent)
-    : SocialContentModelBuilder(parent)
+class FacebookModelBuilderPrivate: public SocialContentModelBuilderPrivate
+{
+public:
+    explicit FacebookModelBuilderPrivate(FacebookModelBuilder *q);
+    static void properties_append(QQmlListProperty<FacebookProperty> *list, FacebookProperty *property);
+    static int properties_count(QQmlListProperty<FacebookProperty> *list);
+    static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
+    static void properties_clear(QQmlListProperty<FacebookProperty> *list);
+private:
+    void clear();
+    QList<FacebookProperty *> m_properties;
+    Q_DECLARE_PUBLIC(FacebookModelBuilder)
+};
+
+FacebookModelBuilderPrivate::FacebookModelBuilderPrivate(FacebookModelBuilder *q)
+    : SocialContentModelBuilderPrivate(q)
 {
 }
 
-static void recursiveSetValues(const QJsonObject &object, const QString &prefix,
-                               QVariantMap &properties)
+void FacebookModelBuilderPrivate::properties_append(QQmlListProperty<FacebookProperty> *list, FacebookProperty *property)
 {
-    for (const QString &key : object.keys()) {
-        const QJsonValue &value = object.value(key);
-        QString realKey;
-        if (!prefix.isEmpty()) {
-            realKey = QString("%1_%2").arg(prefix, key);
-        } else {
-            realKey = key;
-        }
-        if (value.isBool()) {
-            properties.insert(realKey, value.toBool());
-        } else if (value.isDouble()) {
-            properties.insert(realKey, value.toDouble());
-        } else if (value.isObject()) {
-            recursiveSetValues(value.toObject(), realKey, properties);
-        } else if (value.isString()) {
-            properties.insert(realKey, value.toString());
-        }
+    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
+    if (!builder || !property) {
+        return;
     }
+    builder->d_func()->m_properties.append(property);
+}
+
+int FacebookModelBuilderPrivate::properties_count(QQmlListProperty<FacebookProperty> *list)
+{
+    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
+    if (!builder) {
+        return 0;
+    }
+    return builder->d_func()->m_properties.count();
+}
+
+FacebookProperty * FacebookModelBuilderPrivate::properties_at(QQmlListProperty<FacebookProperty> *list, int index)
+{
+    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
+    if (!builder) {
+        return nullptr;
+    }
+
+    const QList<FacebookProperty *> &properties = builder->d_func()->m_properties;
+    if (index < 0 || index >= properties.count()) {
+        return nullptr;
+    }
+
+    return properties.at(index);
+}
+
+void FacebookModelBuilderPrivate::properties_clear(QQmlListProperty<FacebookProperty> *list)
+{
+    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
+    if (!builder) {
+        return;
+    }
+
+    builder->d_func()->clear();
+}
+
+void FacebookModelBuilderPrivate::clear()
+{
+    qDeleteAll(m_properties);
+    m_properties.clear();
+}
+
+FacebookModelBuilder::FacebookModelBuilder(QObject *parent)
+    : SocialContentModelBuilder(*(new FacebookModelBuilderPrivate(this)), parent)
+{
+}
+
+FacebookModelBuilder::~FacebookModelBuilder()
+{
+    Q_D(FacebookModelBuilder);
+    d->clear();
 }
 
 void FacebookModelBuilder::build(SocialContentModel &contentModel,
                                  QNetworkReply::NetworkError error, const QString &errorString,
                                  const QByteArray &data, const QVariantMap &metadata)
 {
-    if (error != QNetworkReply::NoError) {
-        setError(contentModel, SocialNetworkError::Network, errorString);
-        return;
-    }
+    Q_D(FacebookModelBuilder);
+    SocialNetworkError::type outError = SocialNetworkError::No;
+    QString outErrorString;
 
-    QJsonDocument document = QJsonDocument::fromJson(data);
-    if (!document.isObject()) {
-        setError(contentModel, SocialNetworkError::Data, "Cannot convert to JSON");
-        return;
-    }
-
-    // First check metadata
-    const QJsonObject &root = document.object();
-    QString userId = metadata.value("userId").toString();
-
-    if (!root.contains(userId)) {
-        setError(contentModel, SocialNetworkError::Data, "Cannot find userId object");
-        return;
-    }
-
-    const QJsonObject &userIdData = root.value(userId).toObject();
-    QString type = metadata.value("type").toString();
-
-    if (userIdData.value("__type__").toObject().value("name").toString() != type) {
-        setError(contentModel, SocialNetworkError::Data, "Cannot match the type");
+    QJsonObject root = FacebookPrivate::prebuild(error, errorString, data, metadata, outError,
+                                                 outErrorString);
+    if (outError != SocialNetworkError::No) {
+        setError(contentModel, outError, outErrorString);
         return;
     }
 
     const QString &dataRoot = metadata.value("dataRoot").toString();
-    if (!userIdData.contains(dataRoot)) {
+    if (!root.contains(dataRoot)) {
         setError(contentModel, SocialNetworkError::Data, "Cannot find data root object");
         return;
     }
 
-    const QJsonObject &dataObject = userIdData.value(dataRoot).toObject();
+    const QJsonObject &dataObject = root.value(dataRoot).toObject();
     const QJsonArray &nodes = dataObject.value("nodes").toArray();
     const QJsonObject &pageInfo = dataObject.value("page_info").toObject();
 
     QList<QVariantMap> returnedData;
     for (const QJsonValue &value : nodes) {
         QVariantMap properties;
-        recursiveSetValues(value.toObject(), QString(""), properties);
+        if (d->m_properties.isEmpty()) {
+            properties = FacebookPrivate::recursiveValues(value.toObject());
+        } else {
+            properties = FacebookPrivate::buildProperties(value.toObject(), d->m_properties);
+        }
         returnedData.append(properties);
     }
 
@@ -122,3 +161,11 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
     setData(contentModel, returnedData, hasNextPage, false, newMetadata);
 }
 
+QQmlListProperty<FacebookProperty> FacebookModelBuilder::properties()
+{
+    return QQmlListProperty<FacebookProperty>(this, 0,
+                                              &FacebookModelBuilderPrivate::properties_append,
+                                              &FacebookModelBuilderPrivate::properties_count,
+                                              &FacebookModelBuilderPrivate::properties_at,
+                                              &FacebookModelBuilderPrivate::properties_clear);
+}
