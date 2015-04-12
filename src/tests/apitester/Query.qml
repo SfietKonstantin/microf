@@ -15,10 +15,14 @@ Item {
         id: item
         socialNetwork: facebook
         request: container.request
-
+        builder: FacebookItemBuilder {
+            id: itemBuilder
+        }
         onFinished: {
             if (!ok) {
                 errorLabel.text = model.errorString
+            } else {
+                itemDisplay.refresh()
             }
         }
     }
@@ -100,6 +104,7 @@ Item {
                             }
 
                             Repeater {
+                                id: repeater
                                 anchors.left: parent.left; anchors.right: parent.right
                                 model: requestPropertyModel
                                 delegate: TextField {
@@ -107,7 +112,7 @@ Item {
                                         requestPropertyModel.save(model.index, text)
                                     }
 
-                                    anchors.left: parent.left; anchors.right: parent.right
+                                    width: repeater.width
                                     placeholderText: model.name
                                     Component.onCompleted: {
                                         if (model.name === "userId") {
@@ -136,7 +141,7 @@ Item {
                             TextArea {
                                 anchors.left: parent.left; anchors.right: parent.right
                                 onTextChanged: {
-                                    requestPropertyModel.setProperties(text, modelBuilder)
+                                    requestPropertyModel.setProperties(text, itemBuilder, modelBuilder)
                                 }
                             }
                         }
@@ -148,9 +153,11 @@ Item {
                             switch (container.type) {
                             case RequestHelperModel.Object:
                                 modelView.visible = false
+                                itemView.visible = true
                                 break
                             case RequestHelperModel.Model:
                                 modelView.visible = true
+                                itemView.visible = false
                                 break
                             }
                         }
@@ -204,54 +211,31 @@ Item {
             }
         }
 
-        ListView {
-            id: modelView
+        Item {
             Layout.minimumWidth: 200
-            width: parent.width
-            model: model
-            delegate: Item {
-                width: modelView.width
-                height: rect.height + rect.anchors.margins
 
-                Rectangle {
-                    id: rect
-                    anchors.left: parent.left; anchors.right: parent.right
-                    anchors.margins: 12
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: column.height + column.anchors.margins * 2
+            ListView {
+                id: modelView
+                anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
+                width: parent.width
+                model: model
+                spacing: 8
+                delegate: Display {
+                    width: modelView.width
+                    object: model.object
+                }
+            }
 
-                    InfoHelper {
-                        id: infoHelper
-                        object: model.object
-                    }
+            Flickable {
+                id: itemView
+                anchors.top: parent.top; anchors.bottom: parent.bottom; anchors.margins: 12
+                width: parent.width
+                contentHeight: itemDisplay.height
 
-                    Column {
-                        id: column
-                        anchors.left: parent.left; anchors.right: parent.right
-                        anchors.margins: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 8
-                        Label {
-                            id: label
-                            anchors.left: parent.left; anchors.right: parent.right
-                            anchors.margins: 8
-                            wrapMode: Text.WrapAnywhere
-                            textFormat: Text.RichText
-                            text: infoHelper.text
-                        }
-
-                        Repeater {
-                            anchors.left: parent.left; anchors.right: parent.right
-                            model: infoHelper.urls
-
-                            Image {
-                                anchors.left: parent.left; anchors.right: parent.right
-                                source: model.modelData
-                                fillMode: Image.PreserveAspectFit
-                                visible: status === Image.Ready
-                            }
-                        }
-                    }
+                Display {
+                    id: itemDisplay
+                    width: itemView.width
+                    object: item.object
                 }
             }
         }

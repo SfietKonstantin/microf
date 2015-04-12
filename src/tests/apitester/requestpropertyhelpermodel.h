@@ -34,8 +34,9 @@
 
 #include <QtCore/QAbstractListModel>
 
-class FacebookModelBuilder;
 class SocialRequest;
+class FacebookItemBuilder;
+class FacebookModelBuilder;
 class RequestPropertyHelperModelData;
 class RequestPropertyHelperModel : public QAbstractListModel
 {
@@ -65,7 +66,7 @@ public:
     void setRequest(QObject *request);
 public slots:
     void save(int index, const QVariant &value);
-    void setProperties(const QString &properties, FacebookModelBuilder *modelBuilder);
+    void setProperties(const QString &properties, FacebookItemBuilder *itemBuilder, FacebookModelBuilder *modelBuilder);
 signals:
     void countChanged();
     void requestChanged();

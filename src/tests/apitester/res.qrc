@@ -4,5 +4,6 @@
         <file>Token.qml</file>
         <file>Tools.qml</file>
         <file>Query.qml</file>
+        <file>Display.qml</file>
     </qresource>
 </RCC>

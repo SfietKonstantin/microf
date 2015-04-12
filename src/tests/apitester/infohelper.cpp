@@ -66,6 +66,11 @@ QStringList InfoHelper::urls() const
     return m_urls;
 }
 
+void InfoHelper::refresh()
+{
+    generateText();
+}
+
 void InfoHelper::generateText()
 {
     if (!m_object) {

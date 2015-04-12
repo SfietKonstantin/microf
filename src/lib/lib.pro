@@ -27,16 +27,19 @@ HEADERS += \
     socialcontentmodelbuilder.h \
     socialcontentmodelbuilder_p.h \
     facebook/facebook.h \
-    facebook/facebooklogoutrequest.h \
+    facebook/facebook_p.h \
+    facebook/abstractfacebookrequest.h \
     facebook/facebookloginrequest.h \
     facebook/facebooklogincontentbuilder.h \
+    facebook/facebooklogoutrequest.h \
     facebook/facebookconfirmationcontentbuilder.h \
-    facebook/abstractfacebookrequest.h \
-    facebook/facebookfriendlistrequest.h \
-    facebook/facebookmodelbuilder.h \
     facebook/facebookproperty.h \
     facebook/facebookproperty_p.h \
-    facebook/facebook_p.h
+    facebook/facebookitembuilder.h \
+    facebook/facebookmodelbuilder.h \
+    facebook/facebookfriendlistrequest.h \
+    facebook/facebookusersummaryrequest.h \
+    plugin.h
 
 SOURCES += \
     socialnetwork.cpp \
@@ -49,11 +52,13 @@ SOURCES += \
     socialcontentmodel.cpp \
     socialcontentmodelbuilder.cpp \
     facebook/facebook.cpp \
-    facebook/facebooklogoutrequest.cpp \
+    facebook/abstractfacebookrequest.cpp \
     facebook/facebookloginrequest.cpp \
     facebook/facebooklogincontentbuilder.cpp \
+    facebook/facebooklogoutrequest.cpp \
     facebook/facebookconfirmationcontentbuilder.cpp \
-    facebook/abstractfacebookrequest.cpp \
-    facebook/facebookfriendlistrequest.cpp \
+    facebook/facebookproperty.cpp \
+    facebook/facebookitembuilder.cpp \
     facebook/facebookmodelbuilder.cpp \
-    facebook/facebookproperty.cpp
+    facebook/facebookfriendlistrequest.cpp \
+    facebook/facebookusersummaryrequest.cpp

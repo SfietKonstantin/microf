@@ -32,6 +32,7 @@
 #include "requestpropertyhelpermodel.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
+#include <facebook/facebookitembuilder.h>
 #include <facebook/facebookmodelbuilder.h>
 #include <facebook/facebookproperty.h>
 
@@ -130,8 +131,13 @@ void RequestPropertyHelperModel::save(int index, const QVariant &value)
 }
 
 void RequestPropertyHelperModel::setProperties(const QString &properties,
+                                               FacebookItemBuilder *itemBuilder,
                                                FacebookModelBuilder *modelBuilder)
 {
+    if (itemBuilder) {
+        QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
+        properties.clear(&properties);
+    }
     if (modelBuilder) {
         QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
         properties.clear(&properties);
@@ -141,11 +147,20 @@ void RequestPropertyHelperModel::setProperties(const QString &properties,
     for (const QString &line : splitted) {
         QStringList splittedLine = line.split(":");
         if (splittedLine.count() == 2) {
+            const QString &path = splittedLine.at(0).trimmed();
+            const QString &name = splittedLine.at(1).trimmed();
+            if (itemBuilder) {
+                QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
+                FacebookProperty *object = new FacebookProperty(itemBuilder);
+                object->setPath(path);
+                object->setName(name);
+                properties.append(&properties, object);
+            }
             if (modelBuilder) {
                 QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
                 FacebookProperty *object = new FacebookProperty(modelBuilder);
-                object->setPath(splittedLine.at(0).trimmed());
-                object->setName(splittedLine.at(1).trimmed());
+                object->setPath(path);
+                object->setName(name);
                 properties.append(&properties, object);
             }
         }

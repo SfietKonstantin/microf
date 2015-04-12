@@ -32,6 +32,7 @@
 #include "requesthelpermodel.h"
 #include <socialrequest.h>
 #include <facebook/facebookfriendlistrequest.h>
+#include <facebook/facebookusersummaryrequest.h>
 
 class RequestHelperModelData
 {
@@ -54,6 +55,7 @@ RequestHelperModel::RequestHelperModel(QObject *parent)
 {
     QList<RequestHelperModelData *> data;
     data.append(new RequestHelperModelData("Friends", new FacebookFriendListRequest(this), Model));
+    data.append(new RequestHelperModelData("UserSummary", new FacebookUserSummaryRequest(this), Object));
     beginInsertRows(QModelIndex(), 0, data.count());
     m_data = data;
     emit countChanged();

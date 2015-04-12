@@ -32,17 +32,7 @@
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/qqml.h>
-#include <socialcontentitem.h>
-#include <socialcontentmodel.h>
-#include <socialobject.h>
-#include <facebook/facebook.h>
-#include <facebook/facebookloginrequest.h>
-#include <facebook/facebooklogincontentbuilder.h>
-#include <facebook/facebooklogoutrequest.h>
-#include <facebook/facebookconfirmationcontentbuilder.h>
-#include <facebook/facebookfriendlistrequest.h>
-#include <facebook/facebookmodelbuilder.h>
-#include <facebook/facebookproperty.h>
+#include <plugin.h>
 #include "authhelper.h"
 #include "infohelper.h"
 #include "requesthelpermodel.h"
@@ -50,23 +40,7 @@
 
 static void registerTypes()
 {
-    qmlRegisterUncreatableType<SocialNetwork>("org.sfietkonstantin.microf", 1, 0, "SocialNetwork", "Abstract type");
-    qmlRegisterUncreatableType<SocialNetworkStatus>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkStatus", "Abstract type");
-    qmlRegisterUncreatableType<SocialNetworkError>("org.sfietkonstantin.microf", 1, 0, "SocialNetworkError", "Abstract type");
-    qmlRegisterUncreatableType<SocialObject>("org.sfietkonstantin.microf", 1, 0, "SocialObject", "Abstract type");
-    qmlRegisterUncreatableType<SocialRequest>("org.sfietkonstantin.microf", 1, 0, "SocialRequest", "Abstract type");
-    qmlRegisterUncreatableType<SocialContentItemBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentItemBuilder", "Abstract type");
-    qmlRegisterUncreatableType<SocialContentModelBuilder>("org.sfietkonstantin.microf", 1, 0, "SocialContentModelBuilder", "Abstract type");
-    qmlRegisterType<SocialContentItem>("org.sfietkonstantin.microf", 1, 0, "SocialContentItem");
-    qmlRegisterType<SocialContentModel>("org.sfietkonstantin.microf", 1, 0, "SocialContentModel");
-    qmlRegisterType<Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType<FacebookLoginRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginRequest");
-    qmlRegisterType<FacebookLoginContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookLoginContentBuilder");
-    qmlRegisterType<FacebookLogoutRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookLogoutRequest");
-    qmlRegisterType<FacebookConfirmationContentBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookConfirmationContentBuilder");
-    qmlRegisterType<FacebookFriendListRequest>("org.sfietkonstantin.microf", 1, 0, "FacebookFriendListRequest");
-    qmlRegisterType<FacebookModelBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookModelBuilder");
-    qmlRegisterType<FacebookProperty>("org.sfietkonstantin.microf", 1, 0, "FacebookProperty");
+    registerMicroFTypes("org.sfietkonstantin.microf");
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
     qmlRegisterType<InfoHelper>("org.sfietkonstantin.microf", 1, 0, "InfoHelper");
     qmlRegisterType<RequestHelperModel>("org.sfietkonstantin.microf", 1, 0, "RequestHelperModel");

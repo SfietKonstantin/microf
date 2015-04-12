@@ -29,37 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALCONTENTBUILDER_H
-#define SOCIALCONTENTBUILDER_H
+#ifndef FACEBOOKUSERSUMMARYREQUEST_H
+#define FACEBOOKUSERSUMMARYREQUEST_H
 
 #include <QtCore/QObject>
-#include <QtNetwork/QNetworkReply>
-#include <QtQml/QQmlParserStatus>
-#include "socialnetworkerror.h"
 
-class SocialContentItem;
-class SocialContentItemBuilderPrivate;
-class SocialContentItemBuilder : public QObject, public QQmlParserStatus
+#include "abstractfacebookrequest.h"
+
+class FacebookUserSummaryRequestPrivate;
+class FacebookUserSummaryRequest : public AbstractFacebookRequest
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
 public:
-    virtual ~SocialContentItemBuilder();
-    void classBegin() override;
-    void componentComplete() override;
+    explicit FacebookUserSummaryRequest(QObject *parent = 0);
+    QString userId() const;
+    void setUserId(const QString &userId);
+Q_SIGNALS:
+    void userIdChanged();
 protected:
-    explicit SocialContentItemBuilder(QObject *parent = 0);
-    explicit SocialContentItemBuilder(SocialContentItemBuilderPrivate &dd, QObject *parent = 0);
-    virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                       const QString &errorString, const QByteArray &data,
-                       const QVariantMap &metadata) = 0;
-    void setObject(SocialContentItem &contentItem, const QVariantMap &properties,
-                   const QVariantMap &metadata = QVariantMap());
-    void setError(SocialContentItem &contentItem, SocialNetworkError::type error,
-                  const QString &errorString);
-    QScopedPointer<SocialContentItemBuilderPrivate> d_ptr;
+    QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
+                               const QVariantMap &metadata) const override;
+    QString queryId() const override;
+    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
+    QString requestName() const override;
+    QString apiCallerClass() const override;
 private:
-    Q_DECLARE_PRIVATE(SocialContentItemBuilder)
+    Q_DECLARE_PRIVATE(FacebookUserSummaryRequest)
 };
 
-#endif // SOCIALCONTENTBUILDER_H
+#endif // FACEBOOKUSERSUMMARYREQUEST_H

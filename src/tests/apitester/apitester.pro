@@ -26,5 +26,8 @@ RESOURCES += \
 
 OTHER_FILES += \
     main.qml \
-    Token.qml
+    Token.qml \
+    Query.qml \
+    Tools.qml \
+    Display.qml
 

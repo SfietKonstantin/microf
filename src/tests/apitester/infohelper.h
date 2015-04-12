@@ -48,6 +48,8 @@ public:
     void setObject(QObject *object);
     QString text() const;
     QStringList urls() const;
+public slots:
+    void refresh();
 signals:
     void objectChanged();
     void textChanged();

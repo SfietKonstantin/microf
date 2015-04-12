@@ -29,37 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SOCIALCONTENTBUILDER_H
-#define SOCIALCONTENTBUILDER_H
+#ifndef FACEBOOKITEMBUILDER_H
+#define FACEBOOKITEMBUILDER_H
 
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkReply>
-#include <QtQml/QQmlParserStatus>
-#include "socialnetworkerror.h"
+#include <QtQml/QQmlListProperty>
+#include "socialcontentitembuilder.h"
+#include "facebookproperty.h"
 
-class SocialContentItem;
-class SocialContentItemBuilderPrivate;
-class SocialContentItemBuilder : public QObject, public QQmlParserStatus
+class FacebookItemBuilderPrivate;
+class FacebookItemBuilder : public SocialContentItemBuilder
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
 public:
-    virtual ~SocialContentItemBuilder();
-    void classBegin() override;
-    void componentComplete() override;
-protected:
-    explicit SocialContentItemBuilder(QObject *parent = 0);
-    explicit SocialContentItemBuilder(SocialContentItemBuilderPrivate &dd, QObject *parent = 0);
-    virtual void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-                       const QString &errorString, const QByteArray &data,
-                       const QVariantMap &metadata) = 0;
-    void setObject(SocialContentItem &contentItem, const QVariantMap &properties,
-                   const QVariantMap &metadata = QVariantMap());
-    void setError(SocialContentItem &contentItem, SocialNetworkError::type error,
-                  const QString &errorString);
-    QScopedPointer<SocialContentItemBuilderPrivate> d_ptr;
+    explicit FacebookItemBuilder(QObject *parent = 0);
+    ~FacebookItemBuilder();
+    void build(SocialContentItem &contentModel, QNetworkReply::NetworkError error,
+               const QString &errorString, const QByteArray &data,
+               const QVariantMap &metadata) override;
+    QQmlListProperty<FacebookProperty> properties();
 private:
-    Q_DECLARE_PRIVATE(SocialContentItemBuilder)
+    Q_DECLARE_PRIVATE(FacebookItemBuilder)
 };
 
-#endif // SOCIALCONTENTBUILDER_H
+#endif // FACEBOOKITEMBUILDER_H

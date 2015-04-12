@@ -52,6 +52,12 @@ SocialContentItemBuilder::SocialContentItemBuilder(QObject *parent)
 {
 }
 
+SocialContentItemBuilder::SocialContentItemBuilder(SocialContentItemBuilderPrivate &dd,
+                                                   QObject *parent)
+    : QObject(parent), d_ptr(&dd)
+{
+}
+
 SocialContentItemBuilder::~SocialContentItemBuilder()
 {
 }
