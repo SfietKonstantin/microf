@@ -32,6 +32,9 @@
 #include "socialcontentmodelbuilder.h"
 #include "socialcontentmodelbuilder_p.h"
 #include "socialcontentmodel_p.h"
+#ifdef MICROF_DEBUG
+#include <QtCore/QDebug>
+#endif
 
 SocialContentModelBuilderPrivate::SocialContentModelBuilderPrivate(SocialContentModelBuilder *q)
     : q_ptr(q)
@@ -44,6 +47,13 @@ void SocialContentModelBuilderPrivate::build(SocialContentModelBuilder &builder,
                                              const QString &errorString, const QByteArray &data,
                                              const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentModelBuilderPrivate::build";
+    qDebug() << "Network error:" << error;
+    qDebug() << "Error string:" << errorString;
+    qDebug() << "Data:" << data;
+    qDebug() << "Metadata" << metadata;
+#endif
     builder.build(contentModel, error, errorString, data, metadata);
 }
 
@@ -76,6 +86,15 @@ void SocialContentModelBuilder::setData(SocialContentModel &contentModel,
                                         bool hasNext, bool hasPrevious,
                                         const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentModelBuilder::setObject";
+    qDebug() << "Properties:";
+    for (const QVariantMap &entry : data) {
+        qDebug() << entry;
+    }
+    qDebug() << "Has next:" << hasNext << "hasPrevious:" << hasPrevious;
+    qDebug() << "Metadata" << metadata;
+#endif
     SocialContentModelPrivate::setContentModelData(contentModel, data, hasNext, hasPrevious,
                                                    metadata);
 
@@ -84,7 +103,11 @@ void SocialContentModelBuilder::setData(SocialContentModel &contentModel,
 void SocialContentModelBuilder::setError(SocialContentModel &contentModel,
                                          SocialNetworkError::type error, const QString &errorString)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentItemBuilder::setError";
+    qDebug() << "Error:" << error;
+    qDebug() << "Error string" << errorString;
+#endif
     SocialContentModelPrivate::setContentModelError(contentModel, error, errorString);
-
 }
 

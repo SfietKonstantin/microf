@@ -53,8 +53,8 @@ FacebookPrivate::FacebookPrivate(Facebook *q)
     : SocialNetworkPrivate(q)
 {
     const QLocale &systemLocale = QLocale::system();
-    countryCode = QLocale::countryToString(systemLocale.country());
-    locale = QString("%1_%2").arg(QLocale::languageToString(systemLocale.language()), countryCode);
+    locale = systemLocale.name();
+    countryCode = locale.split("_").first();
 }
 
 QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorString,

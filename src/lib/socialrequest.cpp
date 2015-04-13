@@ -31,6 +31,9 @@
 
 #include "socialrequest.h"
 #include "socialrequest_p.h"
+#ifdef MICROF_DEBUG
+#include <QtCore/QDebug>
+#endif
 
 SocialRequestPrivate::SocialRequestPrivate(SocialRequest *q)
     : q_ptr(q)
@@ -43,7 +46,20 @@ QNetworkRequest SocialRequestPrivate::createRequest(const SocialRequest &request
                                                     SocialRequest::Mode mode,
                                                     const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    const QNetworkRequest &result = request.createRequest(socialNetwork, postData, mode, metadata);
+    qDebug() << "SocialRequestPrivate::createRequest";
+    qDebug() << "Mode: " << mode;
+    qDebug() << "Metadata: " << metadata;
+    qDebug() << "Request url:" << result.url();
+    qDebug() << "Header:";
+    for (const QByteArray &header : result.rawHeaderList()) {
+        qDebug() << header << "=" << result.rawHeader(header);
+    }
+    return result;
+#else
     return request.createRequest(socialNetwork, postData, mode, metadata);
+#endif
 }
 
 QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
@@ -51,7 +67,14 @@ QByteArray SocialRequestPrivate::createPostData(const SocialRequest &request,
                                                 SocialRequest::Mode mode,
                                                 const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    const QByteArray &result = request.createPostData(socialNetwork, mode, metadata);
+    qDebug() << "SocialRequestPrivate::createPostData";
+    qDebug() << "Post data:" << result;
+    return result;
+#else
     return request.createPostData(socialNetwork, mode, metadata);
+#endif
 }
 
 QVariantMap SocialRequestPrivate::createMetadata(const SocialRequest &request,
@@ -59,7 +82,14 @@ QVariantMap SocialRequestPrivate::createMetadata(const SocialRequest &request,
                                                  SocialRequest::Mode mode,
                                                  const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    const QVariantMap &result = request.createMetadata(socialNetwork, mode, metadata);
+    qDebug() << "SocialRequestPrivate::createMetadata";
+    qDebug() << "Metadata:" << result;
+    return result;
+#else
     return request.createMetadata(socialNetwork, mode, metadata);
+#endif
 }
 
 SocialRequest::SocialRequest(QObject *parent)

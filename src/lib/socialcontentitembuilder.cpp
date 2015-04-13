@@ -32,6 +32,9 @@
 #include "socialcontentitembuilder.h"
 #include "socialcontentitembuilder_p.h"
 #include "socialcontentitem_p.h"
+#ifdef MICROF_DEBUG
+#include <QtCore/QDebug>
+#endif
 
 SocialContentItemBuilderPrivate::SocialContentItemBuilderPrivate(SocialContentItemBuilder *q)
     : q_ptr(q)
@@ -44,6 +47,13 @@ void SocialContentItemBuilderPrivate::build(SocialContentItemBuilder &builder,
                                             const QString &errorString, const QByteArray &data,
                                             const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentItemBuilderPrivate::build";
+    qDebug() << "Network error:" << error;
+    qDebug() << "Error string:" << errorString;
+    qDebug() << "Data:" << data;
+    qDebug() << "Metadata" << metadata;
+#endif
     builder.build(contentItem, error, errorString, data, metadata);
 }
 
@@ -74,12 +84,22 @@ void SocialContentItemBuilder::setObject(SocialContentItem &contentItem,
                                          const QVariantMap &properties,
                                          const QVariantMap &metadata)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentItemBuilder::setObject";
+    qDebug() << "Properties:" << properties;
+    qDebug() << "Metadata" << metadata;
+#endif
     SocialContentItemPrivate::setContentItemObject(contentItem, properties, metadata);
 }
 
 void SocialContentItemBuilder::setError(SocialContentItem &contentItem,
                                         SocialNetworkError::type error, const QString &errorString)
 {
+#ifdef MICROF_DEBUG
+    qDebug() << "SocialContentItemBuilder::setError";
+    qDebug() << "Error:" << error;
+    qDebug() << "Error string" << errorString;
+#endif
     SocialContentItemPrivate::setContentItemError(contentItem, error, errorString);
 }
 

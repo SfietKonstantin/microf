@@ -35,6 +35,8 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 
+static const char *ERROR_DATA_KEY = "error_data";
+static const char *ERROR_MESSAGE_KEY = "error_message";
 static const char *UID_KEY = "uid";
 static const char *SESSION_KEY_KEY = "session_key";
 static const char *SECRET_KEY = "secret";
@@ -65,12 +67,39 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
 
     QVariantMap properties;
     const QJsonObject &object = document.object();
-    if (object.contains(UID_KEY)) {
-        const QJsonValue &value = object.value(UID_KEY);
-        if (value.isDouble()) {
-            properties.insert(UID_KEY, QString::number(value.toInt()));
+    // Check if we got an error
+    if (object.contains(ERROR_DATA_KEY)) {
+        QString errorData = object.value(ERROR_DATA_KEY).toString();
+        QJsonDocument errorDocument = QJsonDocument::fromJson(errorData.toLocal8Bit());
+        if (!errorDocument.isObject()) {
+            setError(contentItem, SocialNetworkError::Data, "Cannot convert to JSON");
+            return;
         }
+
+        const QJsonObject &errorObject = errorDocument.object();
+        if (!errorObject.contains(ERROR_MESSAGE_KEY)) {
+            setError(contentItem, SocialNetworkError::Data, "Cannot find error_title in error message");
+            return;
+        }
+        QString errorTitle = errorObject.value(ERROR_MESSAGE_KEY).toString();
+        setError(contentItem, SocialNetworkError::SocialNetwork, errorTitle);
+        return;
     }
+
+    const QJsonValue &accessToken = object.value(ACCESS_TOKEN_KEY);
+    if (!accessToken.isString()) {
+        setError(contentItem, SocialNetworkError::Data, "Cannot find access_token in JSON");
+        return;
+    }
+    const QJsonValue &uid = object.value(UID_KEY);
+    if (!uid.isDouble() && !uid.isString()) {
+        setError(contentItem, SocialNetworkError::Data, "Cannot find uid in JSON");
+        return;
+    }
+
+    properties.insert(ACCESS_TOKEN_KEY, accessToken.toString());
+    properties.insert(UID_KEY, uid.toString());
+
     if (object.contains(SESSION_KEY_KEY)) {
         const QJsonValue &value = object.value(SESSION_KEY_KEY);
         if (value.isString()) {
@@ -81,12 +110,6 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
         const QJsonValue &value = object.value(SECRET_KEY);
         if (value.isString()) {
             properties.insert(SECRET_KEY, value.toString());
-        }
-    }
-    if (object.contains(ACCESS_TOKEN_KEY)) {
-        const QJsonValue &value = object.value(ACCESS_TOKEN_KEY);
-        if (value.isString()) {
-            properties.insert(ACCESS_TOKEN_KEY, value.toString());
         }
     }
     setObject(contentItem, properties);
