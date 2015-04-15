@@ -47,7 +47,7 @@ class AuthHelper: public QObject
 public:
     explicit AuthHelper(QObject *parent = 0);
     ~AuthHelper();
-    Q_INVOKABLE static QString generateMachineId();
+    Q_INVOKABLE static QString generateDeviceId();
     Q_INVOKABLE static QString parseUrlQuery(const QString &queryString);
     Q_INVOKABLE static QString formatJson(const QString &json);
     QString email() const;

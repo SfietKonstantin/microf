@@ -41,6 +41,7 @@ static const char *UID_KEY = "uid";
 static const char *SESSION_KEY_KEY = "session_key";
 static const char *SECRET_KEY = "secret";
 static const char *ACCESS_TOKEN_KEY = "access_token";
+static const char *MACHINE_ID_KEY = "machine_id";
 
 FacebookLoginContentBuilder::FacebookLoginContentBuilder(QObject *parent)
     : SocialContentItemBuilder(parent)
@@ -98,7 +99,11 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
     }
 
     properties.insert(ACCESS_TOKEN_KEY, accessToken.toString());
-    properties.insert(UID_KEY, uid.toString());
+    if (uid.isDouble()) {
+        properties.insert(UID_KEY, QString::number(uid.toInt()));
+    } else if (uid.isString()) {
+        properties.insert(UID_KEY, uid.toString());
+    }
 
     if (object.contains(SESSION_KEY_KEY)) {
         const QJsonValue &value = object.value(SESSION_KEY_KEY);
@@ -112,5 +117,12 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
             properties.insert(SECRET_KEY, value.toString());
         }
     }
+    if (object.contains(MACHINE_ID_KEY)) {
+        const QJsonValue &value = object.value(MACHINE_ID_KEY);
+        if (value.isString()) {
+            properties.insert(MACHINE_ID_KEY, value.toString());
+        }
+    }
+
     setObject(contentItem, properties);
 }

@@ -37,6 +37,7 @@
 class SocialNetworkError : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(type)
 public:
     enum type {
         No = 0, // No error

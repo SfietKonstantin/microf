@@ -6,6 +6,7 @@ import org.sfietkonstantin.microf 1.0
 Item {
     id: container
     property bool busy: login.status === SocialNetworkStatus.Busy || logout === SocialNetworkStatus.Busy
+    property bool canGenerateDeviceId: !busy && authHelper.accessToken === "" && authHelper.deviceId === ""
     property bool canLogin: !busy && authHelper.accessToken === "" && emailField.text !== ""
                             && passwordField.text !== "" && authHelper.deviceId !== ""
     property bool canLogout: !busy && authHelper.accessToken !== ""
@@ -131,10 +132,10 @@ Item {
                         Button {
                             id: generateDeviceId
                             anchors.left: parent.left; anchors.right: parent.right
-                            enabled: container.canLogin
+                            enabled: container.canGenerateDeviceId
                             text: "Generate device id"
                             onClicked: {
-                                authHelper.machineId = authHelper.generateMachineId()
+                                authHelper.deviceId = authHelper.generateDeviceId()
                             }
                         }
                         Button {

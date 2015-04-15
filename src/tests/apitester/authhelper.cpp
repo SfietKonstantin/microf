@@ -53,7 +53,7 @@ AuthHelper::~AuthHelper()
 {
 }
 
-QString AuthHelper::generateMachineId()
+QString AuthHelper::generateDeviceId()
 {
     return QUuid::createUuid().toString().remove("{").remove("}");
 }
