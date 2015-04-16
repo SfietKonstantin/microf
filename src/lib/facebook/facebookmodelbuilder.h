@@ -47,7 +47,7 @@ public:
     explicit FacebookModelBuilder(QObject *parent = 0);
     ~FacebookModelBuilder();
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data,
+               const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) override;
     QQmlListProperty<FacebookProperty> properties();
     bool includeRawData() const;

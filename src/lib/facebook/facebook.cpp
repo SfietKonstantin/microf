@@ -49,6 +49,10 @@ static const char *API_KEY9 = "ddc";
 static const int API_KEY10 = 14;
 static const char *API_KEY11 = "d";
 
+static const char *ERROR_KEY = "error";
+static const char *ERROR_MESSAGE_KEY = "message";
+static const char *ERROR_CODE_KEY = "code";
+
 FacebookPrivate::FacebookPrivate(Facebook *q)
     : SocialNetworkPrivate(q)
 {
@@ -57,20 +61,37 @@ FacebookPrivate::FacebookPrivate(Facebook *q)
     countryCode = locale.split("_").first();
 }
 
-QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorString,
+QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
                                       const QByteArray &data, const QVariantMap &metadata,
-                                      SocialNetworkError::type &outError, QString &outErrorString)
+                                      SocialNetworkError::type &outError, QString &outErrorMessage,
+                                      QString &outErrorCode)
 {
     if (error != QNetworkReply::NoError) {
-        outError = SocialNetworkError::Network;
-        outErrorString = errorString;
+        // Check if we got a Facebook error
+        QJsonDocument document = QJsonDocument::fromJson(data);
+        if (!document.isObject()) {
+            outError = SocialNetworkError::Network;
+            outErrorMessage = errorMessage;
+            return QJsonObject();
+        }
+        // Try to extract the error
+        QJsonObject error = document.object().value(ERROR_KEY).toObject();
+        if (!error.contains(ERROR_MESSAGE_KEY) || !error.contains(ERROR_CODE_KEY)) {
+            outError = SocialNetworkError::Network;
+            outErrorMessage = errorMessage;
+            return QJsonObject();
+        }
+
+        outError = SocialNetworkError::SocialNetwork;
+        outErrorMessage = error.value(ERROR_MESSAGE_KEY).toString();
+        outErrorCode = QString::number(error.value(ERROR_CODE_KEY).toInt());
         return QJsonObject();
     }
 
     QJsonDocument document = QJsonDocument::fromJson(data);
     if (!document.isObject()) {
         outError = SocialNetworkError::Data;
-        outErrorString = "Cannot convert to JSON";
+        outErrorMessage = "Cannot convert to JSON";
         return QJsonObject();
     }
 
@@ -80,7 +101,7 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
 
     if (!root.contains(userId)) {
         outError = SocialNetworkError::Data;
-        outErrorString = "Cannot find userId object";
+        outErrorMessage = "Cannot find userId object";
         return QJsonObject();
     }
 
@@ -89,7 +110,7 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
 
     if (userIdData.value("__type__").toObject().value("name").toString() != type) {
         outError = SocialNetworkError::Data;
-        outErrorString = "Cannot match the type";
+        outErrorMessage = "Cannot match the type";
         return QJsonObject();
     }
 

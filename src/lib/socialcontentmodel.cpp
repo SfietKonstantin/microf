@@ -52,19 +52,20 @@ void SocialContentModelPrivate::setContentModelData(SocialContentModel &contentM
 
 void SocialContentModelPrivate::setContentModelError(SocialContentModel &contentModel,
                                                      SocialNetworkError::type error,
-                                                     const QString &errorString)
+                                                     const QString &errorMessage,
+                                                     const QString &errorCode)
 {
-    contentModel.d_func()->setError(error, errorString);
+    contentModel.d_func()->setError(error, errorMessage, errorCode);
 }
 
-bool SocialContentModelPrivate::build(QNetworkReply::NetworkError error, const QString &errorString,
+bool SocialContentModelPrivate::build(QNetworkReply::NetworkError error, const QString &errorMessage,
                                       const QByteArray &data)
 {
     Q_Q(SocialContentModel);
     if (!m_builder) {
         return false;
     }
-    SocialContentModelBuilderPrivate::build(*m_builder, *q, error, errorString, data, metadata());
+    SocialContentModelBuilderPrivate::build(*m_builder, *q, error, errorMessage, data, metadata());
     return true;
 }
 
@@ -323,10 +324,16 @@ SocialNetworkError::type SocialContentModel::error() const
     return d->error;
 }
 
-QString SocialContentModel::errorString() const
+QString SocialContentModel::errorMessage() const
 {
     Q_D(const SocialContentModel);
-    return d->errorString;
+    return d->errorMessage;
+}
+
+QString SocialContentModel::errorCode() const
+{
+    Q_D(const SocialContentModel);
+    return d->errorCode;
 }
 
 bool SocialContentModel::load()

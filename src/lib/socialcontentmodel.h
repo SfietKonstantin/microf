@@ -54,7 +54,8 @@ class SocialContentModel : public QAbstractListModel, public ISocialContent, pub
     Q_PROPERTY(SocialContentModelBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
     Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
     Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
-    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    Q_PROPERTY(QString errorCode READ errorCode NOTIFY errorCodeChanged)
 public:
     enum Roles {
         ObjectRole = Qt::UserRole + 1,
@@ -77,7 +78,8 @@ public:
     void setBuilder(SocialContentModelBuilder * builder);
     SocialNetworkStatus::type status() const override;
     SocialNetworkError::type error() const override;
-    QString errorString() const override;
+    QString errorMessage() const override;
+    QString errorCode() const override;
 public Q_SLOTS:
     bool load();
     bool loadNext();
@@ -91,7 +93,8 @@ Q_SIGNALS:
     void builderChanged();
     void statusChanged() override;
     void errorChanged() override;
-    void errorStringChanged() override;
+    void errorMessageChanged() override;
+    void errorCodeChanged() override;
     void finished(bool ok) override;
 protected:
     QScopedPointer<SocialContentModelPrivate> d_ptr;

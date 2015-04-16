@@ -114,12 +114,12 @@ public:
     }
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data,
+               const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) override
     {
         Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {
-            setError(contentItem, SocialNetworkError::Network, errorString);
+            setError(contentItem, SocialNetworkError::Network, errorMessage);
             return;
         }
 
@@ -142,12 +142,12 @@ public:
     }
 protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data,
+               const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) override
     {
         Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {
-            setError(contentModel, SocialNetworkError::Network, errorString);
+            setError(contentModel, SocialNetworkError::Network, errorMessage);
             return;
         }
 
@@ -291,7 +291,7 @@ void TstSocialNetwork::tstError()
 
     QCOMPARE(socialContentItem.status(), SocialNetworkStatus::Error);
     QCOMPARE(socialContentItem.error(), SocialNetworkError::Network);
-    QVERIFY(!socialContentItem.errorString().isEmpty());
+    QVERIFY(!socialContentItem.errorMessage().isEmpty());
 }
 
 void TstSocialNetwork::tstSimpleList()

@@ -44,20 +44,22 @@ public:
     const QVariantMap & metadata() const;
     void setMetadata(const QVariantMap &metadata);
     static void handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
-                                   QNetworkReply::NetworkError error, const QString &errorString,
+                                   QNetworkReply::NetworkError error, const QString &errorMessage,
                                    const QByteArray &data);
 protected:
     explicit AbstractSocialContentPrivate(ISocialContent *q);
     void setStatus(SocialNetworkStatus::type status);
-    void setError(SocialNetworkError::type error, const QString &errorString);
-    virtual bool build(QNetworkReply::NetworkError error, const QString &errorString,
+    void setError(SocialNetworkError::type error, const QString &errorMessage,
+                  const QString &errorCode);
+    virtual bool build(QNetworkReply::NetworkError error, const QString &errorMessage,
                        const QByteArray &data) = 0;
     ISocialContent * const q_ptr;
     SocialNetworkStatus::type status;
     SocialNetworkError::type error;
-    QString errorString;
+    QString errorMessage;
+    QString errorCode;
 private:
-    void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorString,
+    void handleNetworkReply(QNetworkReply::NetworkError error, const QString &errorMessage,
                             const QByteArray &data);
     QVariantMap m_metadata;
     Q_DECLARE_PUBLIC(ISocialContent)

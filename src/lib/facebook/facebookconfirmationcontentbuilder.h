@@ -41,7 +41,7 @@ public:
     explicit FacebookConfirmationContentBuilder(QObject *parent = 0);
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
-               const QString &errorString, const QByteArray &data,
+               const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) override;
 };
 

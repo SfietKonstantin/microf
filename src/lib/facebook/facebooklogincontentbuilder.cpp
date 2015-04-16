@@ -50,13 +50,13 @@ FacebookLoginContentBuilder::FacebookLoginContentBuilder(QObject *parent)
 
 void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
                                        QNetworkReply::NetworkError error,
-                                       const QString &errorString,
+                                       const QString &errorMessage,
                                        const QByteArray &data, const QVariantMap &metadata)
 {
     Q_UNUSED(metadata);
     if (!error == QNetworkReply::NoError) {
         qWarning() << data;
-        setError(contentItem, SocialNetworkError::Network, errorString);
+        setError(contentItem, SocialNetworkError::Network, errorMessage);
         return;
     }
 
@@ -79,7 +79,8 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
 
         const QJsonObject &errorObject = errorDocument.object();
         if (!errorObject.contains(ERROR_MESSAGE_KEY)) {
-            setError(contentItem, SocialNetworkError::Data, "Cannot find error_title in error message");
+            setError(contentItem, SocialNetworkError::Data,
+                     "Cannot find error_title in error message");
             return;
         }
         QString errorTitle = errorObject.value(ERROR_MESSAGE_KEY).toString();

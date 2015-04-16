@@ -46,9 +46,10 @@ public:
                                     bool hasNext, bool hasPrevious,
                                     const QVariantMap &metadata);
     static void setContentModelError(SocialContentModel &contentModel,
-                                     SocialNetworkError::type error, const QString &errorString);
+                                     SocialNetworkError::type error, const QString &errorMessage,
+                                     const QString &errorCode);
 protected:
-    bool build(QNetworkReply::NetworkError error, const QString &errorString,
+    bool build(QNetworkReply::NetworkError error, const QString &errorMessage,
                const QByteArray &data) override;
 private:
     bool load(SocialRequest::Mode mode);

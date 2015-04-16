@@ -51,12 +51,12 @@ protected:
     explicit SocialContentModelBuilder(QObject *parent = 0);
     explicit SocialContentModelBuilder(SocialContentModelBuilderPrivate &dd, QObject *parent = 0);
     virtual void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
-                       const QString &errorString, const QByteArray &data,
+                       const QString &errorMessage, const QByteArray &data,
                        const QVariantMap &metadata) = 0;
     void setData(SocialContentModel &contentModel, const QList<QVariantMap> &data,
                  bool hasNext, bool hasPrevious, const QVariantMap &metadata = QVariantMap());
     void setError(SocialContentModel &contentModel, SocialNetworkError::type error,
-                  const QString &errorString);
+                  const QString &errorMessage, const QString &errorCode = QString());
     QScopedPointer<SocialContentModelBuilderPrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(SocialContentModelBuilder)

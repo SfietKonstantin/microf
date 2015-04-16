@@ -44,17 +44,17 @@ SocialContentModelBuilderPrivate::SocialContentModelBuilderPrivate(SocialContent
 void SocialContentModelBuilderPrivate::build(SocialContentModelBuilder &builder,
                                              SocialContentModel &contentModel,
                                              QNetworkReply::NetworkError error,
-                                             const QString &errorString, const QByteArray &data,
+                                             const QString &errorMessage, const QByteArray &data,
                                              const QVariantMap &metadata)
 {
 #ifdef MICROF_DEBUG
     qDebug() << "SocialContentModelBuilderPrivate::build";
     qDebug() << "Network error:" << error;
-    qDebug() << "Error string:" << errorString;
+    qDebug() << "Error string:" << errorMessage;
     qDebug() << "Data:" << data;
     qDebug() << "Metadata" << metadata;
 #endif
-    builder.build(contentModel, error, errorString, data, metadata);
+    builder.build(contentModel, error, errorMessage, data, metadata);
 }
 
 SocialContentModelBuilder::SocialContentModelBuilder(QObject *parent)
@@ -101,13 +101,15 @@ void SocialContentModelBuilder::setData(SocialContentModel &contentModel,
 }
 
 void SocialContentModelBuilder::setError(SocialContentModel &contentModel,
-                                         SocialNetworkError::type error, const QString &errorString)
+                                         SocialNetworkError::type error,
+                                         const QString &errorMessage, const QString &errorCode)
 {
 #ifdef MICROF_DEBUG
     qDebug() << "SocialContentItemBuilder::setError";
     qDebug() << "Error:" << error;
-    qDebug() << "Error string" << errorString;
+    qDebug() << "Error string" << errorMessage;
+    qDebug() << "Error code" << errorCode;
 #endif
-    SocialContentModelPrivate::setContentModelError(contentModel, error, errorString);
+    SocialContentModelPrivate::setContentModelError(contentModel, error, errorMessage, errorCode);
 }
 

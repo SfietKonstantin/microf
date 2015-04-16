@@ -34,7 +34,7 @@ Item {
                 authHelper.accessToken = login.object.access_token
                 authHelper.save()
             } else {
-                errorLabel.text = login.errorString
+                errorLabel.text = login.errorMessage
             }
         }
     }
@@ -48,7 +48,7 @@ Item {
             if (ok) {
                 authHelper.logout()
             } else {
-                errorLabel.text = login.errorString
+                errorLabel.text = login.errorMessage
             }
         }
     }

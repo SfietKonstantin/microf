@@ -42,9 +42,9 @@ class FacebookPrivate: public SocialNetworkPrivate
 {
 public:
     explicit FacebookPrivate(Facebook *q);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorString,
+    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
                                 const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorString);
+                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
     static QVariantMap recursiveValues(const QJsonObject &object);
     static QVariantMap buildProperties(const QJsonObject &object,
                                        const QList<FacebookProperty *> &properties);

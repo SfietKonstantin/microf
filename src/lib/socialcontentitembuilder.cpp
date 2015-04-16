@@ -44,17 +44,17 @@ SocialContentItemBuilderPrivate::SocialContentItemBuilderPrivate(SocialContentIt
 void SocialContentItemBuilderPrivate::build(SocialContentItemBuilder &builder,
                                             SocialContentItem &contentItem,
                                             QNetworkReply::NetworkError error,
-                                            const QString &errorString, const QByteArray &data,
+                                            const QString &errorMessage, const QByteArray &data,
                                             const QVariantMap &metadata)
 {
 #ifdef MICROF_DEBUG
     qDebug() << "SocialContentItemBuilderPrivate::build";
     qDebug() << "Network error:" << error;
-    qDebug() << "Error string:" << errorString;
+    qDebug() << "Error message:" << errorMessage;
     qDebug() << "Data:" << data;
     qDebug() << "Metadata" << metadata;
 #endif
-    builder.build(contentItem, error, errorString, data, metadata);
+    builder.build(contentItem, error, errorMessage, data, metadata);
 }
 
 SocialContentItemBuilder::SocialContentItemBuilder(QObject *parent)
@@ -93,14 +93,16 @@ void SocialContentItemBuilder::setObject(SocialContentItem &contentItem,
 }
 
 void SocialContentItemBuilder::setError(SocialContentItem &contentItem,
-                                        SocialNetworkError::type error, const QString &errorString)
+                                        SocialNetworkError::type error, const QString &errorMessage,
+                                        const QString &errorCode)
 {
 #ifdef MICROF_DEBUG
     qDebug() << "SocialContentItemBuilder::setError";
     qDebug() << "Error:" << error;
-    qDebug() << "Error string" << errorString;
+    qDebug() << "Error message" << errorMessage;
+    qDebug() << "Error code" << errorCode;
 #endif
-    SocialContentItemPrivate::setContentItemError(contentItem, error, errorString);
+    SocialContentItemPrivate::setContentItemError(contentItem, error, errorMessage, errorCode);
 }
 
 

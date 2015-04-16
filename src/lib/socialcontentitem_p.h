@@ -42,9 +42,9 @@ public:
     static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties,
                                      const QVariantMap &metadata);
     static void setContentItemError(SocialContentItem &contentItem,
-                                    SocialNetworkError::type error, const QString &errorString);
+                                    SocialNetworkError::type error, const QString &errorMessage, const QString &errorCode);
 protected:
-    bool build(QNetworkReply::NetworkError error, const QString &errorString,
+    bool build(QNetworkReply::NetworkError error, const QString &errorMessage,
                const QByteArray &data) override;
 private:
     void setContentItemObject(const QVariantMap &properties, const QVariantMap &metadata);

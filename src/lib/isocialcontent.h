@@ -42,11 +42,13 @@ public:
     virtual ~ISocialContent() {}
     virtual SocialNetworkStatus::type status() const = 0;
     virtual SocialNetworkError::type error() const = 0;
-    virtual QString errorString() const = 0;
+    virtual QString errorMessage() const = 0;
+    virtual QString errorCode() const = 0;
 Q_SIGNALS:
     virtual void statusChanged() = 0;
     virtual void errorChanged() = 0;
-    virtual void errorStringChanged() = 0;
+    virtual void errorMessageChanged() = 0;
+    virtual void errorCodeChanged() = 0;
     virtual void finished(bool ok) = 0;
 };
 

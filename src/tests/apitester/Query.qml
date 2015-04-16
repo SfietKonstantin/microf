@@ -34,7 +34,7 @@ Item {
         }
         onFinished: {
             if (!ok) {
-                errorLabel.text = socialItem.errorString
+                errorLabel.text = socialItem.errorMessage
             } else {
                 container.rawData = itemBuilder.rawData
             }
@@ -51,7 +51,7 @@ Item {
         }
         onFinished: {
             if (!ok) {
-                errorLabel.text = socialModel.errorString
+                errorLabel.text = socialModel.errorMessage
             } else {
                 container.rawData = modelBuilder.rawData
             }

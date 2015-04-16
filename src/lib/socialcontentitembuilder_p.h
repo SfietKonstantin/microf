@@ -40,7 +40,7 @@ class SocialContentItemBuilderPrivate
 public:
     SocialContentItemBuilderPrivate(SocialContentItemBuilder *q);
     static void build(SocialContentItemBuilder &builder, SocialContentItem &contentItem,
-                      QNetworkReply::NetworkError error, const QString &errorString,
+                      QNetworkReply::NetworkError error, const QString &errorMessage,
                       const QByteArray &data, const QVariantMap &metadata);
 protected:
     SocialContentItemBuilder * const q_ptr;

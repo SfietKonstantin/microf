@@ -58,10 +58,10 @@ void AbstractSocialContentPrivate::setMetadata(const QVariantMap &metadata)
 
 void AbstractSocialContentPrivate::handleNetworkReply(AbstractSocialContentPrivate &contentPrivate,
                                                       QNetworkReply::NetworkError error,
-                                                      const QString &errorString,
+                                                      const QString &errorMessage,
                                                       const QByteArray &data)
 {
-    contentPrivate.handleNetworkReply(error, errorString, data);
+    contentPrivate.handleNetworkReply(error, errorMessage, data);
 }
 
 void AbstractSocialContentPrivate::setStatus(SocialNetworkStatus::type status)
@@ -74,35 +74,39 @@ void AbstractSocialContentPrivate::setStatus(SocialNetworkStatus::type status)
 }
 
 void AbstractSocialContentPrivate::setError(SocialNetworkError::type error,
-                                            const QString &errorString)
+                                            const QString &errorMessage, const QString &errorCode)
 {
     Q_Q(ISocialContent);
     if (this->error != error) {
         this->error = error;
         emit q->errorChanged();
     }
-    if (this->errorString != errorString) {
-        this->errorString = errorString;
-        emit q->errorStringChanged();
+    if (this->errorMessage != errorMessage) {
+        this->errorMessage = errorMessage;
+        emit q->errorMessageChanged();
+    }
+    if (this->errorCode != errorCode) {
+        this->errorCode = errorCode;
+        emit q->errorCodeChanged();
     }
     setStatus(SocialNetworkStatus::Error);
     emit q->finished(false);
 }
 
 void AbstractSocialContentPrivate::handleNetworkReply(QNetworkReply::NetworkError error,
-                                                      const QString &errorString,
+                                                      const QString &errorMessage,
                                                       const QByteArray &data)
 {
     Q_Q(ISocialContent);
-    if (!build(error, errorString, data)) {
+    if (!build(error, errorMessage, data)) {
         qWarning() << "AbstractSocialContentPrivate::handleNetworkReply() failure to build";
-        setError(SocialNetworkError::Internal, "Internal error");
+        setError(SocialNetworkError::Internal, "Internal error", QString());
         return;
     }
 
     if (status == SocialNetworkStatus::Busy) {
         qWarning() << "AbstractSocialContentPrivate::setData() builder did not perform an action";
-        setError(SocialNetworkError::Internal, "Builder did not perform an action");
+        setError(SocialNetworkError::Internal, "Builder did not perform an action", QString());
     }
 }
 

@@ -20,19 +20,20 @@ void SocialContentItemPrivate::setContentItemObject(SocialContentItem &contentIt
 
 void SocialContentItemPrivate::setContentItemError(SocialContentItem &contentItem,
                                                    SocialNetworkError::type error,
-                                                   const QString &errorString)
+                                                   const QString &errorMessage,
+                                                   const QString &errorCode)
 {
-    contentItem.d_func()->setError(error, errorString);
+    contentItem.d_func()->setError(error, errorMessage, errorCode);
 }
 
-bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QString &errorString,
+bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QString &errorMessage,
                                      const QByteArray &data)
 {
     Q_Q(SocialContentItem);
     if (!m_builder) {
         return false;
     }
-    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorString, data, metadata());
+    SocialContentItemBuilderPrivate::build(*m_builder, *q, error, errorMessage, data, metadata());
     return true;
 }
 
@@ -145,10 +146,16 @@ SocialNetworkError::type SocialContentItem::error() const
     return d->error;
 }
 
-QString SocialContentItem::errorString() const
+QString SocialContentItem::errorMessage() const
 {
     Q_D(const SocialContentItem);
-    return d->errorString;
+    return d->errorMessage;
+}
+
+QString SocialContentItem::errorCode() const
+{
+    Q_D(const SocialContentItem);
+    return d->errorCode;
 }
 
 bool SocialContentItem::load()

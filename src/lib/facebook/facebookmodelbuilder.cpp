@@ -129,17 +129,18 @@ FacebookModelBuilder::~FacebookModelBuilder()
 }
 
 void FacebookModelBuilder::build(SocialContentModel &contentModel,
-                                 QNetworkReply::NetworkError error, const QString &errorString,
+                                 QNetworkReply::NetworkError error, const QString &errorMessage,
                                  const QByteArray &data, const QVariantMap &metadata)
 {
     Q_D(FacebookModelBuilder);
     SocialNetworkError::type outError = SocialNetworkError::No;
-    QString outErrorString;
+    QString outErrorMessage;
+    QString outErrorCode;
 
-    QJsonObject root = FacebookPrivate::prebuild(error, errorString, data, metadata,
-                                                 outError, outErrorString);
+    QJsonObject root = FacebookPrivate::prebuild(error, errorMessage, data, metadata,
+                                                 outError, outErrorMessage, outErrorCode);
     if (outError != SocialNetworkError::No) {
-        setError(contentModel, outError, outErrorString);
+        setError(contentModel, outError, outErrorMessage, outErrorCode);
         return;
     }
 
