@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE static QString generateDeviceId();
     Q_INVOKABLE static QString parseUrlQuery(const QString &queryString);
     Q_INVOKABLE static QString formatJson(const QString &json);
+    Q_INVOKABLE static QString fromBase64(const QString &base64);
     QString email() const;
     void setEmail(const QString &email);
     QString deviceId() const;

@@ -36,7 +36,60 @@
 #include "authhelper.h"
 #include "infohelper.h"
 #include "requesthelpermodel.h"
-#include "requestpropertyhelpermodel.h"
+#include "metapropertyhelpermodel.h"
+#include "customfacebookrequest.h"
+#include "customfacebookrequest.h"
+#include "buildershelpermodel.h"
+
+class Helper: public QObject
+{
+    Q_OBJECT
+public:
+    explicit Helper(QObject *parent = 0): QObject(parent) {}
+public slots:
+    void setBuilderProperties(const QString &properties, FacebookItemBuilder *itemBuilder,
+                              AbstractFacebookModelBuilder *modelBuilder)
+    {
+        if (itemBuilder) {
+            QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
+            properties.clear(&properties);
+        }
+        if (modelBuilder) {
+            QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
+            properties.clear(&properties);
+        }
+
+        QStringList splitted = properties.trimmed().split("\n");
+        for (const QString &line : splitted) {
+            QStringList splittedLine = line.split(":");
+            if (splittedLine.count() == 2) {
+                const QString &path = splittedLine.at(0).trimmed();
+                const QString &name = splittedLine.at(1).trimmed();
+                if (itemBuilder) {
+                    QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
+                    FacebookProperty *object = new FacebookProperty(itemBuilder);
+                    object->setPath(path);
+                    object->setName(name);
+                    properties.append(&properties, object);
+                }
+                if (modelBuilder) {
+                    QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
+                    FacebookProperty *object = new FacebookProperty(modelBuilder);
+                    object->setPath(path);
+                    object->setName(name);
+                    properties.append(&properties, object);
+                }
+            }
+        }
+    }
+};
+
+static QObject * helper_singleton(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+    return new Helper();
+}
 
 static void registerTypes()
 {
@@ -44,7 +97,10 @@ static void registerTypes()
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
     qmlRegisterType<InfoHelper>("org.sfietkonstantin.microf", 1, 0, "InfoHelper");
     qmlRegisterType<RequestHelperModel>("org.sfietkonstantin.microf", 1, 0, "RequestHelperModel");
-    qmlRegisterType<RequestPropertyHelperModel>("org.sfietkonstantin.microf", 1, 0, "RequestPropertyHelperModel");
+    qmlRegisterType<MetaPropertyHelperModel>("org.sfietkonstantin.microf", 1, 0, "MetaPropertyHelperModel");
+    qmlRegisterType<CustomFacebookRequest>("org.sfietkonstantin.microf", 1, 0, "CustomFacebookRequest");
+    qmlRegisterType<BuildersHelperModel>("org.sfietkonstantin.microf", 1, 0, "BuildersHelperModel");
+    qmlRegisterSingletonType<Helper>("org.sfietkonstantin.microf", 1, 0, "Helper", helper_singleton);
 }
 
 int main(int argc, char **argv)
@@ -57,3 +113,5 @@ int main(int argc, char **argv)
     Q_UNUSED(engine);
     return app.exec();
 }
+
+#include "main.moc"

@@ -9,6 +9,7 @@ Item {
     property bool canQuery: !busy && authHelper.accessToken !== ""
     property int type: RequestHelperModel.Invalid
     property var request: null
+    property var builder: null
     property string rawData
     anchors.fill: parent
     onTypeChanged: {
@@ -17,7 +18,7 @@ Item {
             rawData = itemBuilder.rawData
             break
         case RequestHelperModel.Model:
-            rawData = modelBuilder.rawData
+            rawData = container.model ? container.model.rawData : ""
             break
         default:
             break
@@ -33,10 +34,9 @@ Item {
             includeRawData: true
         }
         onFinished: {
+            container.rawData = itemBuilder.rawData
             if (!ok) {
                 errorLabel.text = socialItem.errorMessage
-            } else {
-                container.rawData = itemBuilder.rawData
             }
         }
     }
@@ -45,15 +45,11 @@ Item {
         id: socialModel
         socialNetwork: facebook
         request: container.request
-        builder: FacebookModelBuilder {
-            id: modelBuilder
-            includeRawData: true
-        }
+        builder: container.builder
         onFinished: {
+            container.rawData = container.builder ? container.builder.rawData : ""
             if (!ok) {
                 errorLabel.text = socialModel.errorMessage
-            } else {
-                container.rawData = modelBuilder.rawData
             }
         }
     }
@@ -62,9 +58,8 @@ Item {
         id: requestModel
     }
 
-    RequestPropertyHelperModel {
-        id: requestPropertyModel
-        request: container.request
+    BuildersHelperModel {
+        id: buildersModel
     }
 
     IntValidator {
@@ -120,46 +115,45 @@ Item {
                                 model: requestModel
                             }
 
-                            Repeater {
-                                id: repeater
-                                anchors.left: parent.left; anchors.right: parent.right
-                                model: requestPropertyModel
-                                delegate: TextField {
-                                    function save() {
-                                        requestPropertyModel.save(model.index, text)
-                                    }
-
-                                    width: repeater.width
-                                    placeholderText: model.name
-                                    Component.onCompleted: {
-                                        if (model.name === "userId") {
-                                            text = authHelper.userId
-                                            save()
-                                        } else {
-                                            text = model.value
-                                        }
-                                    }
-                                    onEditingFinished: save()
-                                    validator: {
-                                        switch (model.type) {
-                                        case RequestPropertyHelperModel.Int:
-                                            return intValidator
-                                        case RequestPropertyHelperModel.Double:
-                                            return doubleValidator
-                                        default:
-                                            return null
-                                        }
-                                    }
-                                    visible: container.type !== RequestPropertyHelperModel.Unknown
-                                }
+                            MetaEditor {
+                                object: container.request
                             }
 
                             Label { text: "Properties to select" }
                             TextArea {
                                 anchors.left: parent.left; anchors.right: parent.right
                                 onTextChanged: {
-                                    requestPropertyModel.setProperties(text, itemBuilder, modelBuilder)
+                                    Helper.setBuilderProperties(text, itemBuilder, container.builder)
                                 }
+                            }
+                        }
+                    }
+
+                    GroupBox {
+                        title: "Builder"
+                        visible: container.type == RequestHelperModel.Model
+                        anchors.left: parent.left; anchors.right: parent.right
+
+                        Column {
+                            spacing: 3
+                            anchors.left: parent.left; anchors.right: parent.right
+                            ComboBox {
+                                anchors.left: parent.left; anchors.right: parent.right
+                                id: builderField
+                                function setRequest() {
+                                    container.builder = buildersModel.builder(currentIndex)
+                                }
+                                textRole: "text"
+                                enabled: !container.busy
+                                Layout.fillWidth: true
+                                currentIndex: 0
+                                onCurrentIndexChanged: setRequest()
+                                Component.onCompleted: setRequest()
+                                model: buildersModel
+                            }
+
+                            MetaEditor {
+                                object: container.builder
                             }
                         }
                     }
@@ -252,15 +246,6 @@ Item {
                                 id: itemDisplay
                                 width: itemView.width
                                 object: socialItem.object
-
-//                                Connections {
-//                                    target: socialItem
-//                                    onFinished: {
-//                                        if (ok) {
-//                                            itemDisplay.refresh()
-//                                        }
-//                                    }
-//                                }
                             }
                         }
                     }

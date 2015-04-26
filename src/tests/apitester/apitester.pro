@@ -12,14 +12,20 @@ HEADERS += \
     authhelper.h \
     infohelper.h \
     requesthelpermodel.h \
-    requestpropertyhelpermodel.h
+    customfacebookrequest.h \
+    buildershelpermodel.h \
+    metapropertyhelpermodel.h \
+    customfacebookmodelbuilder.h
 
 SOURCES += \
     main.cpp \
     authhelper.cpp \
     infohelper.cpp \
     requesthelpermodel.cpp \
-    requestpropertyhelpermodel.cpp
+    customfacebookrequest.cpp \
+    buildershelpermodel.cpp \
+    metapropertyhelpermodel.cpp \
+    customfacebookmodelbuilder.cpp
 
 RESOURCES += \
     res.qrc
@@ -30,4 +36,7 @@ OTHER_FILES += \
     Query.qml \
     Tools.qml \
     Display.qml
+
+DISTFILES += \
+    MetaEditor.qml
 

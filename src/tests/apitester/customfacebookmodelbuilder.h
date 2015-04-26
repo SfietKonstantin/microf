@@ -29,38 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_P_H
-#define FACEBOOK_P_H
+#ifndef CUSTOMFACEBOOKMODELBUILDER_H
+#define CUSTOMFACEBOOKMODELBUILDER_H
 
-#include "facebook.h"
-#include "socialnetwork_p.h"
-#include <QtNetwork/QNetworkReply>
-#include "socialnetworkerror.h"
+#include <facebook/abstractfacebookmodelbuilder.h>
 
-class FacebookProperty;
-class FacebookPrivate: public SocialNetworkPrivate
+class CustomFacebookModelBuilderPrivate;
+class CustomFacebookModelBuilder : public AbstractFacebookModelBuilder
 {
+    Q_OBJECT
+    Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
 public:
-    explicit FacebookPrivate(Facebook *q);
-    static QJsonObject checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                  const QByteArray &data,
-                                  SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QVariantMap recursiveValues(const QJsonObject &object);
-    static QVariantMap buildProperties(const QJsonObject &object,
-                                       const QList<FacebookProperty *> &properties);
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
+    explicit CustomFacebookModelBuilder(QObject *parent = 0);
+    QString path() const;
+    void setPath(const QString &path);
+signals:
+    void pathChanged();
 private:
-    Q_DECLARE_PUBLIC(Facebook)
+    Q_DECLARE_PRIVATE(CustomFacebookModelBuilder)
+protected:
+    void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
+               const QString &errorMessage, const QByteArray &data,
+               const QVariantMap &metadata) override;
 };
 
-
-#endif // FACEBOOK_P_H
-
+#endif // CUSTOMFACEBOOKMODELBUILDER_H

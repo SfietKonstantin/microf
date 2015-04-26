@@ -29,79 +29,74 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "requesthelpermodel.h"
-#include <socialrequest.h>
-#include "customfacebookrequest.h"
-#include <facebook/facebookfriendlistrequest.h>
-#include <facebook/facebookusersummaryrequest.h>
+#include "buildershelpermodel.h"
+#include "facebook/abstractfacebookmodelbuilder.h"
+#include "facebook/facebookmodelbuilder.h"
+#include "customfacebookmodelbuilder.h"
 
-class RequestHelperModelData
+class BuildersHelperModelData
 {
 public:
-    explicit RequestHelperModelData(const QString &name, SocialRequest *request,
-                                    RequestHelperModel::Type type);
+    explicit BuildersHelperModelData(const QString &name, AbstractFacebookModelBuilder *builder);
     QString name;
-    SocialRequest *request;
-    RequestHelperModel::Type type;
+    AbstractFacebookModelBuilder *builder;
 };
 
-RequestHelperModelData::RequestHelperModelData(const QString &name, SocialRequest *request,
-                                               RequestHelperModel::Type type)
-    : name(name), request(request), type(type)
+BuildersHelperModelData::BuildersHelperModelData(const QString &name,
+                                                 AbstractFacebookModelBuilder *builder)
+    : name(name), builder(builder)
 {
 }
 
-RequestHelperModel::RequestHelperModel(QObject *parent)
+BuildersHelperModel::BuildersHelperModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-    QList<RequestHelperModelData *> data;
-    data.append(new RequestHelperModelData("Custom (Model)", new CustomFacebookRequest(this), Model));
-    data.append(new RequestHelperModelData("Custom (Object)", new CustomFacebookRequest(this), Object));
-    data.append(new RequestHelperModelData("Friends", new FacebookFriendListRequest(this), Model));
-    data.append(new RequestHelperModelData("UserSummary", new FacebookUserSummaryRequest(this), Object));
+    QList<BuildersHelperModelData *> data;
+    FacebookModelBuilder *standard = new FacebookModelBuilder(this);
+    standard->setIncludeRawData(true);
+    data.append(new BuildersHelperModelData("Standard", standard));
+    CustomFacebookModelBuilder *custom = new CustomFacebookModelBuilder(this);
+    custom->setIncludeRawData(true);
+    data.append(new BuildersHelperModelData("Custom", custom));
     beginInsertRows(QModelIndex(), 0, data.count());
     m_data = data;
     emit countChanged();
     endInsertRows();
 }
 
-RequestHelperModel::~RequestHelperModel()
+BuildersHelperModel::~BuildersHelperModel()
 {
     qDeleteAll(m_data);
 }
 
-QHash<int, QByteArray> RequestHelperModel::roleNames() const
+QHash<int, QByteArray> BuildersHelperModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(TextRole, "text");
-    roles.insert(RequestRole, "request");
-    roles.insert(TypeRole, "type");
+    roles.insert(BuilderRole, "builder");
     return roles;
 }
 
-int RequestHelperModel::rowCount(const QModelIndex &parent) const
+int BuildersHelperModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return m_data.count();
 }
 
-QVariant RequestHelperModel::data(const QModelIndex &index, int role) const
+QVariant BuildersHelperModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
     if (row < 0 || row >= m_data.count()) {
         return QVariant();
     }
 
-    const RequestHelperModelData *data = m_data.at(row);
+    const BuildersHelperModelData *data = m_data.at(row);
     switch (role) {
     case TextRole:
         return data->name;
         break;
-    case RequestRole:
-        return QVariant::fromValue(data->request);
-        break;
-    case TypeRole:
-        return data->type;
+    case BuilderRole:
+        return QVariant::fromValue(data->builder);
         break;
     default:
         return QVariant();
@@ -109,24 +104,17 @@ QVariant RequestHelperModel::data(const QModelIndex &index, int role) const
     }
 }
 
-int RequestHelperModel::count() const
+int BuildersHelperModel::count() const
 {
     return m_data.count();
 }
 
-SocialRequest * RequestHelperModel::request(int index) const
+AbstractFacebookModelBuilder *BuildersHelperModel::builder(int index) const
 {
     if (index < 0 || index >= m_data.count()) {
         return nullptr;
     }
-    return m_data.at(index)->request;
+    return m_data.at(index)->builder;
 }
 
-RequestHelperModel::Type RequestHelperModel::type(int index) const
-{
-    if (index < 0 || index >= m_data.count()) {
-        return Invalid;
-    }
-    return m_data.at(index)->type;
-}
 

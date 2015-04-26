@@ -47,5 +47,24 @@ Item {
                 }
             }
         }
+        Tab {
+            title: "Base64"
+            ColumnLayout {
+                anchors.fill: parent; anchors.margins: 12
+                spacing: 3
+
+                TextField {
+                    placeholderText: "Base64"
+                    Layout.fillWidth: true
+                    onTextChanged: base64Result.text = authHelper.fromBase64(text)
+                }
+                TextArea {
+                    id: base64Result
+                    readOnly: true
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
+            }
+        }
     }
 }

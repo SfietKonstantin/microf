@@ -29,20 +29,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef REQUESTPROPERTYHELPERMODEL_H
-#define REQUESTPROPERTYHELPERMODEL_H
+#ifndef METAPROPERTYHELPERMODEL_H
+#define METAPROPERTYHELPERMODEL_H
 
 #include <QtCore/QAbstractListModel>
 
 class SocialRequest;
 class FacebookItemBuilder;
-class FacebookModelBuilder;
+class AbstractFacebookModelBuilder;
 class RequestPropertyHelperModelData;
-class RequestPropertyHelperModel : public QAbstractListModel
+class MetaPropertyHelperModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(QObject * request READ request WRITE setRequest NOTIFY requestChanged)
+    Q_PROPERTY(QObject * object READ object WRITE setObject NOTIFY objectChanged)
     Q_ENUMS(Type)
 public:
     enum Roles {
@@ -56,27 +56,26 @@ public:
         Double,
         String
     };
-    explicit RequestPropertyHelperModel(QObject *parent = 0);
-    virtual ~RequestPropertyHelperModel();
+    explicit MetaPropertyHelperModel(QObject *parent = 0);
+    virtual ~MetaPropertyHelperModel();
     QHash<int, QByteArray> roleNames() const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     int count() const;
-    QObject * request() const;
-    void setRequest(QObject *request);
+    QObject * object() const;
+    void setObject(QObject *object);
 public slots:
     void save(int index, const QVariant &value);
-    void setProperties(const QString &properties, FacebookItemBuilder *itemBuilder, FacebookModelBuilder *modelBuilder);
 signals:
     void countChanged();
-    void requestChanged();
+    void objectChanged();
 private:
     void clear(bool emitSignal);
     void updateMetaObject();
     QList<RequestPropertyHelperModelData *> m_data;
-    QObject * m_request;
+    QObject * m_object;
 };
 
 
 
-#endif // REQUESTPROPERTYHELPERMODEL_H
+#endif // METAPROPERTYHELPERMODEL_H

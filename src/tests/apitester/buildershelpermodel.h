@@ -29,38 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_P_H
-#define FACEBOOK_P_H
+#ifndef BUILDERSHELPERMODEL_H
+#define BUILDERSHELPERMODEL_H
 
-#include "facebook.h"
-#include "socialnetwork_p.h"
-#include <QtNetwork/QNetworkReply>
-#include "socialnetworkerror.h"
+#include <QtCore/QAbstractListModel>
 
-class FacebookProperty;
-class FacebookPrivate: public SocialNetworkPrivate
+class BuildersHelperModelData;
+class AbstractFacebookModelBuilder;
+class BuildersHelperModel : public QAbstractListModel
 {
+    Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
-    explicit FacebookPrivate(Facebook *q);
-    static QJsonObject checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                  const QByteArray &data,
-                                  SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QVariantMap recursiveValues(const QJsonObject &object);
-    static QVariantMap buildProperties(const QJsonObject &object,
-                                       const QList<FacebookProperty *> &properties);
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
+    enum Roles {
+        TextRole = Qt::UserRole + 1,
+        BuilderRole
+    };
+    explicit BuildersHelperModel(QObject *parent = 0);
+    virtual ~BuildersHelperModel();
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    int count() const;
+    Q_INVOKABLE AbstractFacebookModelBuilder * builder(int index) const;
+signals:
+    void countChanged();
 private:
-    Q_DECLARE_PUBLIC(Facebook)
+    QList<BuildersHelperModelData *> m_data;
 };
 
 
-#endif // FACEBOOK_P_H
-
+#endif // BUILDERSHELPERMODEL_H

@@ -29,38 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_P_H
-#define FACEBOOK_P_H
+#ifndef CUSTOMFACEBOOKREQUEST_H
+#define CUSTOMFACEBOOKREQUEST_H
 
-#include "facebook.h"
-#include "socialnetwork_p.h"
-#include <QtNetwork/QNetworkReply>
-#include "socialnetworkerror.h"
+#include "facebook/abstractfacebookrequest.h"
 
-class FacebookProperty;
-class FacebookPrivate: public SocialNetworkPrivate
+class CustomFacebookRequestPrivate;
+class CustomFacebookRequest : public AbstractFacebookRequest
 {
+    Q_OBJECT
+    Q_PROPERTY(QString queryId READ queryId WRITE setQueryId NOTIFY queryIdChanged)
+    Q_PROPERTY(QString requestName READ requestName WRITE setRequestName NOTIFY requestNameChanged)
+    Q_PROPERTY(QString apiCallerClass READ apiCallerClass WRITE setApiCallerClass
+               NOTIFY apiCallerClassChanged)
+    Q_PROPERTY(QString queryParametersJson READ queryParametersJson WRITE setQueryParametersJson
+               NOTIFY queryParametersJsonChanged)
 public:
-    explicit FacebookPrivate(Facebook *q);
-    static QJsonObject checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                  const QByteArray &data,
-                                  SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QVariantMap recursiveValues(const QJsonObject &object);
-    static QVariantMap buildProperties(const QJsonObject &object,
-                                       const QList<FacebookProperty *> &properties);
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
+    explicit CustomFacebookRequest(QObject *parent = 0);
+    QString queryId() const override;
+    void setQueryId(const QString &queryId);
+    QString requestName() const override;
+    void setRequestName(const QString &requestName);
+    QString apiCallerClass() const override;
+    void setApiCallerClass(const QString &apiCallerClass);
+    QString queryParametersJson() const;
+    void setQueryParametersJson(const QString &queryParametersJson);
+signals:
+    void queryIdChanged();
+    void requestNameChanged();
+    void apiCallerClassChanged();
+    void queryParametersJsonChanged();
+
+protected:
+    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
 private:
-    Q_DECLARE_PUBLIC(Facebook)
+    Q_DECLARE_PRIVATE(CustomFacebookRequest)
 };
 
-
-#endif // FACEBOOK_P_H
-
+#endif // CUSTOMFACEBOOKREQUEST_H

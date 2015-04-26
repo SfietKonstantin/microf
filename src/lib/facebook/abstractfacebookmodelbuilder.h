@@ -29,38 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_P_H
-#define FACEBOOK_P_H
+#ifndef ABSTRACTFACEBOOKMODELBUILDER_H
+#define ABSTRACTFACEBOOKMODELBUILDER_H
 
-#include "facebook.h"
-#include "socialnetwork_p.h"
-#include <QtNetwork/QNetworkReply>
-#include "socialnetworkerror.h"
+#include <QtQml/QQmlListProperty>
+#include "socialcontentmodelbuilder.h"
+#include "facebookproperty.h"
 
-class FacebookProperty;
-class FacebookPrivate: public SocialNetworkPrivate
+class AbstractFacebookModelBuilderPrivate;
+class AbstractFacebookModelBuilder : public SocialContentModelBuilder
 {
+    Q_OBJECT
+    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
+    Q_PROPERTY(bool includeRawData READ includeRawData WRITE setIncludeRawData NOTIFY includeRawDataChanged)
+    Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
 public:
-    explicit FacebookPrivate(Facebook *q);
-    static QJsonObject checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                  const QByteArray &data,
-                                  SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QVariantMap recursiveValues(const QJsonObject &object);
-    static QVariantMap buildProperties(const QJsonObject &object,
-                                       const QList<FacebookProperty *> &properties);
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
+    ~AbstractFacebookModelBuilder();
+    QQmlListProperty<FacebookProperty> properties();
+    bool includeRawData() const;
+    void setIncludeRawData(bool includeRawData);
+    QString rawData() const;
+Q_SIGNALS:
+    void includeRawDataChanged();
+    void rawDataChanged();
+protected:
+    explicit AbstractFacebookModelBuilder(AbstractFacebookModelBuilderPrivate &dd, QObject *parent = 0);
 private:
-    Q_DECLARE_PUBLIC(Facebook)
+    Q_DECLARE_PRIVATE(AbstractFacebookModelBuilder)
 };
 
-
-#endif // FACEBOOK_P_H
-
+#endif // ABSTRACTFACEBOOKMODELBUILDER_H

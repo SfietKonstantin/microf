@@ -31,6 +31,7 @@
 
 #include "facebook.h"
 #include "facebook_p.h"
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QLocale>
 #include "facebookproperty_p.h"
@@ -61,10 +62,9 @@ FacebookPrivate::FacebookPrivate(Facebook *q)
     countryCode = locale.split("_").first();
 }
 
-QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                      const QByteArray &data, const QVariantMap &metadata,
-                                      SocialNetworkError::type &outError, QString &outErrorMessage,
-                                      QString &outErrorCode)
+QJsonObject FacebookPrivate::checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
+                                        const QByteArray &data, SocialNetworkError::type &outError,
+                                        QString &outErrorMessage, QString &outErrorCode)
 {
     if (error != QNetworkReply::NoError) {
         // Check if we got a Facebook error
@@ -94,9 +94,17 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
         outErrorMessage = "Cannot convert to JSON";
         return QJsonObject();
     }
+    return document.object();
+}
 
+QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
+                                      const QByteArray &data, const QVariantMap &metadata,
+                                      SocialNetworkError::type &outError, QString &outErrorMessage,
+                                      QString &outErrorCode)
+{
     // First check metadata
-    const QJsonObject &root = document.object();
+    const QJsonObject &root = checkError(error, errorMessage, data, outError, outErrorMessage,
+                                         outErrorCode);
     QString userId = metadata.value("userId").toString();
 
     if (!root.contains(userId)) {
@@ -136,6 +144,15 @@ static void recursiveSetValues(const QJsonObject &object, const QString &prefix,
             recursiveSetValues(value.toObject(), realKey, properties);
         } else if (value.isString()) {
             properties.insert(realKey, value.toString());
+        } else if (value.isArray()) {
+            const QJsonArray &array = value.toArray();
+            for (int i = 0; i < array.count(); ++i) {
+                const QJsonValue &entry = array.at(i);
+                QString newKey = QString("%1_%2").arg(realKey, QString::number(i));
+                if (entry.isObject()) {
+                    recursiveSetValues(entry.toObject(), newKey, properties);
+                }
+            }
         }
     }
 }

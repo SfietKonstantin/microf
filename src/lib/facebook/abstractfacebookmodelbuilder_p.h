@@ -29,38 +29,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOK_P_H
-#define FACEBOOK_P_H
+#ifndef ABSTRACTFACEBOOKMODELBUILDER_P_H
+#define ABSTRACTFACEBOOKMODELBUILDER_P_H
 
-#include "facebook.h"
-#include "socialnetwork_p.h"
-#include <QtNetwork/QNetworkReply>
-#include "socialnetworkerror.h"
+#include "socialcontentmodelbuilder_p.h"
+#include "abstractfacebookmodelbuilder.h"
 
-class FacebookProperty;
-class FacebookPrivate: public SocialNetworkPrivate
+class AbstractFacebookModelBuilderPrivate: public SocialContentModelBuilderPrivate
 {
 public:
-    explicit FacebookPrivate(Facebook *q);
-    static QJsonObject checkError(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                  const QByteArray &data,
-                                  SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QJsonObject prebuild(QNetworkReply::NetworkError error, const QString &errorMessage,
-                                const QByteArray &data, const QVariantMap &metadata,
-                                SocialNetworkError::type &outError, QString &outErrorMessage, QString &outErrorCode);
-    static QVariantMap recursiveValues(const QJsonObject &object);
-    static QVariantMap buildProperties(const QJsonObject &object,
-                                       const QList<FacebookProperty *> &properties);
-    QString locale;
-    QString countryCode;
-    QString userId;
-    QString sessionKey;
-    QString secret;
-    QString accessToken;
+    explicit AbstractFacebookModelBuilderPrivate(AbstractFacebookModelBuilder *q);
+    static void properties_append(QQmlListProperty<FacebookProperty> *list, FacebookProperty *property);
+    static int properties_count(QQmlListProperty<FacebookProperty> *list);
+    static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
+    static void properties_clear(QQmlListProperty<FacebookProperty> *list);
+    void setRawData(const QString &rawData);
+    const QList<FacebookProperty *> properties() const;
+    void writeRawData(const QByteArray &data);
+protected:
+    QList<FacebookProperty *> m_properties;
 private:
-    Q_DECLARE_PUBLIC(Facebook)
+    void clear();
+    bool m_includeRawData;
+    QString m_rawData;
+    Q_DECLARE_PUBLIC(AbstractFacebookModelBuilder)
 };
 
 
-#endif // FACEBOOK_P_H
+#endif // ABSTRACTFACEBOOKMODELBUILDER_P_H
 

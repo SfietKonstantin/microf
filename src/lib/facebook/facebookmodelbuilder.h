@@ -32,32 +32,18 @@
 #ifndef FACEBOOKMODELBUILDER_H
 #define FACEBOOKMODELBUILDER_H
 
-#include <QtQml/QQmlListProperty>
-#include "socialcontentmodelbuilder.h"
-#include "facebookproperty.h"
+#include "abstractfacebookmodelbuilder.h"
 
-class FacebookModelBuilderPrivate;
-class FacebookModelBuilder : public SocialContentModelBuilder
+class FacebookModelBuilder: public AbstractFacebookModelBuilder
 {
-    Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
-    Q_PROPERTY(bool includeRawData READ includeRawData WRITE setIncludeRawData NOTIFY includeRawDataChanged)
-    Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
 public:
-    explicit FacebookModelBuilder(QObject *parent = 0);
-    ~FacebookModelBuilder();
+    FacebookModelBuilder(QObject *parent = 0);
+protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) override;
-    QQmlListProperty<FacebookProperty> properties();
-    bool includeRawData() const;
-    void setIncludeRawData(bool includeRawData);
-    QString rawData() const;
-Q_SIGNALS:
-    void includeRawDataChanged();
-    void rawDataChanged();
 private:
-    Q_DECLARE_PRIVATE(FacebookModelBuilder)
+    Q_DECLARE_PRIVATE(AbstractFacebookModelBuilder)
 };
 
 #endif // FACEBOOKMODELBUILDER_H

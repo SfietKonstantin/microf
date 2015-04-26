@@ -30,113 +30,28 @@
  */
 
 #include "facebookmodelbuilder.h"
-#include "socialcontentmodelbuilder_p.h"
+#include "abstractfacebookmodelbuilder_p.h"
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include "facebook_p.h"
 
-class FacebookModelBuilderPrivate: public SocialContentModelBuilderPrivate
-{
-public:
-    explicit FacebookModelBuilderPrivate(FacebookModelBuilder *q);
-    static void properties_append(QQmlListProperty<FacebookProperty> *list, FacebookProperty *property);
-    static int properties_count(QQmlListProperty<FacebookProperty> *list);
-    static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
-    static void properties_clear(QQmlListProperty<FacebookProperty> *list);
-    void setRawData(const QString &rawData);
-private:
-    void clear();
-    QList<FacebookProperty *> m_properties;
-    bool m_includeRawData;
-    QString m_rawData;
-    Q_DECLARE_PUBLIC(FacebookModelBuilder)
-};
-
-FacebookModelBuilderPrivate::FacebookModelBuilderPrivate(FacebookModelBuilder *q)
-    : SocialContentModelBuilderPrivate(q), m_includeRawData(false)
-{
-}
-
-void FacebookModelBuilderPrivate::properties_append(QQmlListProperty<FacebookProperty> *list, FacebookProperty *property)
-{
-    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
-    if (!builder || !property) {
-        return;
-    }
-    builder->d_func()->m_properties.append(property);
-}
-
-int FacebookModelBuilderPrivate::properties_count(QQmlListProperty<FacebookProperty> *list)
-{
-    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
-    if (!builder) {
-        return 0;
-    }
-    return builder->d_func()->m_properties.count();
-}
-
-FacebookProperty * FacebookModelBuilderPrivate::properties_at(QQmlListProperty<FacebookProperty> *list, int index)
-{
-    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
-    if (!builder) {
-        return nullptr;
-    }
-
-    const QList<FacebookProperty *> &properties = builder->d_func()->m_properties;
-    if (index < 0 || index >= properties.count()) {
-        return nullptr;
-    }
-
-    return properties.at(index);
-}
-
-void FacebookModelBuilderPrivate::properties_clear(QQmlListProperty<FacebookProperty> *list)
-{
-    FacebookModelBuilder *builder = qobject_cast<FacebookModelBuilder *>(list->object);
-    if (!builder) {
-        return;
-    }
-
-    builder->d_func()->clear();
-}
-
-void FacebookModelBuilderPrivate::setRawData(const QString &rawData)
-{
-    Q_Q(FacebookModelBuilder);
-    if (m_rawData != rawData) {
-        m_rawData = rawData;
-        emit q->rawDataChanged();
-    }
-}
-
-void FacebookModelBuilderPrivate::clear()
-{
-    qDeleteAll(m_properties);
-    m_properties.clear();
-}
-
 FacebookModelBuilder::FacebookModelBuilder(QObject *parent)
-    : SocialContentModelBuilder(*(new FacebookModelBuilderPrivate(this)), parent)
+    : AbstractFacebookModelBuilder(*(new AbstractFacebookModelBuilderPrivate(this)), parent)
 {
-}
-
-FacebookModelBuilder::~FacebookModelBuilder()
-{
-    Q_D(FacebookModelBuilder);
-    d->clear();
 }
 
 void FacebookModelBuilder::build(SocialContentModel &contentModel,
                                  QNetworkReply::NetworkError error, const QString &errorMessage,
                                  const QByteArray &data, const QVariantMap &metadata)
 {
-    Q_D(FacebookModelBuilder);
+    Q_D(AbstractFacebookModelBuilder);
     SocialNetworkError::type outError = SocialNetworkError::No;
     QString outErrorMessage;
     QString outErrorCode;
 
+    d->writeRawData(data);
     QJsonObject root = FacebookPrivate::prebuild(error, errorMessage, data, metadata,
                                                  outError, outErrorMessage, outErrorCode);
     if (outError != SocialNetworkError::No) {
@@ -150,11 +65,6 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
         return;
     }
 
-    if (d->m_includeRawData) {
-        QJsonDocument document = QJsonDocument::fromJson(data);
-        d->setRawData(document.toJson(QJsonDocument::Indented));
-    }
-
     const QJsonObject &dataObject = root.value(dataRoot).toObject();
     const QJsonArray &nodes = dataObject.value("nodes").toArray();
     const QJsonObject &pageInfo = dataObject.value("page_info").toObject();
@@ -162,10 +72,10 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
     QList<QVariantMap> returnedData;
     for (const QJsonValue &value : nodes) {
         QVariantMap properties;
-        if (d->m_properties.isEmpty()) {
+        if (d->properties().isEmpty()) {
             properties = FacebookPrivate::recursiveValues(value.toObject());
         } else {
-            properties = FacebookPrivate::buildProperties(value.toObject(), d->m_properties);
+            properties = FacebookPrivate::buildProperties(value.toObject(), d->properties());
         }
         returnedData.append(properties);
     }
@@ -178,34 +88,4 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
     newMetadata.insert("startCursor", startCursor);
     newMetadata.insert("endCursor", endCursor);
     setData(contentModel, returnedData, hasNextPage, false, newMetadata);
-}
-
-QQmlListProperty<FacebookProperty> FacebookModelBuilder::properties()
-{
-    return QQmlListProperty<FacebookProperty>(this, 0,
-                                              &FacebookModelBuilderPrivate::properties_append,
-                                              &FacebookModelBuilderPrivate::properties_count,
-                                              &FacebookModelBuilderPrivate::properties_at,
-                                              &FacebookModelBuilderPrivate::properties_clear);
-}
-
-bool FacebookModelBuilder::includeRawData() const
-{
-    Q_D(const FacebookModelBuilder);
-    return d->m_includeRawData;
-}
-
-void FacebookModelBuilder::setIncludeRawData(bool includeRawData)
-{
-    Q_D(FacebookModelBuilder);
-    if (d->m_includeRawData != includeRawData) {
-        d->m_includeRawData = includeRawData;
-        emit includeRawDataChanged();
-    }
-}
-
-QString FacebookModelBuilder::rawData() const
-{
-    Q_D(const FacebookModelBuilder);
-    return d->m_rawData;
 }

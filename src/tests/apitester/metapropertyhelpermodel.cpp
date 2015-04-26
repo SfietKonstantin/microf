@@ -29,32 +29,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "requestpropertyhelpermodel.h"
+#include "metapropertyhelpermodel.h"
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
 #include <facebook/facebookitembuilder.h>
-#include <facebook/facebookmodelbuilder.h>
+#include <facebook/abstractfacebookmodelbuilder.h>
 #include <facebook/facebookproperty.h>
 
 class RequestPropertyHelperModelData
 {
 public:
     QString name;
-    RequestPropertyHelperModel::Type type;
+    MetaPropertyHelperModel::Type type;
     int propertyIndex;
 };
 
-RequestPropertyHelperModel::RequestPropertyHelperModel(QObject *parent)
+MetaPropertyHelperModel::MetaPropertyHelperModel(QObject *parent)
     : QAbstractListModel(parent)
 {
 }
 
-RequestPropertyHelperModel::~RequestPropertyHelperModel()
+MetaPropertyHelperModel::~MetaPropertyHelperModel()
 {
     qDeleteAll(m_data);
 }
 
-QHash<int, QByteArray> RequestPropertyHelperModel::roleNames() const
+QHash<int, QByteArray> MetaPropertyHelperModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(NameRole, "name");
@@ -63,13 +63,13 @@ QHash<int, QByteArray> RequestPropertyHelperModel::roleNames() const
     return roles;
 }
 
-int RequestPropertyHelperModel::rowCount(const QModelIndex &parent) const
+int MetaPropertyHelperModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return m_data.count();
 }
 
-QVariant RequestPropertyHelperModel::data(const QModelIndex &index, int role) const
+QVariant MetaPropertyHelperModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
     if (row < 0 || row >= m_data.count()) {
@@ -86,9 +86,9 @@ QVariant RequestPropertyHelperModel::data(const QModelIndex &index, int role) co
         break;
     case ValueRole:
     {
-        const QMetaObject *meta = m_request->metaObject();
+        const QMetaObject *meta = m_object->metaObject();
         const QMetaProperty &metaProperty = meta->property(data->propertyIndex);
-        return metaProperty.read(m_request);
+        return metaProperty.read(m_object);
         break;
     }
     default:
@@ -97,26 +97,26 @@ QVariant RequestPropertyHelperModel::data(const QModelIndex &index, int role) co
     }
 }
 
-int RequestPropertyHelperModel::count() const
+int MetaPropertyHelperModel::count() const
 {
     return m_data.count();
 }
 
-QObject * RequestPropertyHelperModel::request() const
+QObject * MetaPropertyHelperModel::object() const
 {
-    return m_request;
+    return m_object;
 }
 
-void RequestPropertyHelperModel::setRequest(QObject *request)
+void MetaPropertyHelperModel::setObject(QObject *object)
 {
-    if (m_request != request) {
-        m_request = request;
-        emit requestChanged();
+    if (m_object != object) {
+        m_object = object;
+        emit objectChanged();
         updateMetaObject();
     }
 }
 
-void RequestPropertyHelperModel::save(int index, const QVariant &value)
+void MetaPropertyHelperModel::save(int index, const QVariant &value)
 {
     if (index < 0 || index >= m_data.count()) {
         return;
@@ -124,50 +124,13 @@ void RequestPropertyHelperModel::save(int index, const QVariant &value)
 
     const RequestPropertyHelperModelData *data = m_data.at(index);
 
-    const QMetaObject *meta = m_request->metaObject();
+    const QMetaObject *meta = m_object->metaObject();
     const QMetaProperty &metaProperty = meta->property(data->propertyIndex);
-    metaProperty.write(m_request, value);
+    metaProperty.write(m_object, value);
     emit dataChanged(this->index(index), this->index(index));
 }
 
-void RequestPropertyHelperModel::setProperties(const QString &properties,
-                                               FacebookItemBuilder *itemBuilder,
-                                               FacebookModelBuilder *modelBuilder)
-{
-    if (itemBuilder) {
-        QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
-        properties.clear(&properties);
-    }
-    if (modelBuilder) {
-        QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
-        properties.clear(&properties);
-    }
-
-    QStringList splitted = properties.trimmed().split("\n");
-    for (const QString &line : splitted) {
-        QStringList splittedLine = line.split(":");
-        if (splittedLine.count() == 2) {
-            const QString &path = splittedLine.at(0).trimmed();
-            const QString &name = splittedLine.at(1).trimmed();
-            if (itemBuilder) {
-                QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
-                FacebookProperty *object = new FacebookProperty(itemBuilder);
-                object->setPath(path);
-                object->setName(name);
-                properties.append(&properties, object);
-            }
-            if (modelBuilder) {
-                QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
-                FacebookProperty *object = new FacebookProperty(modelBuilder);
-                object->setPath(path);
-                object->setName(name);
-                properties.append(&properties, object);
-            }
-        }
-    }
-}
-
-void RequestPropertyHelperModel::clear(bool emitSignal)
+void MetaPropertyHelperModel::clear(bool emitSignal)
 {
     if (rowCount() > 0) {
         beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
@@ -180,25 +143,27 @@ void RequestPropertyHelperModel::clear(bool emitSignal)
     }
 }
 
-void RequestPropertyHelperModel::updateMetaObject()
+void MetaPropertyHelperModel::updateMetaObject()
 {
-    if (!m_request) {
+    if (!m_object) {
         clear(true);
         return;
     }
 
     QList<RequestPropertyHelperModelData *> data;
 
-    const QMetaObject *meta = m_request->metaObject();
+    const QMetaObject *meta = m_object->metaObject();
     int offset = meta->propertyOffset();
     int count = meta->propertyCount();
 
     for (int i = offset; i < count; ++i) {
         const QMetaProperty &metaProperty = meta->property(i);
-        RequestPropertyHelperModelData *entry = new RequestPropertyHelperModelData;
-        entry->name = metaProperty.name();
-        entry->propertyIndex = i;
+        if (!metaProperty.isWritable()) {
+            continue;
+        }
+
         QMetaType::Type type = static_cast<QMetaType::Type>(metaProperty.type());
+        MetaPropertyHelperModel::Type modelType = MetaPropertyHelperModel::Unknown;
         switch (type) {
         case QMetaType::Int:
         case QMetaType::Long:
@@ -206,19 +171,28 @@ void RequestPropertyHelperModel::updateMetaObject()
         case QMetaType::UInt:
         case QMetaType::ULong:
         case QMetaType::ULongLong:
-            entry->type = Int;
+            modelType = Int;
             break;
         case QMetaType::Float:
         case QMetaType::Double:
-            entry->type = Double;
+            modelType = Double;
             break;
         case QMetaType::QString:
-            entry->type = String;
+            modelType = String;
             break;
         default:
-            entry->type = Unknown;
+            modelType = Unknown;
             break;
         }
+
+        if (modelType == MetaPropertyHelperModel::Unknown) {
+            continue;
+        }
+
+        RequestPropertyHelperModelData *entry = new RequestPropertyHelperModelData;
+        entry->name = metaProperty.name();
+        entry->propertyIndex = i;
+        entry->type = modelType;
         data.append(entry);
     }
 

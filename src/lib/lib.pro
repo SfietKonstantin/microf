@@ -36,6 +36,8 @@ HEADERS += \
     facebook/facebookproperty.h \
     facebook/facebookproperty_p.h \
     facebook/facebookitembuilder.h \
+    facebook/abstractfacebookmodelbuilder.h \
+    facebook/abstractfacebookmodelbuilder_p.h \
     facebook/facebookmodelbuilder.h \
     facebook/facebookfriendlistrequest.h \
     facebook/facebookusersummaryrequest.h \
@@ -59,6 +61,7 @@ SOURCES += \
     facebook/facebookconfirmationcontentbuilder.cpp \
     facebook/facebookproperty.cpp \
     facebook/facebookitembuilder.cpp \
+    facebook/abstractfacebookmodelbuilder.cpp \
     facebook/facebookmodelbuilder.cpp \
     facebook/facebookfriendlistrequest.cpp \
     facebook/facebookusersummaryrequest.cpp

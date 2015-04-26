@@ -62,7 +62,7 @@ QString AuthHelper::parseUrlQuery(const QString &queryString)
 {
     QString result;
     QUrlQuery query(queryString);
-    for (QPair<QString, QString> queryEntry : query.queryItems(QUrl::FullyDecoded)) {
+    for (QPair<QString, QString> queryEntry : query.queryItems(QUrl::FullyEncoded)) {
         result.append("<p><b>");
         result.append(queryEntry.first);
         result.append("</b>");
@@ -81,6 +81,11 @@ QString AuthHelper::formatJson(const QString &json)
         return error.errorString();
     }
     return document.toJson(QJsonDocument::Indented);
+}
+
+QString AuthHelper::fromBase64(const QString &base64)
+{
+    return QByteArray::fromBase64(base64.toLocal8Bit());
 }
 
 QString AuthHelper::email() const
