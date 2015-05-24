@@ -39,7 +39,7 @@ FacebookPropertyPrivate::FacebookPropertyPrivate(FacebookProperty *q)
 {
 }
 
-QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, const QString &path)
+QJsonValue FacebookPropertyPrivate::valueFromPath(const QJsonObject &object, const QString &path)
 {
     QStringList splittedPath = path.split("/");
     QJsonValue currentValue = QJsonValue(object);
@@ -47,7 +47,21 @@ QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, co
         const QString &step = splittedPath.takeFirst();
         currentValue = currentValue.toObject().value(step);
     }
+    return currentValue;
+}
 
+QJsonArray FacebookPropertyPrivate::arrayFromPath(const QJsonObject &object, const QString &path)
+{
+    const QJsonValue &currentValue = valueFromPath(object, path);
+    if (!currentValue.isArray()) {
+        return QJsonArray();
+    }
+    return currentValue.toArray();
+}
+
+QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, const QString &path)
+{
+    const QJsonValue &currentValue = valueFromPath(object, path);
     if (!currentValue.isBool() && currentValue.isDouble() && currentValue.isString()) {
         return QVariant();
     }
@@ -56,6 +70,11 @@ QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, co
 
 FacebookProperty::FacebookProperty(QObject *parent)
     : QObject(parent), d_ptr(new FacebookPropertyPrivate(this))
+{
+}
+
+FacebookProperty::FacebookProperty(FacebookPropertyPrivate &dd, QObject *parent)
+    : QObject(parent), d_ptr(&dd)
 {
 }
 

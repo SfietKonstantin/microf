@@ -55,11 +55,10 @@ Q_SIGNALS:
     void pathChanged();
     void nameChanged();
 protected:
+    explicit FacebookProperty(FacebookPropertyPrivate &dd, QObject *parent = 0);
     QScopedPointer<FacebookPropertyPrivate> d_ptr;
 private:
     Q_DECLARE_PRIVATE(FacebookProperty)
-    QString m_path;
-    QString m_name;
 };
 
 #endif // FACEBOOKPROPERTY_H

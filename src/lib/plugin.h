@@ -40,7 +40,7 @@
 #include "facebook/facebookloginrequest.h"
 #include "facebook/facebooklogincontentbuilder.h"
 #include "facebook/facebooklogoutrequest.h"
-#include "facebook/facebookproperty.h"
+#include "facebook/facebooklistproperty.h"
 #include "facebook/facebookitembuilder.h"
 #include "facebook/facebookmodelbuilder.h"
 #include "facebook/facebooknewsfeedmodelbuilder.h"
@@ -70,6 +70,7 @@ void registerMicroFTypes(const char *uri)
     qmlRegisterType<FacebookLogoutRequest>(uri, 1, 0, "FacebookLogoutRequest");
     qmlRegisterType<FacebookConfirmationContentBuilder>(uri, 1, 0, "FacebookConfirmationContentBuilder");
     qmlRegisterType<FacebookProperty>(uri, 1, 0, "FacebookProperty");
+    qmlRegisterType<FacebookListProperty>(uri, 1, 0, "FacebookListProperty");
     qmlRegisterType<FacebookItemBuilder>(uri, 1, 0, "FacebookItemBuilder");
     qmlRegisterType<FacebookModelBuilder>(uri, 1, 0, "FacebookModelBuilder");
     qmlRegisterType<FacebookNewsFeedModelBuilder>(uri, 1, 0, "FacebookNewsFeedModelBuilder");

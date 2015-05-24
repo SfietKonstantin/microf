@@ -101,6 +101,17 @@ void TstSocialObject::testSocialObject()
     QCOMPARE(static_cast<QMetaType::Type>(value.type()), QMetaType::Int);
     QCOMPARE(value.toInt(), 3);
 
+    // Check dynamically set list
+    QVariantList list;
+    list << QVariant(true) << QVariant(QString("test")) << QVariant(123);
+    SocialObjectPrivate::setProperty(socialObject, "list", QVariant(list));
+    index = meta->indexOfProperty("list");
+    QVERIFY(index >= 0);
+    QMetaProperty listProperty = meta->property(index);
+    value = listProperty.read(socialObject);
+    QCOMPARE(static_cast<QMetaType::Type>(value.type()), QMetaType::QVariantList);
+    QCOMPARE(value.toList(), list);
+
     // Check clear
     SocialObjectPrivate::clear(socialObject);
     QCOMPARE(spy.count(), 2);

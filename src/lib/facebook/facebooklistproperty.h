@@ -29,28 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKPROPERTY_P_H
-#define FACEBOOKPROPERTY_P_H
+#ifndef FACEBOOKLISTPROPERTY_H
+#define FACEBOOKLISTPROPERTY_H
 
 #include "facebookproperty.h"
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
+#include <QtQml/QQmlListProperty>
 
-class FacebookPropertyPrivate
+class FacebookListPropertyPrivate;
+class FacebookListProperty : public FacebookProperty
 {
+    Q_OBJECT
+    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
 public:
-    explicit FacebookPropertyPrivate(FacebookProperty *q);
-    static QJsonValue valueFromPath(const QJsonObject &object, const QString &path);
-    static QJsonArray arrayFromPath(const QJsonObject &object, const QString &path);
-    static QVariant propertyFromPath(const QJsonObject &object, const QString &path);
-protected:
-    FacebookProperty * const q_ptr;
+    explicit FacebookListProperty(QObject *parent = 0);
+    ~FacebookListProperty();
+    QQmlListProperty<FacebookProperty> properties();
+    const QList<FacebookProperty *> & propertiesList() const;
 private:
-    Q_DECLARE_PUBLIC(FacebookProperty)
-    QString path;
-    QString name;
+    Q_DECLARE_PRIVATE(FacebookListProperty)
 
 };
 
-#endif // FACEBOOKPROPERTY_P_H
-
+#endif // FACEBOOKLISTPROPERTY_H

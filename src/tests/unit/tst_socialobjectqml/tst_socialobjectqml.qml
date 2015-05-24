@@ -40,5 +40,12 @@ TestCase {
         manager.setProperty("test4", 1234);
         compare(test.count, 1);
     }
+
+    function test_list() {
+        var list = [123, "test", true];
+        compare(manager.object.list, null);
+        manager.setProperty("list", list);
+        compare(manager.object.list, list);
+    }
 }
 

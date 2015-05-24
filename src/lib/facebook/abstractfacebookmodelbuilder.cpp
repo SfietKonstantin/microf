@@ -41,31 +41,31 @@ AbstractFacebookModelBuilderPrivate::AbstractFacebookModelBuilderPrivate(Abstrac
 void AbstractFacebookModelBuilderPrivate::properties_append(QQmlListProperty<FacebookProperty> *list,
                                                             FacebookProperty *property)
 {
-    AbstractFacebookModelBuilder *builder = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
-    if (!builder || !property) {
+    AbstractFacebookModelBuilder *object = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
+    if (!object || !property) {
         return;
     }
-    builder->d_func()->m_properties.append(property);
+    object->d_func()->m_properties.append(property);
 }
 
 int AbstractFacebookModelBuilderPrivate::properties_count(QQmlListProperty<FacebookProperty> *list)
 {
-    AbstractFacebookModelBuilder *builder = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
-    if (!builder) {
+    AbstractFacebookModelBuilder *object = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
+    if (!object) {
         return 0;
     }
-    return builder->d_func()->m_properties.count();
+    return object->d_func()->m_properties.count();
 }
 
 FacebookProperty * AbstractFacebookModelBuilderPrivate::properties_at(QQmlListProperty<FacebookProperty> *list,
                                                                       int index)
 {
-    AbstractFacebookModelBuilder *builder = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
-    if (!builder) {
+    AbstractFacebookModelBuilder *object = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
+    if (!object) {
         return nullptr;
     }
 
-    const QList<FacebookProperty *> &properties = builder->d_func()->m_properties;
+    const QList<FacebookProperty *> &properties = object->d_func()->m_properties;
     if (index < 0 || index >= properties.count()) {
         return nullptr;
     }
@@ -75,12 +75,12 @@ FacebookProperty * AbstractFacebookModelBuilderPrivate::properties_at(QQmlListPr
 
 void AbstractFacebookModelBuilderPrivate::properties_clear(QQmlListProperty<FacebookProperty> *list)
 {
-    AbstractFacebookModelBuilder *builder = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
-    if (!builder) {
+    AbstractFacebookModelBuilder *object = qobject_cast<AbstractFacebookModelBuilder *>(list->object);
+    if (!object) {
         return;
     }
 
-    builder->d_func()->clear();
+    object->d_func()->clear();
 }
 
 void AbstractFacebookModelBuilderPrivate::setRawData(const QString &rawData)
