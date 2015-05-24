@@ -34,6 +34,7 @@
 
 #include "socialrequest.h"
 
+class Facebook;
 class AbstractFacebookRequest : public SocialRequest
 {
     Q_OBJECT
@@ -47,7 +48,8 @@ protected:
     QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
                               const QVariantMap &metadata) const override;
     virtual QString queryId() const = 0;
-    virtual QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const = 0;
+    virtual QJsonObject queryParameters(const Facebook &facebook, Mode mode,
+                                        const QVariantMap &metadata) const = 0;
     virtual QString requestName() const = 0;
     virtual QString apiCallerClass() const = 0;
 };

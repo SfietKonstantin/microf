@@ -105,6 +105,10 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
     // First check metadata
     const QJsonObject &root = checkError(error, errorMessage, data, outError, outErrorMessage,
                                          outErrorCode);
+    if (outError != SocialNetworkError::No) {
+        return QJsonObject();
+    }
+
     QString userId = metadata.value("userId").toString();
 
     if (!root.contains(userId)) {
@@ -147,6 +151,7 @@ static void recursiveSetValues(const QJsonObject &object, const QString &prefix,
         } else if (value.isArray()) {
             const QJsonArray &array = value.toArray();
             for (int i = 0; i < array.count(); ++i) {
+                properties.insert(QString("%1_count").arg(realKey), array.count());
                 const QJsonValue &entry = array.at(i);
                 QString newKey = QString("%1_%2").arg(realKey, QString::number(i));
                 if (entry.isObject()) {

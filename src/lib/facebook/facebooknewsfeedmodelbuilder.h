@@ -29,42 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef CUSTOMFACEBOOKREQUEST_H
-#define CUSTOMFACEBOOKREQUEST_H
+#ifndef FACEBOOKNEWSFEEDMODELBUILDER_H
+#define FACEBOOKNEWSFEEDMODELBUILDER_H
 
-#include "facebook/abstractfacebookrequest.h"
+#include "abstractfacebookmodelbuilder.h"
 
-class CustomFacebookRequestPrivate;
-class CustomFacebookRequest : public AbstractFacebookRequest
+class FacebookNewsFeedModelBuilder : public AbstractFacebookModelBuilder
 {
     Q_OBJECT
-    Q_PROPERTY(QString queryId READ queryId WRITE setQueryId NOTIFY queryIdChanged)
-    Q_PROPERTY(QString requestName READ requestName WRITE setRequestName NOTIFY requestNameChanged)
-    Q_PROPERTY(QString apiCallerClass READ apiCallerClass WRITE setApiCallerClass
-               NOTIFY apiCallerClassChanged)
-    Q_PROPERTY(QString queryParametersJson READ queryParametersJson WRITE setQueryParametersJson
-               NOTIFY queryParametersJsonChanged)
 public:
-    explicit CustomFacebookRequest(QObject *parent = 0);
-    QString queryId() const override;
-    void setQueryId(const QString &queryId);
-    QString requestName() const override;
-    void setRequestName(const QString &requestName);
-    QString apiCallerClass() const override;
-    void setApiCallerClass(const QString &apiCallerClass);
-    QString queryParametersJson() const;
-    void setQueryParametersJson(const QString &queryParametersJson);
-signals:
-    void queryIdChanged();
-    void requestNameChanged();
-    void apiCallerClassChanged();
-    void queryParametersJsonChanged();
-
+    explicit FacebookNewsFeedModelBuilder(QObject *parent = 0);
 protected:
-    QJsonObject queryParameters(const Facebook &facebook, Mode mode,
-                                const QVariantMap &metadata) const override;
+    void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
+               const QString &errorMessage, const QByteArray &data,
+               const QVariantMap &metadata) override;
 private:
-    Q_DECLARE_PRIVATE(CustomFacebookRequest)
+    Q_DECLARE_PRIVATE(AbstractFacebookModelBuilder)
 };
 
-#endif // CUSTOMFACEBOOKREQUEST_H
+#endif // FACEBOOKNEWSFEEDMODELBUILDER_H

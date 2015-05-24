@@ -84,10 +84,13 @@ QString FacebookUserSummaryRequest::queryId() const
     return "10153450790586729";
 }
 
-QJsonObject FacebookUserSummaryRequest::queryParameters(Mode mode, const QVariantMap &metadata) const
+QJsonObject FacebookUserSummaryRequest::queryParameters(const Facebook &facebook,
+                                                        Mode mode, const QVariantMap &metadata) const
 {
     Q_D(const FacebookUserSummaryRequest);
+    Q_UNUSED(facebook);
     Q_UNUSED(mode);
+    Q_UNUSED(metadata);
     QJsonObject returned;
     returned.insert("0", d->userId);
     returned.insert("1", "1080"); // Some image size

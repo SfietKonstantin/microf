@@ -117,9 +117,11 @@ QString FacebookFriendListRequest::queryId() const
     return "10153218947031729";
 }
 
-QJsonObject FacebookFriendListRequest::queryParameters(Mode mode, const QVariantMap &metadata) const
+QJsonObject FacebookFriendListRequest::queryParameters(const Facebook &facebook, Mode mode,
+                                                       const QVariantMap &metadata) const
 {
     Q_D(const FacebookFriendListRequest);
+    Q_UNUSED(facebook);
     QJsonObject returned;
     returned.insert("0", d->userId);
     returned.insert("1", ""); // ??? Maybe for startCursor ?

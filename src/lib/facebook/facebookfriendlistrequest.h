@@ -58,7 +58,8 @@ protected:
     QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
                                const QVariantMap &metadata) const override;
     QString queryId() const override;
-    QJsonObject queryParameters(Mode mode, const QVariantMap &metadata) const override;
+    QJsonObject queryParameters(const Facebook &facebook, Mode mode,
+                                const QVariantMap &metadata) const override;
     QString requestName() const override;
     QString apiCallerClass() const override;
 private:

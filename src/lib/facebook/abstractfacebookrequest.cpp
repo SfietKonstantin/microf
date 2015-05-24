@@ -87,7 +87,7 @@ QByteArray AbstractFacebookRequest::createPostData(const SocialNetwork &socialNe
     query.addQueryItem("method", "get");
     query.addQueryItem("strip_nulls", "true");
     query.addQueryItem("strip_defaults", "true");
-    QJsonDocument document (queryParameters(mode, metadata));
+    QJsonDocument document (queryParameters(*facebook, mode, metadata));
     query.addQueryItem("query_params", document.toJson(QJsonDocument::Compact));
     query.addQueryItem("locale", facebook->locale());
     query.addQueryItem("client_country_code", facebook->countryCode());

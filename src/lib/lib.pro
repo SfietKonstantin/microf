@@ -41,7 +41,9 @@ HEADERS += \
     facebook/facebookmodelbuilder.h \
     facebook/facebookfriendlistrequest.h \
     facebook/facebookusersummaryrequest.h \
-    plugin.h
+    facebook/facebooknewsfeedrequest.h \
+    plugin.h \
+    facebook/facebooknewsfeedmodelbuilder.h
 
 SOURCES += \
     socialnetwork.cpp \
@@ -64,4 +66,6 @@ SOURCES += \
     facebook/abstractfacebookmodelbuilder.cpp \
     facebook/facebookmodelbuilder.cpp \
     facebook/facebookfriendlistrequest.cpp \
-    facebook/facebookusersummaryrequest.cpp
+    facebook/facebookusersummaryrequest.cpp \
+    facebook/facebooknewsfeedrequest.cpp \
+    facebook/facebooknewsfeedmodelbuilder.cpp

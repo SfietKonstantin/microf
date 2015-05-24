@@ -32,6 +32,7 @@
 #include "buildershelpermodel.h"
 #include "facebook/abstractfacebookmodelbuilder.h"
 #include "facebook/facebookmodelbuilder.h"
+#include "facebook/facebooknewsfeedmodelbuilder.h"
 #include "customfacebookmodelbuilder.h"
 
 class BuildersHelperModelData
@@ -55,6 +56,9 @@ BuildersHelperModel::BuildersHelperModel(QObject *parent)
     FacebookModelBuilder *standard = new FacebookModelBuilder(this);
     standard->setIncludeRawData(true);
     data.append(new BuildersHelperModelData("Standard", standard));
+    FacebookNewsFeedModelBuilder *newsFeed = new FacebookNewsFeedModelBuilder(this);
+    newsFeed->setIncludeRawData(true);
+    data.append(new BuildersHelperModelData("News feed", newsFeed));
     CustomFacebookModelBuilder *custom = new CustomFacebookModelBuilder(this);
     custom->setIncludeRawData(true);
     data.append(new BuildersHelperModelData("Custom", custom));

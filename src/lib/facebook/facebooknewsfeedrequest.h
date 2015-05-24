@@ -29,42 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef CUSTOMFACEBOOKREQUEST_H
-#define CUSTOMFACEBOOKREQUEST_H
+#ifndef FACEBOOKNEWSFEEDREQUEST_H
+#define FACEBOOKNEWSFEEDREQUEST_H
 
-#include "facebook/abstractfacebookrequest.h"
+#include "abstractfacebookrequest.h"
 
-class CustomFacebookRequestPrivate;
-class CustomFacebookRequest : public AbstractFacebookRequest
+class FacebookNewsFeedRequestPrivate;
+class FacebookNewsFeedRequest : public AbstractFacebookRequest
 {
     Q_OBJECT
-    Q_PROPERTY(QString queryId READ queryId WRITE setQueryId NOTIFY queryIdChanged)
-    Q_PROPERTY(QString requestName READ requestName WRITE setRequestName NOTIFY requestNameChanged)
-    Q_PROPERTY(QString apiCallerClass READ apiCallerClass WRITE setApiCallerClass
-               NOTIFY apiCallerClassChanged)
-    Q_PROPERTY(QString queryParametersJson READ queryParametersJson WRITE setQueryParametersJson
-               NOTIFY queryParametersJsonChanged)
 public:
-    explicit CustomFacebookRequest(QObject *parent = 0);
-    QString queryId() const override;
-    void setQueryId(const QString &queryId);
-    QString requestName() const override;
-    void setRequestName(const QString &requestName);
-    QString apiCallerClass() const override;
-    void setApiCallerClass(const QString &apiCallerClass);
-    QString queryParametersJson() const;
-    void setQueryParametersJson(const QString &queryParametersJson);
-signals:
-    void queryIdChanged();
-    void requestNameChanged();
-    void apiCallerClassChanged();
-    void queryParametersJsonChanged();
-
+    explicit FacebookNewsFeedRequest(QObject *parent = 0);
 protected:
+    QString queryId() const override;
     QJsonObject queryParameters(const Facebook &facebook, Mode mode,
                                 const QVariantMap &metadata) const override;
+    QString requestName() const override;
+    QString apiCallerClass() const override;
 private:
-    Q_DECLARE_PRIVATE(CustomFacebookRequest)
+    Q_DECLARE_PRIVATE(FacebookNewsFeedRequest)
 };
 
-#endif // CUSTOMFACEBOOKREQUEST_H
+#endif // FACEBOOKNEWSFEEDREQUEST_H

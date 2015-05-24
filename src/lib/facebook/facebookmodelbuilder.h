@@ -37,7 +37,7 @@
 class FacebookModelBuilder: public AbstractFacebookModelBuilder
 {
 public:
-    FacebookModelBuilder(QObject *parent = 0);
+    explicit FacebookModelBuilder(QObject *parent = 0);
 protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,

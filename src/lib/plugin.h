@@ -43,9 +43,11 @@
 #include "facebook/facebookproperty.h"
 #include "facebook/facebookitembuilder.h"
 #include "facebook/facebookmodelbuilder.h"
+#include "facebook/facebooknewsfeedmodelbuilder.h"
 #include "facebook/facebookconfirmationcontentbuilder.h"
 #include "facebook/facebookfriendlistrequest.h"
 #include "facebook/facebookusersummaryrequest.h"
+#include "facebook/facebooknewsfeedrequest.h"
 
 static const char *ABSTRACT_TYPE = "Abstract type cannot be used";
 static const char *GLOBAL_TYPE = "Global type cannot be used";
@@ -70,8 +72,10 @@ void registerMicroFTypes(const char *uri)
     qmlRegisterType<FacebookProperty>(uri, 1, 0, "FacebookProperty");
     qmlRegisterType<FacebookItemBuilder>(uri, 1, 0, "FacebookItemBuilder");
     qmlRegisterType<FacebookModelBuilder>(uri, 1, 0, "FacebookModelBuilder");
+    qmlRegisterType<FacebookNewsFeedModelBuilder>(uri, 1, 0, "FacebookNewsFeedModelBuilder");
     qmlRegisterType<FacebookFriendListRequest>(uri, 1, 0, "FacebookFriendListRequest");
     qmlRegisterType<FacebookUserSummaryRequest>(uri, 1, 0, "FacebookUserSummaryRequest");
+    qmlRegisterType<FacebookNewsFeedRequest>(uri, 1, 0, "FacebookNewsFeedRequest");
 }
 
 #endif // PLUGIN_H

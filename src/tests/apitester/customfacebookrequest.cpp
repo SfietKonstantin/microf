@@ -116,10 +116,11 @@ void CustomFacebookRequest::setQueryParametersJson(const QString &queryParameter
     }
 }
 
-QJsonObject CustomFacebookRequest::queryParameters(SocialRequest::Mode mode,
+QJsonObject CustomFacebookRequest::queryParameters(const Facebook &facebook, SocialRequest::Mode mode,
                                                    const QVariantMap &metadata) const
 {
     Q_D(const CustomFacebookRequest);
+    Q_UNUSED(facebook)
     Q_UNUSED(mode)
     Q_UNUSED(metadata)
     QJsonDocument document = QJsonDocument::fromJson(d->m_queryParametersJson.toLocal8Bit());
