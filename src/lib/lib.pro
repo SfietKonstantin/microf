@@ -12,8 +12,6 @@ HEADERS += \
     socialnetwork_p.h \
     socialnetworkstatus.h \
     socialnetworkerror.h \
-    socialobject.h \
-    socialobject_p.h \
     socialrequest.h \
     socialrequest_p.h \
     isocialcontent.h \
@@ -50,7 +48,6 @@ SOURCES += \
     socialnetwork.cpp \
     socialnetworkstatus.cpp \
     socialnetworkerror.cpp \
-    socialobject.cpp \
     socialrequest.cpp \
     socialcontentitem.cpp \
     socialcontentitembuilder.cpp \

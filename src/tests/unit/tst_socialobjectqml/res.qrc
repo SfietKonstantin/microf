@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>tst_socialobjectqml.qml</file>
-    </qresource>
-</RCC>

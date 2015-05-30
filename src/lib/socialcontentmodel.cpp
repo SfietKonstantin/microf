@@ -32,8 +32,8 @@
 #include "socialcontentmodel.h"
 #include "socialcontentmodel_p.h"
 #include <QtCore/QDebug>
+#include <QtCore/QVariantMap>
 #include "socialnetwork_p.h"
-#include "socialobject_p.h"
 #include "socialcontentmodelbuilder_p.h"
 
 SocialContentModelPrivate::SocialContentModelPrivate(SocialContentModel *q)
@@ -104,25 +104,15 @@ void SocialContentModelPrivate::setContentModelData(const QList<QVariantMap> &da
                                                     const QVariantMap &metadata)
 {
     Q_Q(SocialContentModel);
-    QList<SocialObject *> newData;
-    for (const QVariantMap &properties : data) {
-        SocialObject *object = new SocialObject(q);
-        for (const QString &key : properties.keys()) {
-            const QVariant &value = properties.value(key);
-            SocialObjectPrivate::setProperty(object, key.toLocal8Bit(), value);
-        }
-        newData.append(object);
-    }
-
     switch (m_loadMode) {
     case SocialRequest::Load:
-        setNewData(newData);
+        setNewData(data);
         break;
     case SocialRequest::LoadNext:
-        appendNewData(newData);
+        appendNewData(data);
         break;
     case SocialRequest::LoadPrevious:
-        prependNewData(newData);
+        prependNewData(data);
         break;
     }
 
@@ -141,7 +131,7 @@ void SocialContentModelPrivate::setContentModelData(const QList<QVariantMap> &da
     emit q->finished(true);
 }
 
-void SocialContentModelPrivate::setNewData(const QList<SocialObject *> &data)
+void SocialContentModelPrivate::setNewData(const QList<QVariantMap> &data)
 {
     Q_Q(SocialContentModel);
     if (data.isEmpty()) {
@@ -150,7 +140,6 @@ void SocialContentModelPrivate::setNewData(const QList<SocialObject *> &data)
 
     if (q->rowCount() > 0) {
         q->beginRemoveRows(QModelIndex(), 0, q->rowCount() - 1);
-        qDeleteAll(m_data);
         m_data.clear();
         if (data.isEmpty()) {
             emit q->countChanged();
@@ -166,7 +155,7 @@ void SocialContentModelPrivate::setNewData(const QList<SocialObject *> &data)
     }
 }
 
-void SocialContentModelPrivate::appendNewData(const QList<SocialObject *> &data)
+void SocialContentModelPrivate::appendNewData(const QList<QVariantMap> &data)
 {
     Q_Q(SocialContentModel);
     if (data.isEmpty()) {
@@ -181,7 +170,7 @@ void SocialContentModelPrivate::appendNewData(const QList<SocialObject *> &data)
     }
 }
 
-void SocialContentModelPrivate::prependNewData(const QList<SocialObject *> &data)
+void SocialContentModelPrivate::prependNewData(const QList<QVariantMap> &data)
 {
     Q_Q(SocialContentModel);
     if (data.isEmpty()) {
@@ -190,7 +179,7 @@ void SocialContentModelPrivate::prependNewData(const QList<SocialObject *> &data
 
     if (data.count() > 0) {
         q->beginInsertRows(QModelIndex(), 0, data.count() - 1);
-        QList<SocialObject *> oldData = m_data;
+        QList<QVariantMap> oldData = m_data;
         m_data = data;
         m_data.append(oldData);
         emit q->countChanged();
@@ -205,8 +194,6 @@ SocialContentModel::SocialContentModel(QObject *parent)
 
 SocialContentModel::~SocialContentModel()
 {
-    Q_D(SocialContentModel);
-    qDeleteAll(d->m_data);
 }
 
 QHash<int, QByteArray> SocialContentModel::roleNames() const

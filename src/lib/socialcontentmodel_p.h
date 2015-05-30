@@ -55,16 +55,16 @@ private:
     bool load(SocialRequest::Mode mode);
     void setContentModelData(const QList<QVariantMap> &data, bool hasNext, bool hasPrevious,
                              const QVariantMap &metadata);
-    void setNewData(const QList<SocialObject *> &data);
-    void appendNewData(const QList<SocialObject *> &data);
-    void prependNewData(const QList<SocialObject *> &data);
+    void setNewData(const QList<QVariantMap> &data);
+    void appendNewData(const QList<QVariantMap> &data);
+    void prependNewData(const QList<QVariantMap> &data);
     bool m_hasNext;
     bool m_hasPrevious;
     SocialRequest::Mode m_loadMode;
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentModelBuilder *m_builder;
-    QList<SocialObject *> m_data;
+    QList<QVariantMap> m_data;
     Q_DECLARE_PUBLIC(SocialContentModel)
 };
 

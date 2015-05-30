@@ -42,17 +42,18 @@ public:
     static void setContentItemObject(SocialContentItem &contentItem, const QVariantMap &properties,
                                      const QVariantMap &metadata);
     static void setContentItemError(SocialContentItem &contentItem,
-                                    SocialNetworkError::type error, const QString &errorMessage, const QString &errorCode);
+                                    SocialNetworkError::type error, const QString &errorMessage,
+                                    const QString &errorCode);
 protected:
     bool build(QNetworkReply::NetworkError error, const QString &errorMessage,
                const QByteArray &data) override;
 private:
-    void setContentItemObject(const QVariantMap &properties, const QVariantMap &metadata);
-    void setObject(SocialObject *object);
+    void setContentItemObject(const QVariantMap &object, const QVariantMap &metadata);
+    void setObject(QVariantMap object);
     SocialNetwork *m_socialNetwork;
     SocialRequest *m_request;
     SocialContentItemBuilder *m_builder;
-    SocialObject *m_object;
+    QVariantMap m_object;
     Q_DECLARE_PUBLIC(SocialContentItem)
 };
 

@@ -2,11 +2,11 @@
 #define SOCIALCONTENTITEM_H
 
 #include <QtCore/QObject>
+#include <QtCore/QVariantMap>
 #include <QtQml/QQmlParserStatus>
 #include "isocialcontent.h"
 
 class SocialNetwork;
-class SocialObject;
 class SocialRequest;
 class SocialContentItemBuilder;
 class SocialContentItemPrivate;
@@ -18,7 +18,7 @@ class SocialContentItem: public QObject, public ISocialContent, public QQmlParse
                NOTIFY socialNetworkChanged)
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
     Q_PROPERTY(SocialContentItemBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
-    Q_PROPERTY(SocialObject * object READ object NOTIFY objectChanged)
+    Q_PROPERTY(QVariantMap object READ object NOTIFY objectChanged)
     Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
     Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
@@ -36,7 +36,7 @@ public:
     void setRequest(SocialRequest *request);
     SocialContentItemBuilder * builder() const;
     void setBuilder(SocialContentItemBuilder * builder);
-    SocialObject * object() const;
+    const QVariantMap & object() const;
     SocialNetworkStatus::type status() const override;
     SocialNetworkError::type error() const override;
     QString errorMessage() const override;

@@ -2,12 +2,10 @@
 #include "socialcontentitem_p.h"
 #include <QtCore/QDebug>
 #include "socialnetwork_p.h"
-#include "socialobject_p.h"
 #include "socialcontentitembuilder_p.h"
 
 SocialContentItemPrivate::SocialContentItemPrivate(SocialContentItem *q)
     : AbstractSocialContentPrivate(q), m_socialNetwork(0), m_request(0), m_builder(0)
-    , m_object(0)
 {
 }
 
@@ -37,28 +35,20 @@ bool SocialContentItemPrivate::build(QNetworkReply::NetworkError error, const QS
     return true;
 }
 
-void SocialContentItemPrivate::setContentItemObject(const QVariantMap &properties,
+void SocialContentItemPrivate::setContentItemObject(const QVariantMap &object,
                                                     const QVariantMap &metadata)
 {
     Q_Q(SocialContentItem);
-    SocialObject *newSocialObject = new SocialObject(q);
-    for (const QString &key : properties.keys()) {
-        const QVariant &value = properties.value(key);
-        SocialObjectPrivate::setProperty(newSocialObject, key.toLocal8Bit(), value);
-    }
-    setObject(newSocialObject);
+    setObject(object);
     setMetadata(metadata);
     setStatus(SocialNetworkStatus::Ready);
     emit q->finished(true);
 }
 
-void SocialContentItemPrivate::setObject(SocialObject *object)
+void SocialContentItemPrivate::setObject(QVariantMap object)
 {
     Q_Q(SocialContentItem);
     if (m_object != object) {
-        if (m_object) {
-            m_object->deleteLater();
-        }
         m_object = object;
         emit q->objectChanged();
     }
@@ -67,8 +57,6 @@ void SocialContentItemPrivate::setObject(SocialObject *object)
 SocialContentItem::SocialContentItem(QObject *parent)
     : QObject(parent), d_ptr(new SocialContentItemPrivate(this))
 {
-    Q_D(SocialContentItem);
-    d->m_object = new SocialObject(this);
 }
 
 SocialContentItem::~SocialContentItem()
@@ -128,7 +116,7 @@ void SocialContentItem::setBuilder(SocialContentItemBuilder *replyParser)
     }
 }
 
-SocialObject *SocialContentItem::object() const
+const QVariantMap & SocialContentItem::object() const
 {
     Q_D(const SocialContentItem);
     return d->m_object;

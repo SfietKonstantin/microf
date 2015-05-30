@@ -41,7 +41,6 @@
 #include "socialcontentmodel.h"
 #include "socialcontentmodelbuilder.h"
 #include "socialnetwork.h"
-#include "socialobject.h"
 #include "socialrequest.h"
 
 static const char *NPM_EXEC = "/usr/bin/npm";
@@ -252,11 +251,8 @@ void TstSocialNetwork::tstSimple()
     QCOMPARE(socialContentItem.status(), SocialNetworkStatus::Ready);
 
     // Check the object
-    SocialObject *object = socialContentItem.object();
-    const QMetaObject *meta = object->metaObject();
-    const QMetaProperty &metaProperty = meta->property(meta->indexOfProperty("text"));
-    QVariant value = metaProperty.read(object);
-    QCOMPARE(value, QVariant("Hello world"));
+    const QVariantMap &object = socialContentItem.object();
+    QCOMPARE(object.value("text"), QVariant("Hello world"));
 }
 
 void TstSocialNetwork::tstError()
@@ -349,21 +345,15 @@ void TstSocialNetwork::tstSimpleList()
     QCOMPARE(socialContentModel.count(), 2);
     QVariant value0 = socialContentModel.data(socialContentModel.index(0),
                                               SocialContentModel::ObjectRole);
-    QObject *object0 = value0.value<QObject *>();
-    const QMetaObject *meta0 = object0->metaObject();
-    const QMetaProperty &meta0Index = meta0->property(meta0->indexOfProperty("id"));
-    QCOMPARE(meta0Index.read(object0), QVariant(0));
-    const QMetaProperty &meta0Text = meta0->property(meta0->indexOfProperty("text"));
-    QCOMPARE(meta0Text.read(object0), QVariant("Entry 0"));
+    QVariantMap object0 = value0.toMap();
+    QCOMPARE(object0.value("id"), QVariant(0));
+    QCOMPARE(object0.value("text"), QVariant("Entry 0"));
 
     QVariant value1 = socialContentModel.data(socialContentModel.index(1),
                                               SocialContentModel::ObjectRole);
-    QObject *object1 = value1.value<QObject *>();
-    const QMetaObject *meta1 = object1->metaObject();
-    const QMetaProperty &meta1Index = meta1->property(meta1->indexOfProperty("id"));
-    QCOMPARE(meta1Index.read(object1), QVariant(1));
-    const QMetaProperty &meta1Text = meta1->property(meta1->indexOfProperty("text"));
-    QCOMPARE(meta1Text.read(object1), QVariant("Entry 1"));
+    QVariantMap object1 = value1.toMap();
+    QCOMPARE(object1.value("id"), QVariant(1));
+    QCOMPARE(object1.value("text"), QVariant("Entry 1"));
 
     QVERIFY(socialContentModel.hasNext());
     QVERIFY(!socialContentModel.hasPrevious());
@@ -385,39 +375,27 @@ void TstSocialNetwork::tstSimpleList()
     QCOMPARE(socialContentModel.count(), 4);
     QVariant newValue0 = socialContentModel.data(socialContentModel.index(0),
                                               SocialContentModel::ObjectRole);
-    QObject *newObject0 = newValue0.value<QObject *>();
-    const QMetaObject *newMeta0 = newObject0->metaObject();
-    const QMetaProperty &newMeta0Index = newMeta0->property(newMeta0->indexOfProperty("id"));
-    QCOMPARE(newMeta0Index.read(newObject0), QVariant(0));
-    const QMetaProperty &newMeta0Text = newMeta0->property(newMeta0->indexOfProperty("text"));
-    QCOMPARE(newMeta0Text.read(newObject0), QVariant("Entry 0"));
+    QVariantMap newObject0 = newValue0.toMap();
+    QCOMPARE(newObject0.value("id"), QVariant(0));
+    QCOMPARE(newObject0.value("text"), QVariant("Entry 0"));
 
     QVariant newValue1 = socialContentModel.data(socialContentModel.index(1),
                                               SocialContentModel::ObjectRole);
-    QObject *newObject1 = newValue1.value<QObject *>();
-    const QMetaObject *newMeta1 = newObject1->metaObject();
-    const QMetaProperty &newMeta1Index = newMeta1->property(newMeta1->indexOfProperty("id"));
-    QCOMPARE(newMeta1Index.read(newObject1), QVariant(1));
-    const QMetaProperty &newMeta1Text = newMeta1->property(newMeta1->indexOfProperty("text"));
-    QCOMPARE(newMeta1Text.read(newObject1), QVariant("Entry 1"));
+    QVariantMap newObject1 = newValue1.toMap();
+    QCOMPARE(newObject1.value("id"), QVariant(1));
+    QCOMPARE(newObject1.value("text"), QVariant("Entry 1"));
 
     QVariant newValue2 = socialContentModel.data(socialContentModel.index(2),
                                               SocialContentModel::ObjectRole);
-    QObject *newObject2 = newValue2.value<QObject *>();
-    const QMetaObject *newMeta2 = newObject2->metaObject();
-    const QMetaProperty &newMeta2Index = newMeta2->property(newMeta2->indexOfProperty("id"));
-    QCOMPARE(newMeta2Index.read(newObject2), QVariant(2));
-    const QMetaProperty &newMeta2Text = newMeta2->property(newMeta2->indexOfProperty("text"));
-    QCOMPARE(newMeta2Text.read(newObject2), QVariant("Entry 2"));
+    QVariantMap newObject2 = newValue2.toMap();
+    QCOMPARE(newObject2.value("id"), QVariant(2));
+    QCOMPARE(newObject2.value("text"), QVariant("Entry 2"));
 
     QVariant newValue3 = socialContentModel.data(socialContentModel.index(3),
                                               SocialContentModel::ObjectRole);
-    QObject *newObject3 = newValue3.value<QObject *>();
-    const QMetaObject *newMeta3 = newObject3->metaObject();
-    const QMetaProperty &newMeta3Index = newMeta3->property(newMeta3->indexOfProperty("id"));
-    QCOMPARE(newMeta3Index.read(newObject3), QVariant(3));
-    const QMetaProperty &newMeta3Text = newMeta3->property(newMeta3->indexOfProperty("text"));
-    QCOMPARE(newMeta3Text.read(newObject3), QVariant("Entry 3"));
+    QVariantMap newObject3 = newValue3.toMap();
+    QCOMPARE(newObject3.value("id"), QVariant(3));
+    QCOMPARE(newObject3.value("text"), QVariant("Entry 3"));
 
     QVERIFY(!socialContentModel.hasNext());
     QVERIFY(!socialContentModel.hasPrevious());

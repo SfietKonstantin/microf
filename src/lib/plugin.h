@@ -33,7 +33,6 @@
 #define PLUGIN_H
 
 #include <QtQml/qqml.h>
-#include "socialobject.h"
 #include "socialcontentitem.h"
 #include "socialcontentmodel.h"
 #include "facebook/facebook.h"
@@ -51,14 +50,12 @@
 
 static const char *ABSTRACT_TYPE = "Abstract type cannot be used";
 static const char *GLOBAL_TYPE = "Global type cannot be used";
-static const char *INTERNAL_TYPE = "Internal type cannot be used";
 
 void registerMicroFTypes(const char *uri)
 {
     qmlRegisterUncreatableType<SocialNetwork>(uri, 1, 0, "SocialNetwork", ABSTRACT_TYPE);
     qmlRegisterUncreatableType<SocialNetworkStatus>(uri, 1, 0, "SocialNetworkStatus", GLOBAL_TYPE);
     qmlRegisterUncreatableType<SocialNetworkError>(uri, 1, 0, "SocialNetworkError", GLOBAL_TYPE);
-    qmlRegisterUncreatableType<SocialObject>(uri, 1, 0, "SocialObject", INTERNAL_TYPE);
     qmlRegisterUncreatableType<SocialRequest>(uri, 1, 0, "SocialRequest", ABSTRACT_TYPE);
     qmlRegisterUncreatableType<SocialContentItemBuilder>(uri, 1, 0, "SocialContentItemBuilder", ABSTRACT_TYPE);
     qmlRegisterUncreatableType<SocialContentModelBuilder>(uri, 1, 0, "SocialContentModelBuilder", ABSTRACT_TYPE);

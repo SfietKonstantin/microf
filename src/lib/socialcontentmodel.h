@@ -37,7 +37,6 @@
 #include "isocialcontent.h"
 
 class SocialNetwork;
-class SocialObject;
 class SocialRequest;
 class SocialContentModelBuilder;
 class SocialContentModelPrivate;
