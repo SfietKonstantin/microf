@@ -18,6 +18,7 @@ class SocialContentItem: public QObject, public ISocialContent, public QQmlParse
                NOTIFY socialNetworkChanged)
     Q_PROPERTY(SocialRequest * request READ request WRITE setRequest NOTIFY requestChanged)
     Q_PROPERTY(SocialContentItemBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
+    Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
     Q_PROPERTY(QVariantMap object READ object NOTIFY objectChanged)
     Q_PROPERTY(SocialNetworkStatus::type status READ status NOTIFY statusChanged)
     Q_PROPERTY(SocialNetworkError::type error READ error NOTIFY errorChanged)
@@ -37,6 +38,7 @@ public:
     SocialContentItemBuilder * builder() const;
     void setBuilder(SocialContentItemBuilder * builder);
     const QVariantMap & object() const;
+    bool isEmpty() const;
     SocialNetworkStatus::type status() const override;
     SocialNetworkError::type error() const override;
     QString errorMessage() const override;
@@ -48,6 +50,7 @@ Q_SIGNALS:
     void requestChanged();
     void builderChanged();
     void objectChanged();
+    void emptyChanged();
     void statusChanged() override;
     void errorChanged() override;
     void errorMessageChanged() override;

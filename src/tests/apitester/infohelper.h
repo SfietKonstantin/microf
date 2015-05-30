@@ -34,18 +34,19 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
+#include <QtCore/QVariantMap>
 
 class InfoHelper: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QObject * object READ object WRITE setObject NOTIFY objectChanged)
+    Q_PROPERTY(QVariantMap object READ object WRITE setObject NOTIFY objectChanged)
     Q_PROPERTY(QString text READ text NOTIFY textChanged)
     Q_PROPERTY(QStringList urls READ urls NOTIFY urlsChanged)
 public:
     explicit InfoHelper(QObject *parent = 0);
     ~InfoHelper();
-    QObject * object() const;
-    void setObject(QObject *object);
+    const QVariantMap & object() const;
+    void setObject(const QVariantMap &object);
     QString text() const;
     QStringList urls() const;
 public slots:
@@ -56,7 +57,7 @@ signals:
     void urlsChanged();
 private:
     void generateText();
-    QObject * m_object;
+    QVariantMap m_object;
     QString m_text;
     QStringList m_urls;
 };

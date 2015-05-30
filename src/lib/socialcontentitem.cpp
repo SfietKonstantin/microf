@@ -49,8 +49,12 @@ void SocialContentItemPrivate::setObject(QVariantMap object)
 {
     Q_Q(SocialContentItem);
     if (m_object != object) {
+        bool isEmpty = m_object.isEmpty();
         m_object = object;
         emit q->objectChanged();
+        if (isEmpty != object.isEmpty()) {
+            emit q->emptyChanged();
+        }
     }
 }
 
@@ -120,6 +124,12 @@ const QVariantMap & SocialContentItem::object() const
 {
     Q_D(const SocialContentItem);
     return d->m_object;
+}
+
+bool SocialContentItem::isEmpty() const
+{
+    Q_D(const SocialContentItem);
+    return d->m_object.isEmpty();
 }
 
 SocialNetworkStatus::type SocialContentItem::status() const

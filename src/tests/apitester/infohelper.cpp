@@ -42,12 +42,12 @@ InfoHelper::~InfoHelper()
 {
 }
 
-QObject * InfoHelper::object() const
+const QVariantMap & InfoHelper::object() const
 {
     return m_object;
 }
 
-void InfoHelper::setObject(QObject *object)
+void InfoHelper::setObject(const QVariantMap &object)
 {
     if (m_object != object) {
         m_object = object;
@@ -73,19 +73,15 @@ void InfoHelper::refresh()
 
 void InfoHelper::generateText()
 {
-    if (!m_object) {
+    if (m_object.isEmpty()) {
         return;
     }
-    const QMetaObject *meta = m_object->metaObject();
-    int offset = meta->propertyOffset();
-    int count = meta->propertyCount();
 
     QString text;
     QStringList urls;
-    for (int i = offset; i < count; ++i) {
-        const QMetaProperty &metaProperty = meta->property(i);
-        QString value = metaProperty.read(m_object).toString();
-        text.append(QString("<p><b>%1</b>: %2</p>").arg(metaProperty.name(), value));
+    for (const QString &key : m_object.keys()) {
+        QString value = m_object.value(key).toString();
+        text.append(QString("<p><b>%1</b>: %2</p>").arg(key, value));
         QUrl url (value, QUrl::StrictMode);
         if (url.isValid() && url.scheme().startsWith("http")) {
             urls.append(value);
