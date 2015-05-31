@@ -220,7 +220,7 @@ QVariant SocialContentModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case ObjectRole:
-        return QVariant::fromValue(d->m_data.value(row));
+        return d->m_data.value(row);
         break;
     default:
         return QVariant();

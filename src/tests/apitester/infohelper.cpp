@@ -31,6 +31,7 @@
 
 #include "infohelper.h"
 #include <QtCore/QMetaProperty>
+#include <QtCore/QTextStream>
 #include <QtCore/QUrl>
 
 InfoHelper::InfoHelper(QObject *parent)
@@ -71,6 +72,12 @@ void InfoHelper::refresh()
     generateText();
 }
 
+static bool isUrl(const QString &valueString)
+{
+    QUrl url (valueString, QUrl::StrictMode);
+    return (url.isValid() && url.scheme().startsWith("http"));
+}
+
 void InfoHelper::generateText()
 {
     if (m_object.isEmpty()) {
@@ -80,11 +87,32 @@ void InfoHelper::generateText()
     QString text;
     QStringList urls;
     for (const QString &key : m_object.keys()) {
-        QString value = m_object.value(key).toString();
-        text.append(QString("<p><b>%1</b>: %2</p>").arg(key, value));
-        QUrl url (value, QUrl::StrictMode);
-        if (url.isValid() && url.scheme().startsWith("http")) {
-            urls.append(value);
+        const QVariant &value = m_object.value(key);
+        QString valueString;
+        if (static_cast<QMetaType::Type>(value.type()) == QMetaType::QVariantList) {
+            QTextStream ss (&valueString);
+            ss << "<ol>";
+            for (const QVariant &variant : value.toList()) {
+                const QVariantMap &variantMap = variant.toMap();
+                ss << "<li><ul>";
+                for (const QString &key : variantMap.keys()) {
+                    QString variantMapValue = variantMap.value(key).toString();
+                    ss << "<li>"
+                       << "<b>" << key << "</b>: " << variantMapValue
+                       << "</li>";
+                    if (isUrl(variantMapValue)) {
+                        urls.append(variantMapValue);
+                    }
+                }
+                ss << "</ul></li>";
+            }
+            ss << "</ol>";
+        } else {
+            valueString = value.toString();
+        }
+        text.append(QString("<p><b>%1</b>: %2</p>").arg(key, valueString));
+        if (isUrl(valueString)) {
+            urls.append(valueString);
         }
     }
 

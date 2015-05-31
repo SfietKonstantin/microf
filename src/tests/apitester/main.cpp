@@ -29,6 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
+#include <QtCore/QRegularExpression>
 #include <QtWidgets/QApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/qqml.h>
@@ -40,6 +41,59 @@
 #include "customfacebookrequest.h"
 #include "customfacebookrequest.h"
 #include "buildershelpermodel.h"
+
+template<class T> void appendPropertyToBuilder(T *builder, const QString &path, const QString &name)
+{
+    QQmlListProperty<FacebookProperty> properties = builder->properties();
+    FacebookProperty *property = new FacebookProperty(builder);
+    property->setPath(path);
+    property->setName(name);
+    properties.append(&properties, property);
+}
+
+static void appendProperty(FacebookItemBuilder *itemBuilder,
+                           AbstractFacebookModelBuilder *modelBuilder,
+                           const QString &path, const QString &name)
+{
+    if (itemBuilder) {
+        appendPropertyToBuilder(itemBuilder, path, name);
+    }
+    if (modelBuilder) {
+        appendPropertyToBuilder(modelBuilder, path, name);
+    }
+}
+
+template<class T> void appendListPropertyToBuilder(T *builder, const QString &path,
+                                                   const QString &name,
+                                                   const QMap<QString, QString> &mapping)
+{
+    QQmlListProperty<FacebookProperty> properties = builder->properties();
+    FacebookListProperty *property = new FacebookListProperty(builder);
+    property->setPath(path);
+    property->setName(name);
+
+    QQmlListProperty<FacebookProperty> listProperties = property->properties();
+    for (const QString &path : mapping.keys()) {
+        FacebookProperty *listProperty = new FacebookProperty();
+        listProperty->setName(mapping.value(path));
+        listProperty->setPath(path);
+        listProperties.append(&listProperties, listProperty);
+    }
+    properties.append(&properties, property);
+}
+
+static void appendListProperty(FacebookItemBuilder *itemBuilder,
+                               AbstractFacebookModelBuilder *modelBuilder,
+                               const QString &path, const QString &name,
+                               const QMap<QString, QString> &mapping)
+{
+    if (itemBuilder) {
+        appendListPropertyToBuilder(itemBuilder, path, name, mapping);
+    }
+    if (modelBuilder) {
+        appendListPropertyToBuilder(modelBuilder, path, name, mapping);
+    }
+}
 
 class Helper: public QObject
 {
@@ -60,25 +114,54 @@ public slots:
         }
 
         QStringList splitted = properties.trimmed().split("\n");
+
+        QRegularExpression mainRegExp ("^([a-zA-Z_/]+)(\\[[a-zA-Z_/:,]+\\])?:([a-zA-Z_]+)$");
+        QRegularExpression listRegExp ("^([a-zA-Z_/]+):([a-zA-Z_]+)$");
+
         for (const QString &line : splitted) {
-            QStringList splittedLine = line.split(":");
-            if (splittedLine.count() == 2) {
-                const QString &path = splittedLine.at(0).trimmed();
-                const QString &name = splittedLine.at(1).trimmed();
-                if (itemBuilder) {
-                    QQmlListProperty<FacebookProperty> properties = itemBuilder->properties();
-                    FacebookProperty *object = new FacebookProperty(itemBuilder);
-                    object->setPath(path);
-                    object->setName(name);
-                    properties.append(&properties, object);
+            QRegularExpressionMatch match = mainRegExp.match(line.trimmed());
+            if (!match.isValid()) {
+                continue;
+            }
+
+            QStringList captured = match.capturedTexts();
+            QString path;
+            QString listMapping;
+            QString name;
+            if (captured.count() == 3) {
+                path = captured.at(1);
+                name = captured.at(2);
+            } else if (captured.count() == 4) {
+                path = captured.at(1);
+                listMapping = captured.at(2);
+                name = captured.at(3);
+            } else {
+                continue;
+            }
+
+            if (path.isEmpty() || name.isEmpty()) {
+                continue;
+            }
+
+            if (listMapping.isEmpty()) {
+                appendProperty(itemBuilder, modelBuilder, path, name);
+            } else {
+                QMap<QString, QString> mapping;
+                QStringList listSplitted = listMapping.remove('[').remove(']').split(",");
+                for (const QString &entry : listSplitted) {
+                    QRegularExpressionMatch listMatch = listRegExp.match(entry.trimmed());
+                    QString listPath = listMatch.captured(1);
+                    QString listName = listMatch.captured(2);
+
+                    if (!listPath.isEmpty() && !listName.isEmpty()) {
+                        mapping.insert(listPath, listName);
+                    }
                 }
-                if (modelBuilder) {
-                    QQmlListProperty<FacebookProperty> properties = modelBuilder->properties();
-                    FacebookProperty *object = new FacebookProperty(modelBuilder);
-                    object->setPath(path);
-                    object->setName(name);
-                    properties.append(&properties, object);
+                if (mapping.isEmpty()) {
+                    continue;
                 }
+
+                appendListProperty(itemBuilder, modelBuilder, path, name, mapping);
             }
         }
     }
