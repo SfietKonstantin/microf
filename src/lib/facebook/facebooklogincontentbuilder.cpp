@@ -101,7 +101,7 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
 
     properties.insert(ACCESS_TOKEN_KEY, accessToken.toString());
     if (uid.isDouble()) {
-        properties.insert(UID_KEY, QString::number(uid.toInt()));
+        properties.insert(UID_KEY, QString::number(uid.toVariant().toInt()));
     } else if (uid.isString()) {
         properties.insert(UID_KEY, uid.toString());
     }

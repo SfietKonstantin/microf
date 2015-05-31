@@ -34,6 +34,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QLocale>
+#include <QtCore/QStringList>
 #include "facebookproperty_p.h"
 #include "facebooklistproperty.h"
 
@@ -85,7 +86,7 @@ QJsonObject FacebookPrivate::checkError(QNetworkReply::NetworkError error, const
 
         outError = SocialNetworkError::SocialNetwork;
         outErrorMessage = error.value(ERROR_MESSAGE_KEY).toString();
-        outErrorCode = QString::number(error.value(ERROR_CODE_KEY).toInt());
+        outErrorCode = QString::number(error.value(ERROR_CODE_KEY).toVariant().toInt());
         return QJsonObject();
     }
 

@@ -66,28 +66,28 @@ QJsonObject FacebookNewsFeedRequest::queryParameters(const Facebook &facebook, S
     QString timestamp = QString::number(QDateTime::currentMSecsSinceEpoch() / 1000);
     QString uuid = QUuid::createUuid().toString().remove("{").remove("}");
     returned.insert("0", QString("%1_%2_%3").arg(facebook.userId(), timestamp, uuid));
-    returned.insert("1", "{is_charging:\"false\",battery_level:100}"); // Battery level
-    returned.insert("2", "GOOD"); // Signal strength
-    returned.insert("3", ""); // Device id ???
+    returned.insert("1", QString("{is_charging:\"false\",battery_level:100}")); // Battery level
+    returned.insert("2", QString("GOOD")); // Signal strength
+    returned.insert("3", QString("")); // Device id ???
     returned.insert("5", QJsonArray()); // ???
-    returned.insert("6", "auto"); // ???
-    returned.insert("7", "top_stories");
+    returned.insert("6", QString("auto")); // ???
+    returned.insert("7", QString("top_stories"));
     if (mode == LoadNext) {
         returned.insert("9", metadata.value("endCursor").toString());
     }
 
     returned.insert("10", 10); // ???
     returned.insert("11", 160);
-    returned.insert("12", "image/jpeg");
+    returned.insert("12", QString("image/jpeg"));
     returned.insert("13", 540);
     returned.insert("14", 1080);
     returned.insert("15", 1080);
     returned.insert("16", 559); // ???
     returned.insert("17", 2048);
-    returned.insert("18", "contain-fit");
-    returned.insert("19", "false"); // ???
+    returned.insert("18", QString("contain-fit"));
+    returned.insert("19", QString("false")); // ???
 
-    returned.insert("20", "true"); // ???
+    returned.insert("20", QString("true")); // ???
 
 
 
@@ -100,11 +100,11 @@ QJsonObject FacebookNewsFeedRequest::queryParameters(const Facebook &facebook, S
 
     returned.insert("30", 120);
 
-    returned.insert("32", "image/x-auto");
+    returned.insert("32", QString("image/x-auto"));
     returned.insert("33", 480);
-    returned.insert("34", "image/x-auto");
-    returned.insert("35", "true"); // ???
-    returned.insert("36", "2"); // ???
+    returned.insert("34", QString("image/x-auto"));
+    returned.insert("35", QString("true")); // ???
+    returned.insert("36", QString("2")); // ???
     returned.insert("37", 480);
     returned.insert("38", 1080);
     returned.insert("39", 540);
@@ -114,11 +114,11 @@ QJsonObject FacebookNewsFeedRequest::queryParameters(const Facebook &facebook, S
     returned.insert("42", 60); // Small number: ???
 
     returned.insert("44", 160);
-    returned.insert("45", "feed");
-    returned.insert("46", "ANDROID_STORY");
-    returned.insert("47", "PRODUCTION");
-    returned.insert("48", "false"); // ???
-    returned.insert("49", "true"); // ???
+    returned.insert("45", QString("feed"));
+    returned.insert("46", QString("ANDROID_STORY"));
+    returned.insert("47", QString("PRODUCTION"));
+    returned.insert("48", QString("false")); // ???
+    returned.insert("49", QString("true")); // ???
 
 
     returned.insert("51", 320);

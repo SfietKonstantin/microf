@@ -93,17 +93,17 @@ QJsonObject FacebookUserSummaryRequest::queryParameters(const Facebook &facebook
     Q_UNUSED(metadata);
     QJsonObject returned;
     returned.insert("0", d->userId);
-    returned.insert("1", "1080"); // Some image size
-    returned.insert("2", "image/jpeg");
-    returned.insert("3", "640"); // Some image size
-    returned.insert("4", "2"); // ??? Some type ?
-    returned.insert("5", "80"); // ???
-    returned.insert("6", "image/x-auto");
-    returned.insert("9", "false"); // ???
-    returned.insert("10", "180"); // ???
-    returned.insert("11", "240");
-    returned.insert("12", "180");
-    returned.insert("14", "ANDROID_TIMELINE");
+    returned.insert("1", QString("1080")); // Some image size
+    returned.insert("2", QString("image/jpeg"));
+    returned.insert("3", QString("640")); // Some image size
+    returned.insert("4", QString("2")); // ??? Some type ?
+    returned.insert("5", QString("80")); // ???
+    returned.insert("6", QString("image/x-auto"));
+    returned.insert("9", QString("false")); // ???
+    returned.insert("10", QString("180")); // ???
+    returned.insert("11", QString("240"));
+    returned.insert("12", QString("180"));
+    returned.insert("14", QString("ANDROID_TIMELINE"));
     return returned;
 }
 

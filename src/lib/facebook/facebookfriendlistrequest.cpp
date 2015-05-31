@@ -124,7 +124,7 @@ QJsonObject FacebookFriendListRequest::queryParameters(const Facebook &facebook,
     Q_UNUSED(facebook);
     QJsonObject returned;
     returned.insert("0", d->userId);
-    returned.insert("1", ""); // ??? Maybe for startCursor ?
+    returned.insert("1", QString("")); // ??? Maybe for startCursor ?
     if (mode == LoadNext) {
         returned.insert("2", metadata.value("endCursor").toString());
     }
