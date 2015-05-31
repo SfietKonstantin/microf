@@ -46,11 +46,11 @@ class CustomFacebookRequest : public AbstractFacebookRequest
                NOTIFY queryParametersJsonChanged)
 public:
     explicit CustomFacebookRequest(QObject *parent = 0);
-    QString queryId() const override;
+    QString queryId() const Q_DECL_OVERRIDE;
     void setQueryId(const QString &queryId);
-    QString requestName() const override;
+    QString requestName() const Q_DECL_OVERRIDE;
     void setRequestName(const QString &requestName);
-    QString apiCallerClass() const override;
+    QString apiCallerClass() const Q_DECL_OVERRIDE;
     void setApiCallerClass(const QString &apiCallerClass);
     QString queryParametersJson() const;
     void setQueryParametersJson(const QString &queryParametersJson);
@@ -62,7 +62,7 @@ signals:
 
 protected:
     QJsonObject queryParameters(const Facebook &facebook, Mode mode,
-                                const QVariantMap &metadata) const override;
+                                const QVariantMap &metadata) const Q_DECL_OVERRIDE;
 private:
     Q_DECLARE_PRIVATE(CustomFacebookRequest)
 };

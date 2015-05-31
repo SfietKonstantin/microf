@@ -29,8 +29,8 @@ class SocialContentItem: public QObject, public ISocialContent, public QQmlParse
 public:
     explicit SocialContentItem(QObject *parent = 0);
     virtual ~SocialContentItem();
-    void classBegin() override;
-    void componentComplete() override;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
     SocialNetwork * socialNetwork() const;
     void setSocialNetwork(SocialNetwork *socialNetwork);
     SocialRequest * request() const;
@@ -39,10 +39,10 @@ public:
     void setBuilder(SocialContentItemBuilder * builder);
     const QVariantMap & object() const;
     bool isEmpty() const;
-    SocialNetworkStatus::type status() const override;
-    SocialNetworkError::type error() const override;
-    QString errorMessage() const override;
-    QString errorCode() const override;
+    SocialNetworkStatus::type status() const Q_DECL_OVERRIDE;
+    SocialNetworkError::type error() const Q_DECL_OVERRIDE;
+    QString errorMessage() const Q_DECL_OVERRIDE;
+    QString errorCode() const Q_DECL_OVERRIDE;
 public Q_SLOTS:
     bool load();
 Q_SIGNALS:
@@ -51,11 +51,11 @@ Q_SIGNALS:
     void builderChanged();
     void objectChanged();
     void emptyChanged();
-    void statusChanged() override;
-    void errorChanged() override;
-    void errorMessageChanged() override;
-    void errorCodeChanged() override;
-    void finished(bool ok) override;
+    void statusChanged() Q_DECL_OVERRIDE;
+    void errorChanged() Q_DECL_OVERRIDE;
+    void errorMessageChanged() Q_DECL_OVERRIDE;
+    void errorCodeChanged() Q_DECL_OVERRIDE;
+    void finished(bool ok) Q_DECL_OVERRIDE;
 protected:
     QScopedPointer<SocialContentItemPrivate> d_ptr;
 private:

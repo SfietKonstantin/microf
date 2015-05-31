@@ -75,7 +75,7 @@ public:
 protected:
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
                                   const QByteArray &postData, Mode mode,
-                                  const QVariantMap &metadata) const override
+                                  const QVariantMap &metadata) const Q_DECL_OVERRIDE
     {
         Q_UNUSED(socialNetwork);
         Q_UNUSED(postData);
@@ -87,7 +87,7 @@ protected:
         return request;
     }
     QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                              const QVariantMap &metadata) const override
+                              const QVariantMap &metadata) const Q_DECL_OVERRIDE
     {
         Q_UNUSED(socialNetwork);
         Q_UNUSED(mode);
@@ -114,7 +114,7 @@ public:
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) override
+               const QVariantMap &metadata) Q_DECL_OVERRIDE
     {
         Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {
@@ -142,7 +142,7 @@ public:
 protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) override
+               const QVariantMap &metadata) Q_DECL_OVERRIDE
     {
         Q_UNUSED(metadata);
         if (error != QNetworkReply::NoError) {

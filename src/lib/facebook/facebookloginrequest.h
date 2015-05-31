@@ -61,9 +61,9 @@ Q_SIGNALS:
 protected:
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
                                   const QByteArray &postData, Mode mode,
-                                  const QVariantMap &metadata) const override;
+                                  const QVariantMap &metadata) const Q_DECL_OVERRIDE;
     QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                              const QVariantMap &metadata) const override;
+                              const QVariantMap &metadata) const Q_DECL_OVERRIDE;
 private:
     Q_DECLARE_PRIVATE(FacebookLoginRequest)
 };

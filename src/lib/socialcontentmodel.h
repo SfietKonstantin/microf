@@ -61,11 +61,11 @@ public:
     };
     explicit SocialContentModel(QObject *parent = 0);
     virtual ~SocialContentModel();
-    QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
-    void classBegin() override;
-    void componentComplete() override;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
     int count() const;
     bool hasNext() const;
     bool hasPrevious() const;
@@ -75,10 +75,10 @@ public:
     void setRequest(SocialRequest *request);
     SocialContentModelBuilder * builder() const;
     void setBuilder(SocialContentModelBuilder * builder);
-    SocialNetworkStatus::type status() const override;
-    SocialNetworkError::type error() const override;
-    QString errorMessage() const override;
-    QString errorCode() const override;
+    SocialNetworkStatus::type status() const Q_DECL_OVERRIDE;
+    SocialNetworkError::type error() const Q_DECL_OVERRIDE;
+    QString errorMessage() const Q_DECL_OVERRIDE;
+    QString errorCode() const Q_DECL_OVERRIDE;
 public Q_SLOTS:
     bool load();
     bool loadNext();
@@ -90,11 +90,11 @@ Q_SIGNALS:
     void socialNetworkChanged();
     void requestChanged();
     void builderChanged();
-    void statusChanged() override;
-    void errorChanged() override;
-    void errorMessageChanged() override;
-    void errorCodeChanged() override;
-    void finished(bool ok) override;
+    void statusChanged() Q_DECL_OVERRIDE;
+    void errorChanged() Q_DECL_OVERRIDE;
+    void errorMessageChanged() Q_DECL_OVERRIDE;
+    void errorCodeChanged() Q_DECL_OVERRIDE;
+    void finished(bool ok) Q_DECL_OVERRIDE;
 protected:
     QScopedPointer<SocialContentModelPrivate> d_ptr;
 private:

@@ -45,8 +45,8 @@ class SocialContentItemBuilder : public QObject, public QQmlParserStatus
     Q_INTERFACES(QQmlParserStatus)
 public:
     virtual ~SocialContentItemBuilder();
-    void classBegin() override;
-    void componentComplete() override;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
 protected:
     explicit SocialContentItemBuilder(QObject *parent = 0);
     explicit SocialContentItemBuilder(SocialContentItemBuilderPrivate &dd, QObject *parent = 0);

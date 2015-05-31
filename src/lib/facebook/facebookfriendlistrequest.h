@@ -56,12 +56,12 @@ Q_SIGNALS:
     void profilePictureSizeChanged();
 protected:
     QVariantMap createMetadata(const SocialNetwork &socialNetwork, Mode mode,
-                               const QVariantMap &metadata) const override;
-    QString queryId() const override;
+                               const QVariantMap &metadata) const Q_DECL_OVERRIDE;
+    QString queryId() const Q_DECL_OVERRIDE;
     QJsonObject queryParameters(const Facebook &facebook, Mode mode,
-                                const QVariantMap &metadata) const override;
-    QString requestName() const override;
-    QString apiCallerClass() const override;
+                                const QVariantMap &metadata) const Q_DECL_OVERRIDE;
+    QString requestName() const Q_DECL_OVERRIDE;
+    QString apiCallerClass() const Q_DECL_OVERRIDE;
 private:
     Q_DECLARE_PRIVATE(FacebookFriendListRequest)
 };

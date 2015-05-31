@@ -54,8 +54,8 @@ public:
         LoadPrevious
     };
     virtual ~SocialRequest();
-    void classBegin() override;
-    void componentComplete() override;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
     virtual Type type() const = 0;
 protected:
     explicit SocialRequest(QObject *parent = 0);

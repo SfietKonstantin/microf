@@ -45,8 +45,8 @@ class FacebookProperty : public QObject, public QQmlParserStatus
 public:
     explicit FacebookProperty(QObject *parent = 0);
     virtual ~FacebookProperty();
-    void classBegin() override;
-    void componentComplete() override;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
     QString path() const;
     void setPath(const QString &path);
     QString name() const;

@@ -45,8 +45,8 @@ class SocialNetwork : public QObject, public QQmlParserStatus
 public:
     explicit SocialNetwork(QObject *parent = 0);
     virtual ~SocialNetwork();
-    void classBegin() override;
-    void componentComplete() override;
+    void classBegin() Q_DECL_OVERRIDE;
+    void componentComplete() Q_DECL_OVERRIDE;
 protected:
     explicit SocialNetwork(SocialNetworkPrivate &dd, QObject *parent = 0);
     QScopedPointer<SocialNetworkPrivate> d_ptr;

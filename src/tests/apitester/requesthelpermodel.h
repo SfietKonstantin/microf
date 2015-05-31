@@ -54,9 +54,9 @@ public:
     };
     explicit RequestHelperModel(QObject *parent = 0);
     virtual ~RequestHelperModel();
-    QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
     int count() const;
     Q_INVOKABLE SocialRequest * request(int index) const;
     Q_INVOKABLE Type type(int index) const;

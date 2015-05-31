@@ -41,7 +41,7 @@ public:
 protected:
     void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) override;
+               const QVariantMap &metadata) Q_DECL_OVERRIDE;
 private:
     Q_DECLARE_PRIVATE(AbstractFacebookModelBuilder)
 };

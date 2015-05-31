@@ -50,7 +50,7 @@ public:
                                      const QString &errorCode);
 protected:
     bool build(QNetworkReply::NetworkError error, const QString &errorMessage,
-               const QByteArray &data) override;
+               const QByteArray &data) Q_DECL_OVERRIDE;
 private:
     bool load(SocialRequest::Mode mode);
     void setContentModelData(const QList<QVariantMap> &data, bool hasNext, bool hasPrevious,

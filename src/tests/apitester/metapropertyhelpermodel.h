@@ -58,9 +58,9 @@ public:
     };
     explicit MetaPropertyHelperModel(QObject *parent = 0);
     virtual ~MetaPropertyHelperModel();
-    QHash<int, QByteArray> roleNames() const override;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const Q_DECL_OVERRIDE;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
+    QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
     int count() const;
     QObject * object() const;
     void setObject(QObject *object);

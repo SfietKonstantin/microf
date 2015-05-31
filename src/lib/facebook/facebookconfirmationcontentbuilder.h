@@ -42,7 +42,7 @@ public:
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) override;
+               const QVariantMap &metadata) Q_DECL_OVERRIDE;
 };
 
 #endif // FACEBOOKCONFIRMATIONCONTENTBUILDER_H

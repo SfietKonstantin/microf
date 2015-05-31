@@ -48,7 +48,7 @@ public:
     ~FacebookItemBuilder();
     void build(SocialContentItem &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) override;
+               const QVariantMap &metadata) Q_DECL_OVERRIDE;
     QQmlListProperty<FacebookProperty> properties();
     bool includeRawData() const;
     void setIncludeRawData(bool includeRawData);

@@ -39,14 +39,14 @@ class AbstractFacebookRequest : public SocialRequest
 {
     Q_OBJECT
 public:
-    Type type() const override;
+    Type type() const Q_DECL_OVERRIDE;
 protected:
     explicit AbstractFacebookRequest(SocialRequestPrivate &dd, QObject *parent = 0);
     QNetworkRequest createRequest(const SocialNetwork &socialNetwork,
                                   const QByteArray &postData, Mode mode,
-                                  const QVariantMap &metadata) const override;
+                                  const QVariantMap &metadata) const Q_DECL_OVERRIDE;
     QByteArray createPostData(const SocialNetwork &socialNetwork, Mode mode,
-                              const QVariantMap &metadata) const override;
+                              const QVariantMap &metadata) const Q_DECL_OVERRIDE;
     virtual QString queryId() const = 0;
     virtual QJsonObject queryParameters(const Facebook &facebook, Mode mode,
                                         const QVariantMap &metadata) const = 0;
