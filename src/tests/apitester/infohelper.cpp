@@ -96,12 +96,24 @@ void InfoHelper::generateText()
                 const QVariantMap &variantMap = variant.toMap();
                 ss << "<li><ul>";
                 for (const QString &key : variantMap.keys()) {
-                    QString variantMapValue = variantMap.value(key).toString();
+                    const QVariant &variantMapValue = variantMap.value(key);
+                    QString variantMapValueString;
+                    if (static_cast<QMetaType::Type>(variantMapValue.type()) == QMetaType::QVariantList) {
+                        const QVariantList &list = variantMapValue.toList();
+                        QTextStream ss (&variantMapValueString);
+                        ss << "<ul>";
+                        for (const QVariant &entry : list)  {
+                            ss << "<li>" << entry.toString() << "</li>";
+                        }
+                        ss << "</ul>";
+                    } else {
+                        variantMapValueString  = variantMapValue.toString();
+                    }
                     ss << "<li>"
-                       << "<b>" << key << "</b>: " << variantMapValue
+                       << "<b>" << key << "</b>: " << variantMapValueString
                        << "</li>";
-                    if (isUrl(variantMapValue)) {
-                        urls.append(variantMapValue);
+                    if (isUrl(variantMapValueString)) {
+                        urls.append(variantMapValueString);
                     }
                 }
                 ss << "</ul></li>";

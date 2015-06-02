@@ -62,10 +62,30 @@ QJsonArray FacebookPropertyPrivate::arrayFromPath(const QJsonObject &object, con
 QVariant FacebookPropertyPrivate::propertyFromPath(const QJsonObject &object, const QString &path)
 {
     const QJsonValue &currentValue = valueFromPath(object, path);
-    if (!currentValue.isBool() && currentValue.isDouble() && currentValue.isString()) {
+    if (currentValue.isArray()) {
+        const QJsonArray &currentValueArray = currentValue.toArray();
+        if (!isCorrectArray(currentValueArray)) {
+            return QVariant();
+        } else {
+            return currentValueArray;
+        }
+    }
+    if (!currentValue.isBool() && !currentValue.isDouble() && !currentValue.isString()) {
         return QVariant();
     }
     return currentValue.toVariant();
+}
+
+bool FacebookPropertyPrivate::isCorrectArray(const QJsonArray &array)
+{
+    bool ok = true;
+    for (const QJsonValue &value : array) {
+        if (value.isObject() || value.isUndefined()) {
+            ok = false;
+            break;
+        }
+    }
+    return ok;
 }
 
 FacebookProperty::FacebookProperty(QObject *parent)

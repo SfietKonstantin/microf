@@ -46,6 +46,7 @@ public:
 protected:
     FacebookProperty * const q_ptr;
 private:
+    static bool isCorrectArray(const QJsonArray &array);
     Q_DECLARE_PUBLIC(FacebookProperty)
     QString path;
     QString name;
