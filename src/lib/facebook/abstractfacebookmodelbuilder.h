@@ -41,17 +41,9 @@ class AbstractFacebookModelBuilder : public SocialContentModelBuilder
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
-    Q_PROPERTY(bool includeRawData READ includeRawData WRITE setIncludeRawData NOTIFY includeRawDataChanged)
-    Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
 public:
     ~AbstractFacebookModelBuilder();
     QQmlListProperty<FacebookProperty> properties();
-    bool includeRawData() const;
-    void setIncludeRawData(bool includeRawData);
-    QString rawData() const;
-Q_SIGNALS:
-    void includeRawDataChanged();
-    void rawDataChanged();
 protected:
     explicit AbstractFacebookModelBuilder(AbstractFacebookModelBuilderPrivate &dd, QObject *parent = 0);
 private:

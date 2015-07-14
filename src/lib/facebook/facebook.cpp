@@ -107,7 +107,7 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
     // First check metadata
     const QJsonObject &root = checkError(error, errorMessage, data, outError, outErrorMessage,
                                          outErrorCode);
-    if (outError != SocialNetworkError::No) {
+    if (outError != SocialNetworkError::None) {
         return QJsonObject();
     }
 

@@ -45,17 +45,14 @@ public:
     static int properties_count(QQmlListProperty<FacebookProperty> *list);
     static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
     static void properties_clear(QQmlListProperty<FacebookProperty> *list);
-    void setRawData(const QString &rawData);
 private:
     void clear();
     QList<FacebookProperty *> m_properties;
-    bool m_includeRawData;
-    QString m_rawData;
     Q_DECLARE_PUBLIC(FacebookItemBuilder)
 };
 
 FacebookItemBuilderPrivate::FacebookItemBuilderPrivate(FacebookItemBuilder *q)
-    : SocialContentItemBuilderPrivate(q), m_includeRawData(false)
+    : SocialContentItemBuilderPrivate(q)
 {
 }
 
@@ -102,15 +99,6 @@ void FacebookItemBuilderPrivate::properties_clear(QQmlListProperty<FacebookPrope
     builder->d_func()->clear();
 }
 
-void FacebookItemBuilderPrivate::setRawData(const QString &rawData)
-{
-    Q_Q(FacebookItemBuilder);
-    if (m_rawData != rawData) {
-        m_rawData = rawData;
-        emit q->rawDataChanged();
-    }
-}
-
 void FacebookItemBuilderPrivate::clear()
 {
     qDeleteAll(m_properties);
@@ -133,20 +121,15 @@ void FacebookItemBuilder::build(SocialContentItem &contentItem,
                                  const QByteArray &data, const QVariantMap &metadata)
 {
     Q_D(FacebookItemBuilder);
-    SocialNetworkError::type outError = SocialNetworkError::No;
+    SocialNetworkError::type outError = SocialNetworkError::None;
     QString outErrorMessage;
     QString outErrorCode;
 
     QJsonObject root = FacebookPrivate::prebuild(error, errorMessage, data, metadata,
                                                  outError, outErrorMessage, outErrorCode);
-    if (outError != SocialNetworkError::No) {
+    if (outError != SocialNetworkError::None) {
         setError(contentItem, outError, outErrorMessage, outErrorCode);
         return;
-    }
-
-    if (d->m_includeRawData) {
-        QJsonDocument document = QJsonDocument::fromJson(data);
-        d->setRawData(document.toJson(QJsonDocument::Indented));
     }
 
     root.remove("__type__");
@@ -168,25 +151,4 @@ QQmlListProperty<FacebookProperty> FacebookItemBuilder::properties()
                                               &FacebookItemBuilderPrivate::properties_count,
                                               &FacebookItemBuilderPrivate::properties_at,
                                               &FacebookItemBuilderPrivate::properties_clear);
-}
-
-bool FacebookItemBuilder::includeRawData() const
-{
-    Q_D(const FacebookItemBuilder);
-    return d->m_includeRawData;
-}
-
-void FacebookItemBuilder::setIncludeRawData(bool includeRawData)
-{
-    Q_D(FacebookItemBuilder);
-    if (d->m_includeRawData != includeRawData) {
-        d->m_includeRawData = includeRawData;
-        emit includeRawDataChanged();
-    }
-}
-
-QString FacebookItemBuilder::rawData() const
-{
-    Q_D(const FacebookItemBuilder);
-    return d->m_rawData;
 }

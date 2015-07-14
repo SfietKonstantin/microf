@@ -38,7 +38,7 @@
 #include <QtCore/QDebug>
 
 AbstractSocialContentPrivate::AbstractSocialContentPrivate(ISocialContent *q)
-    : q_ptr(q), status(SocialNetworkStatus::Null) , error(SocialNetworkError::No)
+    : q_ptr(q), status(SocialNetworkStatus::Null) , error(SocialNetworkError::None)
 {
 }
 

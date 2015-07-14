@@ -29,28 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKITEMBUILDER_H
-#define FACEBOOKITEMBUILDER_H
+#include "facebookmodelrawdataproxybuilder.h"
+#include <QtCore/QJsonDocument>
+#include "facebook/abstractfacebookmodelbuilder.h"
+#include "facebook/facebookitembuilder.h"
+#include "socialcontentmodelbuilder_p.h"
 
-#include <QtQml/QQmlListProperty>
-#include "socialcontentitembuilder.h"
-#include "facebookproperty.h"
 
-class FacebookItemBuilderPrivate;
-class FacebookItemBuilder : public SocialContentItemBuilder
+FacebookModelRawDataProxyBuilder::FacebookModelRawDataProxyBuilder(QObject *parent)
+    : SocialContentModelBuilder(parent), m_builder(0)
 {
-    Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
-public:
-    explicit FacebookItemBuilder(QObject *parent = 0);
-    ~FacebookItemBuilder();
-    QQmlListProperty<FacebookProperty> properties();
-protected:
-    void build(SocialContentItem &contentModel, QNetworkReply::NetworkError error,
-               const QString &errorMessage, const QByteArray &data,
-               const QVariantMap &metadata) Q_DECL_OVERRIDE;
-private:
-    Q_DECLARE_PRIVATE(FacebookItemBuilder)
-};
+}
 
-#endif // FACEBOOKITEMBUILDER_H
+AbstractFacebookModelBuilder * FacebookModelRawDataProxyBuilder::builder() const
+{
+    return m_builder;
+}
+
+void FacebookModelRawDataProxyBuilder::setBuilder(AbstractFacebookModelBuilder *builder)
+{
+    if (m_builder != builder) {
+        m_builder = builder;
+        emit builderChanged();
+    }
+}
+
+QString FacebookModelRawDataProxyBuilder::rawData() const
+{
+    return m_rawData;
+}
+
+void FacebookModelRawDataProxyBuilder::build(SocialContentModel &contentModel,
+                                            QNetworkReply::NetworkError error,
+                                            const QString &errorMessage, const QByteArray &data,
+                                            const QVariantMap &metadata)
+{
+    QJsonDocument document = QJsonDocument::fromJson(data);
+    QString rawData = QString::fromLatin1(document.toJson(QJsonDocument::Indented));
+    if (m_rawData != rawData) {
+        m_rawData = rawData;
+        emit rawDataChanged();
+    }
+
+    if (m_builder) {
+        SocialContentModelBuilderPrivate::build(*m_builder, contentModel, error, errorMessage,
+                                                data, metadata);
+    }
+}
+

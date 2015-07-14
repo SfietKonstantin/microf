@@ -41,6 +41,8 @@
 #include "customfacebookrequest.h"
 #include "customfacebookrequest.h"
 #include "buildershelpermodel.h"
+#include "facebookitemrawdataproxybuilder.h"
+#include "facebookmodelrawdataproxybuilder.h"
 
 template<class T> void appendPropertyToBuilder(T *builder, const QString &path, const QString &name)
 {
@@ -184,6 +186,8 @@ static void registerTypes()
     qmlRegisterType<CustomFacebookRequest>("org.sfietkonstantin.microf", 1, 0, "CustomFacebookRequest");
     qmlRegisterType<BuildersHelperModel>("org.sfietkonstantin.microf", 1, 0, "BuildersHelperModel");
     qmlRegisterSingletonType<Helper>("org.sfietkonstantin.microf", 1, 0, "Helper", helper_singleton);
+    qmlRegisterType<FacebookItemRawDataProxyBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookItemRawDataProxyBuilder");
+    qmlRegisterType<FacebookModelRawDataProxyBuilder>("org.sfietkonstantin.microf", 1, 0, "FacebookModelRawDataProxyBuilder");
 }
 
 int main(int argc, char **argv)

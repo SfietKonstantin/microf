@@ -29,28 +29,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FACEBOOKITEMBUILDER_H
-#define FACEBOOKITEMBUILDER_H
+#ifndef FACEBOOKMODELRAWDATAPROXYBUILDER_H
+#define FACEBOOKMODELRAWDATAPROXYBUILDER_H
 
-#include <QtQml/QQmlListProperty>
-#include "socialcontentitembuilder.h"
-#include "facebookproperty.h"
+#include "socialcontentmodelbuilder.h"
 
-class FacebookItemBuilderPrivate;
-class FacebookItemBuilder : public SocialContentItemBuilder
+class AbstractFacebookModelBuilder;
+class FacebookModelRawDataProxyBuilder : public SocialContentModelBuilder
 {
     Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<FacebookProperty> properties READ properties)
+    Q_PROPERTY(AbstractFacebookModelBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
+    Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
 public:
-    explicit FacebookItemBuilder(QObject *parent = 0);
-    ~FacebookItemBuilder();
-    QQmlListProperty<FacebookProperty> properties();
+    explicit FacebookModelRawDataProxyBuilder(QObject *parent = 0);
+    AbstractFacebookModelBuilder * builder() const;
+    void setBuilder(AbstractFacebookModelBuilder * builder);
+    QString rawData() const;
+signals:
+    void builderChanged();
+    void rawDataChanged();
 protected:
-    void build(SocialContentItem &contentModel, QNetworkReply::NetworkError error,
+    void build(SocialContentModel &contentModel, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
                const QVariantMap &metadata) Q_DECL_OVERRIDE;
 private:
-    Q_DECLARE_PRIVATE(FacebookItemBuilder)
+    AbstractFacebookModelBuilder *m_builder;
+    QString m_rawData;
 };
 
-#endif // FACEBOOKITEMBUILDER_H
+#endif // FACEBOOKMODELRAWDATAPROXYBUILDER_H

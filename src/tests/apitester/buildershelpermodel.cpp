@@ -54,13 +54,10 @@ BuildersHelperModel::BuildersHelperModel(QObject *parent)
 {
     QList<BuildersHelperModelData *> data;
     FacebookModelBuilder *standard = new FacebookModelBuilder(this);
-    standard->setIncludeRawData(true);
     data.append(new BuildersHelperModelData("Standard", standard));
     FacebookNewsFeedModelBuilder *newsFeed = new FacebookNewsFeedModelBuilder(this);
-    newsFeed->setIncludeRawData(true);
     data.append(new BuildersHelperModelData("News feed", newsFeed));
     CustomFacebookModelBuilder *custom = new CustomFacebookModelBuilder(this);
-    custom->setIncludeRawData(true);
     data.append(new BuildersHelperModelData("Custom", custom));
     beginInsertRows(QModelIndex(), 0, data.count());
     m_data = data;

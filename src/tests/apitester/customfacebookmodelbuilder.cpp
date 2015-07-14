@@ -74,14 +74,13 @@ void CustomFacebookModelBuilder::build(SocialContentModel &contentModel,
 {
     Q_D(CustomFacebookModelBuilder);
     Q_UNUSED(metadata)
-    SocialNetworkError::type outError = SocialNetworkError::No;
+    SocialNetworkError::type outError = SocialNetworkError::None;
     QString outErrorMessage;
     QString outErrorCode;
 
-    d->writeRawData(data);
     const QJsonObject &root = FacebookPrivate::checkError(error, errorMessage, data, outError,
                                                           outErrorMessage, outErrorCode);
-    if (outError != SocialNetworkError::No) {
+    if (outError != SocialNetworkError::None) {
         setError(contentModel, outError, outErrorMessage, outErrorCode);
         return;
     }

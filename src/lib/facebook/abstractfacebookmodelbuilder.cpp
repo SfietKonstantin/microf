@@ -34,7 +34,7 @@
 #include <QtCore/QJsonDocument>
 
 AbstractFacebookModelBuilderPrivate::AbstractFacebookModelBuilderPrivate(AbstractFacebookModelBuilder *q)
-    : SocialContentModelBuilderPrivate(q), m_includeRawData(false)
+    : SocialContentModelBuilderPrivate(q)
 {
 }
 
@@ -83,26 +83,9 @@ void AbstractFacebookModelBuilderPrivate::properties_clear(QQmlListProperty<Face
     object->d_func()->clear();
 }
 
-void AbstractFacebookModelBuilderPrivate::setRawData(const QString &rawData)
-{
-    Q_Q(AbstractFacebookModelBuilder);
-    if (m_rawData != rawData) {
-        m_rawData = rawData;
-        emit q->rawDataChanged();
-    }
-}
-
 const QList<FacebookProperty *> AbstractFacebookModelBuilderPrivate::properties() const
 {
     return m_properties;
-}
-
-void AbstractFacebookModelBuilderPrivate::writeRawData(const QByteArray &data)
-{
-    if (m_includeRawData) {
-        QJsonDocument document = QJsonDocument::fromJson(data);
-        setRawData(document.toJson(QJsonDocument::Indented));
-    }
 }
 
 void AbstractFacebookModelBuilderPrivate::clear()
@@ -129,25 +112,4 @@ QQmlListProperty<FacebookProperty> AbstractFacebookModelBuilder::properties()
                                               &AbstractFacebookModelBuilderPrivate::properties_count,
                                               &AbstractFacebookModelBuilderPrivate::properties_at,
                                               &AbstractFacebookModelBuilderPrivate::properties_clear);
-}
-
-bool AbstractFacebookModelBuilder::includeRawData() const
-{
-    Q_D(const AbstractFacebookModelBuilder);
-    return d->m_includeRawData;
-}
-
-void AbstractFacebookModelBuilder::setIncludeRawData(bool includeRawData)
-{
-    Q_D(AbstractFacebookModelBuilder);
-    if (d->m_includeRawData != includeRawData) {
-        d->m_includeRawData = includeRawData;
-        emit includeRawDataChanged();
-    }
-}
-
-QString AbstractFacebookModelBuilder::rawData() const
-{
-    Q_D(const AbstractFacebookModelBuilder);
-    return d->m_rawData;
 }

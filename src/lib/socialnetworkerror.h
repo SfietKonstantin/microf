@@ -40,7 +40,7 @@ class SocialNetworkError : public QObject
     Q_ENUMS(type)
 public:
     enum type {
-        No = 0, // No error
+        None = 0, // No error
         Network = 1, // Network error
         Data = 2, // Failed to process data coming from the social network
         SocialNetwork = 3, // The social network emitted an error

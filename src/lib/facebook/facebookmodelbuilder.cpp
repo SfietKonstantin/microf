@@ -47,14 +47,13 @@ void FacebookModelBuilder::build(SocialContentModel &contentModel,
                                  const QByteArray &data, const QVariantMap &metadata)
 {
     Q_D(AbstractFacebookModelBuilder);
-    SocialNetworkError::type outError = SocialNetworkError::No;
+    SocialNetworkError::type outError = SocialNetworkError::None;
     QString outErrorMessage;
     QString outErrorCode;
 
-    d->writeRawData(data);
     QJsonObject root = FacebookPrivate::prebuild(error, errorMessage, data, metadata,
                                                  outError, outErrorMessage, outErrorCode);
-    if (outError != SocialNetworkError::No) {
+    if (outError != SocialNetworkError::None) {
         setError(contentModel, outError, outErrorMessage, outErrorCode);
         return;
     }

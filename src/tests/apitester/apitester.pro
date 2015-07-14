@@ -15,7 +15,9 @@ HEADERS += \
     customfacebookrequest.h \
     buildershelpermodel.h \
     metapropertyhelpermodel.h \
-    customfacebookmodelbuilder.h
+    customfacebookmodelbuilder.h \
+    facebookitemrawdataproxybuilder.h \
+    facebookmodelrawdataproxybuilder.h
 
 SOURCES += \
     main.cpp \
@@ -25,7 +27,9 @@ SOURCES += \
     customfacebookrequest.cpp \
     buildershelpermodel.cpp \
     metapropertyhelpermodel.cpp \
-    customfacebookmodelbuilder.cpp
+    customfacebookmodelbuilder.cpp \
+    facebookitemrawdataproxybuilder.cpp \
+    facebookmodelrawdataproxybuilder.cpp
 
 RESOURCES += \
     res.qrc

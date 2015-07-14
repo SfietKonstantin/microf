@@ -43,15 +43,11 @@ public:
     static int properties_count(QQmlListProperty<FacebookProperty> *list);
     static FacebookProperty * properties_at(QQmlListProperty<FacebookProperty> *list, int index);
     static void properties_clear(QQmlListProperty<FacebookProperty> *list);
-    void setRawData(const QString &rawData);
     const QList<FacebookProperty *> properties() const;
-    void writeRawData(const QByteArray &data);
 protected:
     QList<FacebookProperty *> m_properties;
 private:
     void clear();
-    bool m_includeRawData;
-    QString m_rawData;
     Q_DECLARE_PUBLIC(AbstractFacebookModelBuilder)
 };
 

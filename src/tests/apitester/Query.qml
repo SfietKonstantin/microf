@@ -9,13 +9,12 @@ Item {
     property bool canQuery: !busy && authHelper.accessToken !== ""
     property int type: RequestHelperModel.Invalid
     property var request: null
-    property var builder: null
     property string rawData
     anchors.fill: parent
     onTypeChanged: {
         switch (container.type) {
         case RequestHelperModel.Object:
-            rawData = itemBuilder.rawData
+            rawData = itemRawDataBuilder.rawData
             break
         case RequestHelperModel.Model:
             rawData = container.model ? container.model.rawData : ""
@@ -29,12 +28,14 @@ Item {
         id: socialItem
         socialNetwork: facebook
         request: container.request
-        builder: FacebookItemBuilder {
-            id: itemBuilder
-            includeRawData: true
+        builder: FacebookItemRawDataProxyBuilder {
+            id: itemRawDataBuilder
+            builder: FacebookItemBuilder {
+                id: itemBuilder
+            }
         }
         onFinished: {
-            container.rawData = itemBuilder.rawData
+            container.rawData = itemRawDataBuilder.rawData
             if (!ok) {
                 errorLabel.text = socialItem.errorMessage
             }
@@ -45,9 +46,12 @@ Item {
         id: socialModel
         socialNetwork: facebook
         request: container.request
-        builder: container.builder
+        builder: FacebookModelRawDataProxyBuilder {
+            id: modelRawDataBuilder
+        }
+
         onFinished: {
-            container.rawData = container.builder ? container.builder.rawData : ""
+            container.rawData = modelRawDataBuilder.rawData
             if (!ok) {
                 errorLabel.text = socialModel.errorMessage
             }
@@ -123,7 +127,7 @@ Item {
                             TextArea {
                                 anchors.left: parent.left; anchors.right: parent.right
                                 onTextChanged: {
-                                    Helper.setBuilderProperties(text, itemBuilder, container.builder)
+                                    Helper.setBuilderProperties(text, itemBuilder, modelRawDataBuilder.builder)
                                 }
                             }
                         }
@@ -141,7 +145,7 @@ Item {
                                 anchors.left: parent.left; anchors.right: parent.right
                                 id: builderField
                                 function setRequest() {
-                                    container.builder = buildersModel.builder(currentIndex)
+                                    modelRawDataBuilder.builder = buildersModel.builder(currentIndex)
                                 }
                                 textRole: "text"
                                 enabled: !container.busy
@@ -153,7 +157,7 @@ Item {
                             }
 
                             MetaEditor {
-                                object: container.builder
+                                object: modelRawDataBuilder.builder
                             }
                         }
                     }
