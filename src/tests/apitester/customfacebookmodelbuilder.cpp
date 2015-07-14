@@ -111,13 +111,7 @@ void CustomFacebookModelBuilder::build(SocialContentModel &contentModel,
     const QJsonArray &array = arrayValue.toArray();
     QList<QVariantMap> returnedData;
     for (const QJsonValue &value : array) {
-        QVariantMap properties;
-        if (d->properties().isEmpty()) {
-            properties = FacebookPrivate::recursiveValues(value.toObject());
-        } else {
-            properties = FacebookPrivate::buildProperties(value.toObject(), d->properties());
-        }
-        returnedData.append(properties);
+        returnedData.append(FacebookPrivate::buildProperties(value.toObject(), d->properties()));
     }
 
     setData(contentModel, returnedData, false, false);

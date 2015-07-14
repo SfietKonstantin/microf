@@ -131,46 +131,6 @@ QJsonObject FacebookPrivate::prebuild(QNetworkReply::NetworkError error, const Q
     return userIdData;
 }
 
-static void recursiveSetValues(const QJsonObject &object, const QString &prefix,
-                               QVariantMap &properties)
-{
-    for (const QString &key : object.keys()) {
-        const QJsonValue &value = object.value(key);
-        QString realKey;
-        if (!prefix.isEmpty()) {
-            realKey = QString("%1_%2").arg(prefix, key);
-        } else {
-            realKey = key;
-        }
-        if (value.isBool()) {
-            properties.insert(realKey, value.toBool());
-        } else if (value.isDouble()) {
-            properties.insert(realKey, value.toDouble());
-        } else if (value.isObject()) {
-            recursiveSetValues(value.toObject(), realKey, properties);
-        } else if (value.isString()) {
-            properties.insert(realKey, value.toString());
-        } else if (value.isArray()) {
-            const QJsonArray &array = value.toArray();
-            for (int i = 0; i < array.count(); ++i) {
-                properties.insert(QString("%1_count").arg(realKey), array.count());
-                const QJsonValue &entry = array.at(i);
-                QString newKey = QString("%1_%2").arg(realKey, QString::number(i));
-                if (entry.isObject()) {
-                    recursiveSetValues(entry.toObject(), newKey, properties);
-                }
-            }
-        }
-    }
-}
-
-QVariantMap FacebookPrivate::recursiveValues(const QJsonObject &object)
-{
-    QVariantMap returned;
-    recursiveSetValues(object, "", returned);
-    return returned;
-}
-
 QVariantMap FacebookPrivate::buildProperties(const QJsonObject &object,
                                              const QList<FacebookProperty *> &properties)
 {

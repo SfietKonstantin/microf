@@ -76,13 +76,7 @@ void FacebookNewsFeedModelBuilder::build(SocialContentModel &contentModel,
 
     QList<QVariantMap> returnedData;
     for (const QJsonValue &value : nodes) {
-        QVariantMap properties;
-        if (d->properties().isEmpty()) {
-            properties = FacebookPrivate::recursiveValues(value.toObject());
-        } else {
-            properties = FacebookPrivate::buildProperties(value.toObject(), d->properties());
-        }
-        returnedData.append(properties);
+        returnedData.append(FacebookPrivate::buildProperties(value.toObject(), d->properties()));
     }
 
     bool hasNextPage = pageInfo.value("has_next_page").toBool();

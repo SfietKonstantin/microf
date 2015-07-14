@@ -133,15 +133,7 @@ void FacebookItemBuilder::build(SocialContentItem &contentItem,
     }
 
     root.remove("__type__");
-
-    QVariantMap properties;
-    if (d->m_properties.isEmpty()) {
-        properties = FacebookPrivate::recursiveValues(root);
-    } else {
-        properties = FacebookPrivate::buildProperties(root, d->m_properties);
-    }
-
-    setObject(contentItem, properties);
+    setObject(contentItem, FacebookPrivate::buildProperties(root, d->m_properties));
 }
 
 QQmlListProperty<FacebookProperty> FacebookItemBuilder::properties()
