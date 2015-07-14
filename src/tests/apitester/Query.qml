@@ -10,6 +10,7 @@ Item {
     property int type: RequestHelperModel.Invalid
     property var request: null
     property string rawData
+    property string summary
     anchors.fill: parent
     onTypeChanged: {
         switch (container.type) {
@@ -36,6 +37,7 @@ Item {
         }
         onFinished: {
             container.rawData = itemRawDataBuilder.rawData
+            container.summary = itemRawDataBuilder.summary
             if (!ok) {
                 errorLabel.text = socialItem.errorMessage
             }
@@ -52,6 +54,7 @@ Item {
 
         onFinished: {
             container.rawData = modelRawDataBuilder.rawData
+            container.summary = modelRawDataBuilder.summary
             if (!ok) {
                 errorLabel.text = socialModel.errorMessage
             }
@@ -264,6 +267,19 @@ Item {
                         anchors.margins: 12
                         readOnly: true
                         text: container.rawData
+                    }
+                }
+
+                Tab {
+                    title: "Summary"
+                    clip: true
+
+                    TextArea {
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        readOnly: true
+                        text: container.summary
+                        textFormat: TextEdit.RichText
                     }
                 }
             }

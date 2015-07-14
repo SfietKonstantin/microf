@@ -33,8 +33,9 @@
 #include <QtCore/QJsonDocument>
 #include "facebook/abstractfacebookmodelbuilder.h"
 #include "facebook/facebookitembuilder.h"
+#include "facebook/facebook_p.h"
 #include "socialcontentmodelbuilder_p.h"
-
+#include "proxybuilderhelper.h"
 
 FacebookModelRawDataProxyBuilder::FacebookModelRawDataProxyBuilder(QObject *parent)
     : SocialContentModelBuilder(parent), m_builder(0)
@@ -59,8 +60,13 @@ QString FacebookModelRawDataProxyBuilder::rawData() const
     return m_rawData;
 }
 
+QString FacebookModelRawDataProxyBuilder::summary() const
+{
+    return m_summary;
+}
+
 void FacebookModelRawDataProxyBuilder::build(SocialContentModel &contentModel,
-                                            QNetworkReply::NetworkError error,
+                                             QNetworkReply::NetworkError error,
                                             const QString &errorMessage, const QByteArray &data,
                                             const QVariantMap &metadata)
 {
@@ -69,6 +75,14 @@ void FacebookModelRawDataProxyBuilder::build(SocialContentModel &contentModel,
     if (m_rawData != rawData) {
         m_rawData = rawData;
         emit rawDataChanged();
+    }
+
+    QString summary;
+    QTextStream stream (&summary);
+    getSummary(document, stream);
+    if (m_summary != summary) {
+        m_summary = summary;
+        emit summaryChanged();
     }
 
     if (m_builder) {

@@ -17,7 +17,8 @@ HEADERS += \
     metapropertyhelpermodel.h \
     customfacebookmodelbuilder.h \
     facebookitemrawdataproxybuilder.h \
-    facebookmodelrawdataproxybuilder.h
+    facebookmodelrawdataproxybuilder.h \
+    proxybuilderhelper.h
 
 SOURCES += \
     main.cpp \

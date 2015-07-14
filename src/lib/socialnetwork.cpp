@@ -46,7 +46,7 @@ AbstractSocialContentPrivate::~AbstractSocialContentPrivate()
 {
 }
 
-const QVariantMap & AbstractSocialContentPrivate::metadata() const
+QVariantMap AbstractSocialContentPrivate::metadata() const
 {
     return m_metadata;
 }

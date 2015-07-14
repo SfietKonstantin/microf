@@ -40,14 +40,17 @@ class FacebookItemRawDataProxyBuilder : public SocialContentItemBuilder
     Q_OBJECT
     Q_PROPERTY(FacebookItemBuilder * builder READ builder WRITE setBuilder NOTIFY builderChanged)
     Q_PROPERTY(QString rawData READ rawData NOTIFY rawDataChanged)
+    Q_PROPERTY(QString summary READ summary NOTIFY summaryChanged)
 public:
     explicit FacebookItemRawDataProxyBuilder(QObject *parent = 0);
     FacebookItemBuilder * builder() const;
     void setBuilder(FacebookItemBuilder * builder);
     QString rawData() const;
+    QString summary() const;
 signals:
     void builderChanged();
     void rawDataChanged();
+    void summaryChanged();
 protected:
     void build(SocialContentItem &contentItem, QNetworkReply::NetworkError error,
                const QString &errorMessage, const QByteArray &data,
@@ -55,6 +58,9 @@ protected:
 private:
     FacebookItemBuilder * m_builder;
     QString m_rawData;
+    QString m_summary;
 };
+
+
 
 #endif // FACEBOOKITEMRAWDATAPROXYBUILDER_H
