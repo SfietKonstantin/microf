@@ -59,8 +59,8 @@ Item {
 
         ScrollView {
             id: infoView
-            width: 300
-            Layout.minimumWidth: 200
+            width: 400
+            Layout.minimumWidth: 300
 
             Flickable {
                 width: parent.width

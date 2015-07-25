@@ -18,7 +18,8 @@ HEADERS += \
     customfacebookmodelbuilder.h \
     facebookitemrawdataproxybuilder.h \
     facebookmodelrawdataproxybuilder.h \
-    proxybuilderhelper.h
+    proxybuilderhelper.h \
+    searchhelper.h
 
 SOURCES += \
     main.cpp \
@@ -30,7 +31,8 @@ SOURCES += \
     metapropertyhelpermodel.cpp \
     customfacebookmodelbuilder.cpp \
     facebookitemrawdataproxybuilder.cpp \
-    facebookmodelrawdataproxybuilder.cpp
+    facebookmodelrawdataproxybuilder.cpp \
+    searchhelper.cpp
 
 RESOURCES += \
     res.qrc
@@ -40,8 +42,10 @@ OTHER_FILES += \
     Token.qml \
     Query.qml \
     Tools.qml \
-    Display.qml
+    Display.qml \
+    Burp.qml
 
 DISTFILES += \
-    MetaEditor.qml
+    MetaEditor.qml \
+    SearchTextArea.qml
 

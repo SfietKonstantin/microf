@@ -36,6 +36,7 @@
 #include <plugin.h>
 #include "authhelper.h"
 #include "infohelper.h"
+#include "searchhelper.h"
 #include "requesthelpermodel.h"
 #include "metapropertyhelpermodel.h"
 #include "customfacebookrequest.h"
@@ -181,6 +182,7 @@ static void registerTypes()
     registerMicroFTypes("org.sfietkonstantin.microf");
     qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
     qmlRegisterType<InfoHelper>("org.sfietkonstantin.microf", 1, 0, "InfoHelper");
+    qmlRegisterType<SearchHelper>("org.sfietkonstantin.microf", 1, 0, "SearchHelper");
     qmlRegisterType<RequestHelperModel>("org.sfietkonstantin.microf", 1, 0, "RequestHelperModel");
     qmlRegisterType<MetaPropertyHelperModel>("org.sfietkonstantin.microf", 1, 0, "MetaPropertyHelperModel");
     qmlRegisterType<CustomFacebookRequest>("org.sfietkonstantin.microf", 1, 0, "CustomFacebookRequest");

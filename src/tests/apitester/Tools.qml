@@ -19,7 +19,7 @@ Item {
                     Layout.fillWidth: true
                     onTextChanged: urlQueryResult.text = authHelper.parseUrlQuery(text)
                 }
-                TextArea {
+                SearchTextArea {
                     id: urlQueryResult
                     textFormat: Text.RichText
                     readOnly: true
@@ -39,7 +39,7 @@ Item {
                     Layout.fillWidth: true
                     onTextChanged: jsonResult.text = authHelper.formatJson(text)
                 }
-                TextArea {
+                SearchTextArea {
                     id: jsonResult
                     readOnly: true
                     Layout.fillWidth: true
@@ -58,7 +58,7 @@ Item {
                     Layout.fillWidth: true
                     onTextChanged: base64Result.text = authHelper.fromBase64(text)
                 }
-                TextArea {
+                SearchTextArea {
                     id: base64Result
                     readOnly: true
                     Layout.fillWidth: true

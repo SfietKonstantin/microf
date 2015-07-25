@@ -6,5 +6,7 @@
         <file>Query.qml</file>
         <file>Display.qml</file>
         <file>MetaEditor.qml</file>
+        <file>SearchTextArea.qml</file>
+        <file>Burp.qml</file>
     </qresource>
 </RCC>

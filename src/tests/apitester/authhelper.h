@@ -51,6 +51,12 @@ public:
     Q_INVOKABLE static QString parseUrlQuery(const QString &queryString);
     Q_INVOKABLE static QString formatJson(const QString &json);
     Q_INVOKABLE static QString fromBase64(const QString &base64);
+    Q_INVOKABLE static QString formatDate(const QString &date);
+    Q_INVOKABLE static QString formatBurpRequestInfo(const QString &base64Encoded);
+    Q_INVOKABLE static QString formatBurpRequestQuery(const QString &url);
+    Q_INVOKABLE static QString formatBurpRequestPostData(const QString &base64Encoded);
+    Q_INVOKABLE static QString formatBurpReply(const QString &base64Encoded);
+    Q_INVOKABLE static QString formatBurpReplyData(const QString &base64Encoded);
     QString email() const;
     void setEmail(const QString &email);
     QString deviceId() const;

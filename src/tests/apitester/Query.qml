@@ -262,7 +262,7 @@ Item {
                     title: "Raw data"
                     clip: true
 
-                    TextArea {
+                    SearchTextArea {
                         anchors.fill: parent
                         anchors.margins: 12
                         readOnly: true
@@ -274,7 +274,7 @@ Item {
                     title: "Summary"
                     clip: true
 
-                    TextArea {
+                    SearchTextArea {
                         anchors.fill: parent
                         anchors.margins: 12
                         readOnly: true

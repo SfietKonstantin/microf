@@ -34,6 +34,9 @@
 #include <QtCore/QSettings>
 #include <QtCore/QUuid>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QDateTime>
+#include <QtCore/QLocale>
+#include <QtCore/QDebug>
 
 AuthHelper::AuthHelper(QObject *parent)
     : QObject(parent)
@@ -86,6 +89,114 @@ QString AuthHelper::formatJson(const QString &json)
 QString AuthHelper::fromBase64(const QString &base64)
 {
     return QByteArray::fromBase64(base64.toLocal8Bit());
+}
+
+QString AuthHelper::formatDate(const QString &date)
+{
+    QString realDate = date;
+    realDate.remove("CEST ");
+    QLocale locale = QLocale(QLocale::English);
+    QDateTime dateTime = locale.toDateTime(realDate, "ddd MMM dd hh:mm:ss yyyy");
+    return dateTime.time().toString(Qt::SystemLocaleShortDate);
+}
+
+QString AuthHelper::formatBurpRequestInfo(const QString &base64Encoded)
+{
+    QString data = fromBase64(base64Encoded);
+    QStringList dataSplitted = data.split("\r\n\r\n");
+    if (dataSplitted.count() != 2) {
+        return QString();
+    }
+
+    QStringList dataList = dataSplitted.first().split("\r\n");
+    if (dataList.isEmpty()) {
+        return QString();
+    }
+    dataList.removeFirst();
+
+    QString result;
+    for (const QString &entry : dataList) {
+        QStringList entrySplitted = entry.split(": ");
+        int count = entrySplitted.count();
+        if (count == 1 || count == 2) {
+            result.append("<p><b>");
+            result.append(entrySplitted.at(0));
+            result.append("</b>");
+            if (count == 2) {
+                result.append(" = ");
+                result.append(QUrl::fromPercentEncoding(entrySplitted.at(1).toLocal8Bit()));
+            }
+            result.append("</p>");
+        }
+    }
+    return result;
+}
+
+QString AuthHelper::formatBurpRequestQuery(const QString &url)
+{
+    return parseUrlQuery(QUrl(url).query());
+}
+
+QString AuthHelper::formatBurpRequestPostData(const QString &base64Encoded)
+{
+    QString data = fromBase64(base64Encoded);
+    QStringList dataSplitted = data.split("\r\n\r\n");
+    if (dataSplitted.count() != 2) {
+        return QString();
+    }
+
+    return parseUrlQuery(dataSplitted.at(1));
+}
+
+QString AuthHelper::formatBurpReply(const QString &base64Encoded)
+{
+    QString data = fromBase64(base64Encoded);
+    QStringList dataSplitted = data.split("\r\n\r\n");
+    if (dataSplitted.count() != 2) {
+        return QString();
+    }
+
+    QStringList dataList = dataSplitted.first().split("\r\n");
+    if (dataList.isEmpty()) {
+        return QString();
+    }
+    QString result;
+    result.append("<b>");
+    result.append(dataList.takeFirst());
+    result.append("</b>");
+
+    for (const QString &entry : dataList) {
+        QStringList entrySplitted = entry.split(": ");
+        int count = entrySplitted.count();
+        if (count == 1 || count == 2) {
+            result.append("<p><b>");
+            result.append(entrySplitted.at(0));
+            result.append("</b>");
+            if (count == 2) {
+                result.append(" = ");
+                result.append(QUrl::fromPercentEncoding(entrySplitted.at(1).toLocal8Bit()));
+            }
+            result.append("</p>");
+        }
+    }
+    return result;
+}
+
+QString AuthHelper::formatBurpReplyData(const QString &base64Encoded)
+{
+    QString data = fromBase64(base64Encoded);
+    QStringList dataSplitted = data.split("\r\n\r\n");
+    if (dataSplitted.count() != 2) {
+        return QString();
+    }
+
+    const QString &returned = dataSplitted.at(1);
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(returned.toLocal8Bit(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        return returned;
+    }
+    return document.toJson(QJsonDocument::Indented);
 }
 
 QString AuthHelper::email() const

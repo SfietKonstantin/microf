@@ -19,10 +19,10 @@ ApplicationWindow {
 
     visible: true
     title: "FB API browser"
-    minimumWidth: 650
-    minimumHeight: 500
-    width: 650
-    height: 500
+    minimumWidth: 1000
+    minimumHeight: 700
+    width: 1000
+    height: 700
 
     menuBar: MenuBar {
         Menu {
@@ -52,6 +52,11 @@ ApplicationWindow {
             id: tools
             title: "Tools"
             Tools {}
+        }
+        Tab {
+            id: burp
+            title: "Burp reader"
+            Burp {}
         }
     }
 
