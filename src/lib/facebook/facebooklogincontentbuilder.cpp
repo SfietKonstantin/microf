@@ -54,7 +54,7 @@ void FacebookLoginContentBuilder::build(SocialContentItem &contentItem,
                                        const QByteArray &data, const QVariantMap &metadata)
 {
     Q_UNUSED(metadata);
-    if (!error == QNetworkReply::NoError) {
+    if (error == QNetworkReply::NoError) {
         qWarning() << data;
         setError(contentItem, SocialNetworkError::Network, errorMessage);
         return;

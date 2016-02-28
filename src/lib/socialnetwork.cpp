@@ -97,7 +97,6 @@ void AbstractSocialContentPrivate::handleNetworkReply(QNetworkReply::NetworkErro
                                                       const QString &errorMessage,
                                                       const QByteArray &data)
 {
-    Q_Q(ISocialContent);
     if (!build(error, errorMessage, data)) {
         qWarning() << "AbstractSocialContentPrivate::handleNetworkReply() failure to build";
         setError(SocialNetworkError::Internal, "Internal error", QString());
