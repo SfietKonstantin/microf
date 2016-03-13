@@ -1,0 +1,19 @@
+module: fb
+name: LoginRequest
+no_qt: true
+properties:
+    - name: email
+      type: QString
+      access: c
+
+    - name: password
+      type: QString
+      access: c
+      
+    - name: deviceId
+      type: QString
+      access: c
+      
+    - name: machineId
+      type: QString
+      access: c

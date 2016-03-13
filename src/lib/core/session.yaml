@@ -1,0 +1,29 @@
+module: fb
+name: Session
+source: json
+properties:
+    - name: userId
+      type: QString
+      access: c
+      json_path: uid
+
+    - name: sessionKey
+      type: QString
+      access: c
+      json_path: session_key
+      
+    - name: secret
+      type: QString
+      access: c
+      json_path: secret
+      
+    - name: accessToken
+      type: QString
+      access: c
+      json_path: access_token
+      
+    - name: machineId
+      type: QString
+      access: c
+      json_path: machine_id
+      json_optional: true
