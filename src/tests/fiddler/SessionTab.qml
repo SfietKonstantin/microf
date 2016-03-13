@@ -5,11 +5,11 @@ import org.sfietkonstantin.microf 1.0
 
 Item {
     id: container
-    property bool busy: login.status === ViewController.Busy // || logout === ViewController.Busy
+    property bool busy: login.status === ViewController.Busy
     property bool canGenerateDeviceId: !busy && authHelper.accessToken === "" && authHelper.deviceId === ""
     property bool canLogin: !busy && authHelper.accessToken === "" && emailField.text !== ""
                             && passwordField.text !== "" && authHelper.deviceId !== ""
-    // property bool canLogout: !busy && authHelper.accessToken !== ""
+    property bool canLogout: !busy && authHelper.accessToken !== ""
     property bool canEdit: !busy && authHelper.accessToken === ""
     anchors.fill: parent
 
@@ -38,22 +38,6 @@ Item {
             }
         }
     }
-
-    /*
-    SocialContentItem {
-        id: logout
-        socialNetwork: facebook
-        request: FacebookLogoutRequest {}
-        builder: FacebookConfirmationContentBuilder {}
-        onFinished: {
-            if (ok) {
-                authHelper.logout()
-            } else {
-                errorLabel.text = login.errorMessage
-            }
-        }
-    }
-    */
 
     SplitView {
         anchors.fill: parent
@@ -150,17 +134,15 @@ Item {
                                 login.login()
                             }
                         }
-                        /*
                         Button {
                             id: logoutButton
                             anchors.left: parent.left; anchors.right: parent.right
                             enabled: container.canLogout
                             text: "Logout"
                             onClicked: {
-                                logout.load()
+                                login.logout(authHelper.accessToken)
                             }
                         }
-                        */
                     }
 
                     Label {

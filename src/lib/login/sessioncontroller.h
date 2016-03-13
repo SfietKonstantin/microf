@@ -66,6 +66,7 @@ public:
     void setMachineId(const QString &machineId);
 public Q_SLOTS:
     bool login();
+    bool logout(const QString &accessToken);
 Q_SIGNALS:
     void facebookChanged();
     void emailChanged();
@@ -73,6 +74,7 @@ Q_SIGNALS:
     void deviceIdChanged();
     void machineIdChanged();
 private:
+    void registerExecutors();
     using Executor_t = ::microcore::core::Executor<Error_t>;
     ::microcore::data::Item< ::microcore::fb::Session> m_data {};
     ::microf::Facebook * m_facebook {nullptr};
@@ -81,6 +83,7 @@ private:
     QString m_deviceId {};
     QString m_machineId {};
     Executor_t *m_loginExecutor {nullptr};
+    Executor_t *m_logoutExecutor {nullptr};
 };
 
 }}

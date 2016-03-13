@@ -79,6 +79,15 @@ static const int SIG_SUFFIX16 = 4;
 static const char *SIG_SUFFIX17 = "a";
 static const int SIG_SUFFIX18 = 32;
 
+struct Empty
+{
+    using SourceItem_t = Empty;
+    void setData(const Empty &data)
+    {
+        Q_UNUSED(data)
+    }
+};
+
 static QString sigSuffix()
 {
     QString returned;
@@ -149,7 +158,7 @@ private:
                 onResult(HttpRequest(HttpRequest::Type::Post, networkRequest, postData));
             }
         private:
-            QByteArray createPostData()
+            QByteArray createPostData() const
             {
                 QMap<QString, QString> parameters;
                 parameters.insert("api_key", m_parent.facebook()->apiKey());
@@ -298,6 +307,151 @@ private:
     };
 };
 
+class LogoutRequest
+{
+public:
+    explicit LogoutRequest() = default;
+    explicit LogoutRequest(QString &&token) : m_token (token) {}
+    DEFAULT_COPY_DEFAULT_MOVE(LogoutRequest);
+    QString token() const { return m_token; }
+private:
+    QString m_token {};
+};
+
+class LogoutModifier: public ItemModifier<Empty, LogoutRequest, Error>
+{
+public:
+    explicit LogoutModifier(SessionController &parent,
+                            QNetworkAccessManager &network)
+        : ItemModifier<Empty, LogoutRequest, Error>(m_item, std::unique_ptr<Factory_t>(new JobFactory(parent, network)))
+    {
+    }
+private:
+    class LogoutRequestFactory: public IJobFactory<LogoutRequest, HttpRequest, Error>
+    {
+    public:
+        using Job_t = IJob<HttpRequest, Error>;
+        explicit LogoutRequestFactory(SessionController &parent)
+            : m_parent(parent)
+        {
+        }
+        std::unique_ptr<Job_t> create(LogoutRequest &&request) const override
+        {
+            return std::unique_ptr<Job_t>(new Job(std::move(request), m_parent));
+        }
+    private:
+        class Job : public Job_t
+        {
+        public:
+            explicit Job(LogoutRequest &&request, SessionController &parent)
+                : m_request(std::move(request)), m_parent(parent)
+            {
+            }
+            void execute(OnResult_t onResult, OnError_t onError) override
+            {
+                Q_UNUSED(onError)
+                const QByteArray &postData = createPostData();
+                QString accessToken {m_request.token()};
+                accessToken.prepend("OAuth ");
+                QNetworkRequest networkRequest (QUrl("https://b-api.facebook.com/method/auth.expireSession"));
+                networkRequest.setRawHeader("Authorization", accessToken.toLocal8Bit());
+                networkRequest.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+                networkRequest.setRawHeader("Host", "b-api.facebook.com");
+                networkRequest.setRawHeader("Connection", "Keep-Alive");
+                networkRequest.setRawHeader("User-Agent", m_parent.facebook()->userAgent());
+                networkRequest.setRawHeader("Content-Length", QByteArray::number(postData.size()));
+                networkRequest.setRawHeader("X-FB-HTTP-Engine", "Apache");
+                onResult(HttpRequest(HttpRequest::Type::Post, networkRequest, postData));
+            }
+        private:
+            QByteArray createPostData() const
+            {
+                QUrlQuery query;
+                query.addQueryItem("reason", "USER_INITIATED");
+                query.addQueryItem("locale", m_parent.facebook()->locale());
+                query.addQueryItem("client_country_code", m_parent.facebook()->countryCode());
+                query.addQueryItem("method", "auth.expireSession");
+                query.addQueryItem("fb_api_req_friendly_name", "logout");
+                query.addQueryItem("fb_api_caller_class", "com.facebook.katana.server.handler.Fb4aAuthHandler");
+                return query.toString(QUrl::FullyEncoded).toLocal8Bit();
+            }
+            LogoutRequest m_request {};
+            SessionController &m_parent;
+        };
+        SessionController &m_parent;
+    };
+    class EmptyFactory: public IJobFactory<HttpResult, Empty, Error>
+    {
+    public:
+        using Job_t = IJob<Empty, Error>;
+        explicit EmptyFactory()
+
+        {
+        }
+        std::unique_ptr<Job_t> create(HttpResult &&request) const override
+        {
+            return std::unique_ptr<Job_t>(new Job(std::move(request)));
+        }
+    private:
+        class Job: public Job_t
+        {
+        public:
+            explicit Job(HttpResult &&request)
+                : m_request(std::move(request))
+            {
+            }
+            void execute(OnResult_t onResult, OnError_t onError) override
+            {
+                Q_UNUSED(onError)
+                onResult(Empty());
+            }
+        private:
+            HttpResult m_request {};
+        };
+    };
+    class JobFactory: public IJobFactory<LogoutRequest, Empty, Error>
+    {
+    public:
+        using Job_t = IJob<Empty, Error>;
+        explicit JobFactory(SessionController &parent,
+                            QNetworkAccessManager &network)
+            : m_logoutFactory(parent)
+            , m_httpFactory (network)
+        {
+        }
+        std::unique_ptr<Job_t> create(LogoutRequest &&request) const override
+        {
+            return std::unique_ptr<Job_t>(new Job(std::move(request), *this));
+        }
+    private:
+        class Job: public Job_t
+        {
+        public:
+            explicit Job(LogoutRequest &&request, const JobFactory &parent)
+                : m_request(std::move(request)), m_parent(parent)
+            {
+            }
+            void execute(OnResult_t onResult, OnError_t onError) override
+            {
+                m_httpToEmpty.reset(new Pipe<HttpResult, Empty, Error>(m_parent.m_emptyFactory, onResult, onError));
+                m_httpRequestToResult = std::move(m_httpToEmpty->prepend(m_parent.m_httpFactory));
+                m_requestToHttpRequest = std::move(m_httpRequestToResult->prepend(m_parent.m_logoutFactory));
+                m_requestToHttpRequest->send(std::move(m_request));
+            }
+        private:
+            LogoutRequest m_request {};
+            const JobFactory &m_parent;
+            std::unique_ptr<Pipe<LogoutRequest, HttpRequest, Error>> m_requestToHttpRequest {};
+            std::unique_ptr<Pipe<HttpRequest, HttpResult, Error>> m_httpRequestToResult {};
+            std::unique_ptr<Pipe<HttpResult, Empty, Error>> m_httpToEmpty {};
+        };
+        LogoutRequestFactory m_logoutFactory;
+        HttpRequestFactory m_httpFactory;
+        EmptyFactory m_emptyFactory {};
+    };
+    Empty m_item {};
+};
+
 }
 
 SessionController::SessionController(QObject *parent)
@@ -380,22 +534,49 @@ bool SessionController::login()
     if (m_facebook == nullptr) {
         return false;
     }
-
-    if (m_loginExecutor == nullptr) {
-        QQmlContext *context {QQmlEngine::contextForObject(this)};
-        if (context == nullptr) {
-            return false;
-        }
-        QNetworkAccessManager *network {context->engine()->networkAccessManager()};
-        Q_ASSERT(network);
-        m_loginExecutor = &(addExecutor(std::unique_ptr<LoginModifier>(new LoginModifier(m_data, *this, *network))));
-    }
+    registerExecutors();
 
     static_cast<LoginModifier *>(m_loginExecutor)->start(LoginRequest(QString(m_email),
                                                                       QString(m_password),
                                                                       QString(m_deviceId),
                                                                       QString(m_machineId)));
     return true;
+}
+
+bool SessionController::logout(const QString &accessToken)
+{
+    if (m_facebook == nullptr) {
+        return false;
+    }
+    if (accessToken.isEmpty()) {
+        return false;
+    }
+    registerExecutors();
+
+    static_cast<LogoutModifier *>(m_logoutExecutor)->start(LogoutRequest(QString(accessToken)));
+    return true;
+}
+
+void SessionController::registerExecutors()
+{
+    if (m_loginExecutor != nullptr && m_logoutExecutor != nullptr) {
+        return;
+    }
+
+    QQmlContext *context {QQmlEngine::contextForObject(this)};
+    if (context == nullptr) {
+        return;
+    }
+    QNetworkAccessManager *network {context->engine()->networkAccessManager()};
+    Q_ASSERT(network);
+
+    if (m_loginExecutor == nullptr) {
+        m_loginExecutor = &(addExecutor(std::unique_ptr<LoginModifier>(new LoginModifier(m_data, *this, *network))));
+    }
+
+    if (m_logoutExecutor == nullptr) {
+        m_logoutExecutor = &(addExecutor(std::unique_ptr<LogoutModifier>(new LogoutModifier(*this, *network))));
+    }
 }
 
 }}
