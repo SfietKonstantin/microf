@@ -12,12 +12,15 @@ set(${PROJECT_NAME}_SRCS
     facebook.cpp
 )
 
-set(${PROJECT_NAME}_CORE_SRCS
-    core/loginrequest.cpp
-    core/session.cpp
-    core/sessionobject.cpp
-    core/sessiontypes.h
-    core/sessionrequestfactory.cpp
+microgen_bean(${PROJECT_NAME}_CORE_SRCS
+    core/loginrequest.yaml
+    core/session.yaml
+)
+microgen_qtbean(${PROJECT_NAME}_CORE_SRCS
+    core/session.yaml
+)
+microgen_factory(${PROJECT_NAME}_CORE_SRCS
+    core/session.yaml
 )
 
 set(${PROJECT_NAME}_LOGIN_SRCS
@@ -36,6 +39,7 @@ target_link_libraries(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}
+    ${PROJECT_BINARY_DIR}
 )
 
 
