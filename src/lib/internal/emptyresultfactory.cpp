@@ -29,37 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QRegularExpression>
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
+#include "emptyresultfactory.h"
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+namespace microf { namespace internal {
 
-static void registerTypes()
+EmptyResultFactory::EmptyResultFactory()
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-
-
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
 }
 
-int main(int argc, char **argv)
+std::unique_ptr<EmptyResultFactory::Job_t> EmptyResultFactory::create(HttpResult &&request) const
 {
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
+    return std::unique_ptr<Job_t>(new Job(std::move(request)));
 }
+
+EmptyResultFactory::Job::Job(HttpResult &&request)
+    : m_request(std::move(request))
+{
+}
+
+void EmptyResultFactory::Job::execute(OnResult_t onResult, OnError_t onError)
+{
+    Q_UNUSED(onError)
+    onResult(EmptyResult());
+}
+
+}}

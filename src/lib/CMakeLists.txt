@@ -10,10 +10,20 @@ find_package(Qt5Network REQUIRED)
 
 set(${PROJECT_NAME}_SRCS
     facebook.cpp
+    sessioncontroller.cpp
+)
+
+set(${PROJECT_NAME}_INTERNALS_SRCS
+    internal/emptyresult.cpp
+    internal/emptyresultfactory.cpp
+    internal/loginrequestfactory.cpp
+    internal/loginresultpreprocessfactory.cpp
+    internal/logoutrequestfactory.cpp
 )
 
 microgen_bean(${PROJECT_NAME}_CORE_SRCS
     core/loginrequest.yaml
+    core/logoutrequest.yaml
     core/session.yaml
 )
 microgen_qtbean(${PROJECT_NAME}_CORE_SRCS
@@ -23,14 +33,10 @@ microgen_factory(${PROJECT_NAME}_CORE_SRCS
     core/session.yaml
 )
 
-set(${PROJECT_NAME}_LOGIN_SRCS
-    login/sessioncontroller.cpp
-)
-
 add_library(${PROJECT_NAME} STATIC
     ${${PROJECT_NAME}_SRCS}
     ${${PROJECT_NAME}_CORE_SRCS}
-    ${${PROJECT_NAME}_LOGIN_SRCS}
+    ${${PROJECT_NAME}_INTERNALS_SRCS}
 )
 qt5_use_modules(${PROJECT_NAME} Core Network)
 target_link_libraries(${PROJECT_NAME}

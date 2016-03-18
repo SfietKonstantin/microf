@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef MICROF_LOGIN_LOGINCONTROLLER_H
-#define MICROF_LOGIN_LOGINCONTROLLER_H
+#ifndef MICROF_SESSIONCONTROLLER_H
+#define MICROF_SESSIONCONTROLLER_H
 
 #include <qt/viewitemcontroller.h>
 #include "core/session.h"
@@ -39,9 +39,6 @@
 namespace microf {
 
 class Facebook;
-
-namespace login {
-
 class SessionController : public ::microcore::qt::ViewItemController< ::microcore::data::Item< ::microcore::fb::Session>>
 {
     Q_OBJECT
@@ -55,7 +52,6 @@ public:
     ::microcore::data::Item< ::microcore::fb::Session> & item() override;
     ::microf::Facebook * facebook() const;
     void setFacebook(::microf::Facebook *facebook);
-
     QString email() const;
     void setEmail(const QString &email);
     QString password() const;
@@ -86,6 +82,6 @@ private:
     Executor_t *m_logoutExecutor {nullptr};
 };
 
-}}
+}
 
-#endif // MICROF_LOGIN_LOGINCONTROLLER_H
+#endif // MICROF_SESSIONCONTROLLER_H

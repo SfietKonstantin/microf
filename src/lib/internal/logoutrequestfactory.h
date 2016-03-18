@@ -29,37 +29,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QRegularExpression>
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
+#ifndef MICROF_INTERNAL_LOGOUTREQUESTFACTORY_H
+#define MICROF_INTERNAL_LOGOUTREQUESTFACTORY_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+#include <core/ijobfactory.h>
+#include <http/httprequest.h>
+#include <error/error.h>
+#include "core/logoutrequest.h"
 
-static void registerTypes()
+namespace microf {
+
+class SessionController;
+namespace internal {
+
+using ::microcore::core::IJobFactory;
+using ::microcore::core::IJob;
+using ::microcore::http::HttpRequest;
+using ::microcore::error::Error;
+using ::microcore::fb::LogoutRequest;
+
+class LogoutRequestFactory: public IJobFactory<LogoutRequest, HttpRequest, Error>
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
+public:
+    using Job_t = IJob<HttpRequest, Error>;
+    explicit LogoutRequestFactory(SessionController &parent);
+    std::unique_ptr<Job_t> create(LogoutRequest &&request) const override;
+private:
+    class Job : public Job_t
+    {
+    public:
+        explicit Job(LogoutRequest &&request, SessionController &parent);
+        void execute(OnResult_t onResult, OnError_t onError) override;
+    private:
+        QByteArray createPostData() const;
+        LogoutRequest m_request {};
+        SessionController &m_parent;
+    };
+    SessionController &m_parent;
+};
 
+}}
 
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-}
-
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+#endif // MICROF_INTERNAL_LOGOUTREQUESTFACTORY_H

@@ -29,37 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QRegularExpression>
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
+#ifndef MICROF_INTERNAL_LOGINRESULTPREPROCESSFACTORY_H
+#define MICROF_INTERNAL_LOGINRESULTPREPROCESSFACTORY_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+#include <core/ijobfactory.h>
+#include <json/jsontypes.h>
+#include <error/error.h>
 
-static void registerTypes()
+namespace microf { namespace internal {
+
+using ::microcore::core::IJobFactory;
+using ::microcore::core::IJob;
+using ::microcore::json::JsonResult;
+using ::microcore::error::Error;
+
+class LoginResultPreprocessFactory: public IJobFactory<JsonResult, JsonResult, Error>
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
+public:
+    using Job_t = IJob<JsonResult, Error>;
+    std::unique_ptr<Job_t> create(JsonResult &&request) const override;
+private:
+    class Job: public Job_t
+    {
+    public:
+        explicit Job(JsonResult &&json);
+        void execute(OnResult_t onResult, OnError_t onError) override;
+    private:
+        JsonResult m_json {};
+    };
+};
 
+}}
 
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-}
-
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+#endif // MICROF_INTERNAL_LOGINRESULTPREPROCESSFACTORY_H

@@ -29,37 +29,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QtCore/QRegularExpression>
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
+#ifndef MICROF_INTERNAL_EMPTYRESULT_H
+#define MICROF_INTERNAL_EMPTYRESULT_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+namespace microf { namespace internal {
 
-static void registerTypes()
+struct EmptyResult
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
+    using SourceItem_t = EmptyResult;
+    void setData(const EmptyResult &data);
+};
 
+}}
 
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-}
-
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+#endif // MICROF_INTERNAL_EMPTYRESULT_H

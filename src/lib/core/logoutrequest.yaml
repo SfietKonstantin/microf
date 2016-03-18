@@ -1,0 +1,7 @@
+module: fb
+name: LogoutRequest
+no_qt: true
+properties:
+    - name: token
+      type: QString
+      access: c
