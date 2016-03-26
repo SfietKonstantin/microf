@@ -29,39 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#ifndef MICROF_INTERNAL_THREADSREQUESTFACTORY_H
+#define MICROF_INTERNAL_THREADSREQUESTFACTORY_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+#include <core/ijobfactory.h>
+#include <http/httprequest.h>
+#include <error/error.h>
+#include "core/loginrequest.h"
+#include "emptyrequest.h"
 
-static void registerTypes()
+namespace microf {
+
+class IController;
+namespace internal {
+
+using ::microcore::core::IJobFactory;
+using ::microcore::core::IJob;
+using ::microcore::http::HttpRequest;
+using ::microcore::error::Error;
+
+class ThreadsRequestFactory: public IJobFactory<EmptyRequest, HttpRequest, Error>
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
-}
+public:
+    using Job_t = IJob<HttpRequest, Error>;
+    explicit ThreadsRequestFactory(IController &parent);
+    std::unique_ptr<Job_t> create(EmptyRequest &&request) const override;
+private:
+    class Job : public Job_t
+    {
+    public:
+        explicit Job(IController &parent);
+        void execute(OnResult_t onResult, OnError_t onError) override;
+    private:
+        QByteArray createPostData() const;
+        IController &m_parent;
+    };
+    IController &m_parent;
+};
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+}}
+
+#endif // MICROF_INTERNAL_THREADSREQUESTFACTORY_H

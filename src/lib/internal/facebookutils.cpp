@@ -29,39 +29,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#include "facebookutils.h"
+#include <QJsonDocument>
+#include <QUrlQuery>
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+namespace microf { namespace internal {
 
-static void registerTypes()
+FacebookUtils::FacebookUtils(Facebook &facebook)
+    : m_facebook {facebook}
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
 }
 
-int main(int argc, char **argv)
+QNetworkRequest FacebookUtils::createHttpRequest(const QByteArray &postData) const
 {
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
+    QNetworkRequest request {QUrl("https://graph.facebook.com/graphql")};
+    QByteArray authorization {"OAuth "};
+    authorization.append(m_facebook.accessToken().toLocal8Bit());
+    request.setRawHeader("Authorization", authorization);
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRawHeader("Host", "graph.facebook.com");
+    request.setRawHeader("Connection", "Keep-Alive");
+    request.setRawHeader("Content-Length", QByteArray::number(postData.size()));
+    return request;
 }
+
+QByteArray FacebookUtils::createPostData(const QByteArray &queryId,
+                                         const QByteArray &requestName,
+                                         const QJsonObject &object) const
+{
+    QJsonDocument document {object};
+    QUrlQuery query {};
+    query.addQueryItem("query_id", queryId);
+    query.addQueryItem("query_params", document.toJson(QJsonDocument::Compact));
+    query.addQueryItem("fb_api_req_friendly_name", requestName);
+    query.addQueryItem("method", "get");
+    query.addQueryItem("locale", m_facebook.locale());
+    query.addQueryItem("client_country_code", m_facebook.countryCode());
+    return query.toString(QUrl::FullyEncoded).toLocal8Bit();
+}
+
+}}

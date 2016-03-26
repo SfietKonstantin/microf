@@ -29,39 +29,74 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
+#include "abstracttester.h"
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QJsonArray>
 #include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+using namespace ::microf;
 
-static void registerTypes()
+AbstractTester::AbstractTester(QObject *parent)
+    : QObject(parent)
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
 }
 
-int main(int argc, char **argv)
+void AbstractTester::classBegin()
 {
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
+}
+
+void AbstractTester::componentComplete()
+{
+    QQmlContext *context {QQmlEngine::contextForObject(this)};
+    Q_ASSERT(context);
+    QNetworkAccessManager *network {context->engine()->networkAccessManager()};
+    Q_ASSERT(network);
+    m_httpRequestFactory.reset(new HttpRequestFactory(*network));
+}
+
+Facebook * AbstractTester::facebook() const
+{
+    return m_facebook;
+}
+
+void AbstractTester::setFacebook(Facebook *facebook)
+{
+    if (m_facebook != facebook) {
+        m_facebook = facebook;
+        emit facebookChanged();
+    }
+}
+
+JsonTreeModel * AbstractTester::model() const
+{
+    return m_model;
+}
+
+void AbstractTester::setModel(JsonTreeModel *model)
+{
+    if (m_model != model) {
+        m_model = model;
+        emit modelChanged();
+    }
+}
+
+void AbstractTester::onResult(microcore::json::JsonResult &&result)
+{
+    if (m_model == nullptr) {
+        return;
+    }
+
+    QJsonValue value {};
+    if (result.isObject()) {
+        value = QJsonObject(result.object());
+    } else if (result.isArray()) {
+        value = QJsonArray(result.array());
+    }
+    m_model->setValue(std::move(value));
+}
+
+void AbstractTester::onError(microcore::error::Error &&error)
+{
+    Q_UNUSED(error)
 }

@@ -32,7 +32,7 @@
 #include "loginrequestfactory.h"
 #include <QCryptographicHash>
 #include <QUrlQuery>
-#include "sessioncontroller.h"
+#include "icontroller.h"
 #include "facebook.h"
 
 namespace {
@@ -86,7 +86,7 @@ static QString sigSuffix()
 
 namespace microf { namespace internal {
 
-LoginRequestFactory::LoginRequestFactory(SessionController &parent)
+LoginRequestFactory::LoginRequestFactory(IController &parent)
     : m_parent(parent)
 {
 }
@@ -96,7 +96,7 @@ std::unique_ptr<LoginRequestFactory::Job_t> LoginRequestFactory::create(LoginReq
     return std::unique_ptr<Job_t>(new Job(std::move(request), m_parent));
 }
 
-LoginRequestFactory::Job::Job(LoginRequest &&request, SessionController &parent)
+LoginRequestFactory::Job::Job(LoginRequest &&request, IController &parent)
     : m_request(std::move(request)), m_parent(parent)
 {
 }
@@ -104,6 +104,7 @@ LoginRequestFactory::Job::Job(LoginRequest &&request, SessionController &parent)
 void LoginRequestFactory::Job::execute(Job::OnResult_t onResult, Job::OnError_t onError)
 {
     Q_UNUSED(onError);
+    Q_ASSERT(m_parent.facebook());
     const QByteArray &postData = createPostData();
     QNetworkRequest networkRequest (QUrl("https://b-api.facebook.com/method/auth.login"));
     networkRequest.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -117,6 +118,7 @@ void LoginRequestFactory::Job::execute(Job::OnResult_t onResult, Job::OnError_t 
 
 QByteArray LoginRequestFactory::Job::createPostData() const
 {
+    Q_ASSERT(m_parent.facebook());
     QMap<QString, QString> parameters;
     parameters.insert("api_key", m_parent.facebook()->apiKey());
     parameters.insert("client_country_code", m_parent.facebook()->countryCode());

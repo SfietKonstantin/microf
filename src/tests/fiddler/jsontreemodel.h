@@ -29,39 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#ifndef JSONTREEMODEL_H
+#define JSONTREEMODEL_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+#include <QAbstractListModel>
+#include <QJsonValue>
+#include <memory>
 
-static void registerTypes()
+class JsonTreeModel : public QAbstractItemModel
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
-}
+    Q_OBJECT
+public:
+    enum Roles {
+        KeyRole = Qt::UserRole + 1,
+        LabelRole
+    };
+    explicit JsonTreeModel(QObject *parent = nullptr);
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex &parent) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    void setValue(QJsonValue &&value);
+private:
+    class Node
+    {
+    public:
+        explicit Node() = default;
+        Node *parent {nullptr};
+        int row {-1};
+        QString key {};
+        QString label {};
+        QJsonValue value {};
+        std::vector<Node> children {};
+    };
+    QHash<int, QByteArray> roleNames() const override final;
+    void setProperties(Node &node, int row, QString &&key, QJsonValue &&value, Node *parent);
+    void addChildren(QModelIndex &&parent, Node &node);
+    void addChildrenForObject(QModelIndex &&parent, Node &node, QJsonObject &&object);
+    void addChildrenForArray(QModelIndex &&parent, Node &node, QJsonArray &&array);
+    std::unique_ptr<Node> m_root {};
+};
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+#endif // JSONTREEMODEL_H

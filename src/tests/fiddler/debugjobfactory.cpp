@@ -29,39 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#include "debugjobfactory.h"
+#include <QLoggingCategory>
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+Q_LOGGING_CATEGORY(debugLog, "microf.debug");
 
-static void registerTypes()
+DebugJobFactory::DebugJobFactory()
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
 }
 
-int main(int argc, char **argv)
+std::unique_ptr<IJob<JsonResult, Error>> DebugJobFactory::create(JsonResult &&request) const
 {
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
+    return std::unique_ptr<IJob<JsonResult, Error>>(new Job(std::move(request)));
+}
+
+DebugJobFactory::Job::Job(microcore::json::JsonResult &&request)
+    : m_request {std::move(request)}
+{
+}
+
+void DebugJobFactory::Job::execute(OnResult_t onResult, OnError_t onError)
+{
+    Q_UNUSED(onError)
+    qCDebug(debugLog) << m_request.toJson(QJsonDocument::Indented);
+    onResult(std::move(m_request));
+
 }

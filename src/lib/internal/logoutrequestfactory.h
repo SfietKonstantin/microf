@@ -39,7 +39,7 @@
 
 namespace microf {
 
-class SessionController;
+class IController;
 namespace internal {
 
 using ::microcore::core::IJobFactory;
@@ -52,20 +52,20 @@ class LogoutRequestFactory: public IJobFactory<LogoutRequest, HttpRequest, Error
 {
 public:
     using Job_t = IJob<HttpRequest, Error>;
-    explicit LogoutRequestFactory(SessionController &parent);
+    explicit LogoutRequestFactory(IController &parent);
     std::unique_ptr<Job_t> create(LogoutRequest &&request) const override;
 private:
     class Job : public Job_t
     {
     public:
-        explicit Job(LogoutRequest &&request, SessionController &parent);
+        explicit Job(LogoutRequest &&request, IController &parent);
         void execute(OnResult_t onResult, OnError_t onError) override;
     private:
         QByteArray createPostData() const;
         LogoutRequest m_request {};
-        SessionController &m_parent;
+        IController &m_parent;
     };
-    SessionController &m_parent;
+    IController &m_parent;
 };
 
 }}

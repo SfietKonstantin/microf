@@ -29,39 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
+#include "threadsrequestfactory.h"
+#include <QUrlQuery>
+#include <QJsonDocument>
 #include <QJsonObject>
-#include <QtQml/qqml.h>
+#include "icontroller.h"
 #include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#include "facebookutils.h"
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+namespace microf { namespace internal {
 
-static void registerTypes()
+ThreadsRequestFactory::ThreadsRequestFactory(IController &parent)
+    : m_parent {parent}
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
 }
 
-int main(int argc, char **argv)
+std::unique_ptr<ThreadsRequestFactory::Job_t> ThreadsRequestFactory::create(EmptyRequest &&request) const
 {
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
+    Q_UNUSED(request);
+    return std::unique_ptr<Job_t>(new Job(m_parent));
 }
+
+ThreadsRequestFactory::Job::Job(IController &parent)
+    : m_parent {parent}
+{
+}
+
+void ThreadsRequestFactory::Job::execute(Job::OnResult_t onResult, Job::OnError_t onError)
+{
+    Q_UNUSED(onError)
+    Q_ASSERT(m_parent.facebook());
+    FacebookUtils utils {*(m_parent.facebook())};
+    QJsonObject requestJson {
+        {"2", "true"},
+        {"12", "false"},
+        {"13", "false"}
+    };
+    QByteArray postData {utils.createPostData("10153919752026729", "ThreadQuery", requestJson)};
+    onResult(HttpRequest(HttpRequest::Type::Post, utils.createHttpRequest(postData), postData));
+}
+
+}}

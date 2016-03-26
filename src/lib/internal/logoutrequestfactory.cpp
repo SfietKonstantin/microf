@@ -31,12 +31,12 @@
 
 #include "logoutrequestfactory.h"
 #include <QUrlQuery>
-#include "sessioncontroller.h"
+#include "icontroller.h"
 #include "facebook.h"
 
 namespace microf { namespace internal {
 
-LogoutRequestFactory::LogoutRequestFactory(SessionController &parent)
+LogoutRequestFactory::LogoutRequestFactory(IController &parent)
     : m_parent(parent)
 {
 }
@@ -46,7 +46,7 @@ std::unique_ptr<LogoutRequestFactory::Job_t> LogoutRequestFactory::create(Logout
     return std::unique_ptr<Job_t>(new Job(std::move(request), m_parent));
 }
 
-LogoutRequestFactory::Job::Job(LogoutRequest &&request, SessionController &parent)
+LogoutRequestFactory::Job::Job(LogoutRequest &&request, IController &parent)
     : m_request(std::move(request)), m_parent(parent)
 {
 }
@@ -54,6 +54,7 @@ LogoutRequestFactory::Job::Job(LogoutRequest &&request, SessionController &paren
 void LogoutRequestFactory::Job::execute(Job::OnResult_t onResult, Job::OnError_t onError)
 {
     Q_UNUSED(onError)
+    Q_ASSERT(m_parent.facebook());
     const QByteArray &postData = createPostData();
     QString accessToken {m_request.token()};
     accessToken.prepend("OAuth ");
@@ -70,6 +71,7 @@ void LogoutRequestFactory::Job::execute(Job::OnResult_t onResult, Job::OnError_t
 
 QByteArray LogoutRequestFactory::Job::createPostData() const
 {
+    Q_ASSERT(m_parent.facebook());
     QUrlQuery query {};
     query.addQueryItem("reason", "USER_INITIATED");
     query.addQueryItem("locale", m_parent.facebook()->locale());

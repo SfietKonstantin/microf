@@ -15,9 +15,14 @@ include_directories(
 set(${PROJECT_NAME}_SRCS
     main.cpp
     authhelper.cpp
+    abstracttester.cpp
+    threadstester.cpp
+    debugjobfactory.cpp
+    jsontreemodel.cpp
     res.qrc
     main.qml
     SessionTab.qml
+    TestTab.qml
 )
 
 add_executable(${PROJECT_NAME}

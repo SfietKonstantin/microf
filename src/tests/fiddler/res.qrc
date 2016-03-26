@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>SessionTab.qml</file>
+        <file>TestTab.qml</file>
     </qresource>
 </RCC>

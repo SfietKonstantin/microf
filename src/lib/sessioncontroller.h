@@ -33,13 +33,18 @@
 #define MICROF_SESSIONCONTROLLER_H
 
 #include <qt/viewitemcontroller.h>
+#include "icontroller.h"
 #include "core/session.h"
 #include "data/item.h"
 
 namespace microf {
 
+using ::microcore::qt::ViewItemController;
+using ::microcore::data::Item;
+using ::microcore::fb::Session;
+
 class Facebook;
-class SessionController : public ::microcore::qt::ViewItemController< ::microcore::data::Item< ::microcore::fb::Session>>
+class SessionController : public ViewItemController<Item<Session>>, public IController
 {
     Q_OBJECT
     Q_PROPERTY(microf::Facebook * facebook READ facebook WRITE setFacebook NOTIFY facebookChanged)
@@ -50,8 +55,9 @@ class SessionController : public ::microcore::qt::ViewItemController< ::microcor
 public:
     explicit SessionController(QObject *parent = nullptr);
     ::microcore::data::Item< ::microcore::fb::Session> & item() override;
-    ::microf::Facebook * facebook() const;
-    void setFacebook(::microf::Facebook *facebook);
+    void componentComplete() override;
+    Facebook * facebook() const override;
+    void setFacebook(Facebook *facebook);
     QString email() const;
     void setEmail(const QString &email);
     QString password() const;

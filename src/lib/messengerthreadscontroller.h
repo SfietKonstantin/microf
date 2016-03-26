@@ -29,39 +29,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include <QApplication>
-#include <QQmlApplicationEngine>
-#include <QJsonObject>
-#include <QtQml/qqml.h>
-#include "facebook.h"
-#include "core/sessionobject.h"
-#include "sessioncontroller.h"
-#include "qt/viewitem.h"
-#include "authhelper.h"
-#include "threadstester.h"
-#include "jsontreemodel.h"
+#ifndef MICROF_MESSENGERTHREADSCONTROLLER_H
+#define MICROF_MESSENGERTHREADSCONTROLLER_H
 
-using SessionViewItem = ::microcore::qt::ViewItem<::microcore::data::Item< ::microcore::fb::Session>, ::microcore::fb::qt::SessionObject>;
+#include <qt/viewmodelcontroller.h>
+#include "icontroller.h"
+#include "core/session.h"
+#include "data/model.h"
 
-static void registerTypes()
+namespace microf {
+
+using ::microcore::qt::ViewModelController;
+using ::microcore::data::Model;
+
+class Facebook;
+class MessengerThreadsController : public ViewModelController<Model< ::microcore::fb::Session>>, public IController
 {
-    qmlRegisterUncreatableType< ::microcore::qt::ViewController>("org.sfietkonstantin.microf", 1, 0, "ViewController", "Uncreatable");
-    qmlRegisterType< ::microf::Facebook>("org.sfietkonstantin.microf", 1, 0, "Facebook");
-    qmlRegisterType< ::microcore::fb::qt::SessionObject>("org.sfietkonstantin.microf", 1, 0, "Session");
-    qmlRegisterType< ::microf::SessionController>("org.sfietkonstantin.microf", 1, 0, "SessionController");
-    qmlRegisterType<SessionViewItem>("org.sfietkonstantin.microf", 1, 0, "SessionViewItem");
-    qmlRegisterType<ThreadsTester>("org.sfietkonstantin.microf", 1, 0, "ThreadsTester");
-    qmlRegisterType<AuthHelper>("org.sfietkonstantin.microf", 1, 0, "AuthHelper");
-    qmlRegisterType<JsonTreeModel>("org.sfietkonstantin.microf", 1, 0, "JsonTreeModel");
+    Q_OBJECT
+    Q_PROPERTY(microf::Facebook * facebook READ facebook WRITE setFacebook NOTIFY facebookChanged)
+public:
+    explicit MessengerThreadsController(QObject *parent = nullptr);
+    ::microcore::data::Model< ::microcore::fb::Session> & model() override;
+    ::microf::Facebook * facebook() const override;
+    void setFacebook(::microf::Facebook *facebook);
+Q_SIGNALS:
+    void facebookChanged();
+private:
+    void registerExecutors();
+    ::microcore::data::Model< ::microcore::fb::Session> m_data {};
+    ::microf::Facebook * m_facebook {nullptr};
+};
+
 }
 
-int main(int argc, char **argv)
-{
-    QApplication app(argc, argv);
-    registerTypes();
-    app.setOrganizationName("microf");
-    app.setApplicationName("fidller");
-    QQmlApplicationEngine engine (QUrl("qrc:/main.qml"));
-    Q_UNUSED(engine);
-    return app.exec();
-}
+#endif // MICROF_MESSENGERTHREADSCONTROLLER_H

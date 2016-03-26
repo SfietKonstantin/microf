@@ -1,5 +1,5 @@
-import QtQuick 2.3
-import QtQuick.Controls 1.2
+import QtQuick 2.5
+import QtQuick.Controls 1.4
 import org.sfietkonstantin.microf 1.0
 
 ApplicationWindow {
@@ -41,6 +41,10 @@ ApplicationWindow {
         Tab {
             title: "Session"
             SessionTab {}
+        }
+        Tab {
+            title: "Test"
+            TestTab {}
         }
     }
 }

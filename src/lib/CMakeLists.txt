@@ -11,14 +11,18 @@ find_package(Qt5Network REQUIRED)
 set(${PROJECT_NAME}_SRCS
     facebook.cpp
     sessioncontroller.cpp
+    messengerthreadscontroller.cpp
 )
 
 set(${PROJECT_NAME}_INTERNALS_SRCS
+    internal/facebookutils.cpp
+    internal/emptyrequest.h
     internal/emptyresult.cpp
     internal/emptyresultfactory.cpp
     internal/loginrequestfactory.cpp
     internal/loginresultpreprocessfactory.cpp
     internal/logoutrequestfactory.cpp
+    internal/threadsrequestfactory.cpp
 )
 
 microgen_bean(${PROJECT_NAME}_CORE_SRCS

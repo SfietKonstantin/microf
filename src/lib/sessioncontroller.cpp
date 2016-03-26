@@ -173,17 +173,22 @@ SessionController::SessionController(QObject *parent)
 {
 }
 
+void SessionController::componentComplete()
+{
+    registerExecutors();
+}
+
 SessionItem_t & SessionController::item()
 {
     return m_data;
 }
 
-::microf::Facebook * SessionController::facebook() const
+Facebook * SessionController::facebook() const
 {
     return m_facebook;
 }
 
-void SessionController::setFacebook(::microf::Facebook *facebook)
+void SessionController::setFacebook(Facebook *facebook)
 {
     if (m_facebook != facebook) {
         m_facebook = facebook;
@@ -248,7 +253,6 @@ bool SessionController::login()
     if (m_facebook == nullptr) {
         return false;
     }
-    registerExecutors();
 
     LoginModifier *loginModifier {static_cast<LoginModifier *>(m_loginExecutor)};
     loginModifier->start(LoginRequest(QString(m_email), QString(m_password),
@@ -264,7 +268,6 @@ bool SessionController::logout(const QString &accessToken)
     if (accessToken.isEmpty()) {
         return false;
     }
-    registerExecutors();
 
     static_cast<LogoutModifier *>(m_logoutExecutor)->start(LogoutRequest(QString(accessToken)));
     return true;
@@ -277,9 +280,7 @@ void SessionController::registerExecutors()
     }
 
     QQmlContext *context {QQmlEngine::contextForObject(this)};
-    if (context == nullptr) {
-        return;
-    }
+    Q_ASSERT(context);
     QNetworkAccessManager *network {context->engine()->networkAccessManager()};
     Q_ASSERT(network);
 
